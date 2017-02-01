@@ -1,0 +1,1666 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<project>
+  <fileVersion>2</fileVersion>
+  <fileChecksum>1584328770</fileChecksum>
+  <configuration>
+    <name>Debug</name>
+    <outputs>
+      <file>$PROJ_DIR$\debug\obj\fsl_dac_hal.o</file>
+      <file>$PROJ_DIR$\debug\obj\fsl_dma_hal.o</file>
+      <file>$PROJ_DIR$\debug\obj\fsl_llwu_hal.pbi</file>
+      <file>$PROJ_DIR$\debug\obj\fsl_rtc_hal.o</file>
+      <file>$PROJ_DIR$\debug\obj\fsl_lptmr_hal.o</file>
+      <file>$PROJ_DIR$\debug\obj\fsl_dspi_hal.o</file>
+      <file>$PROJ_DIR$\debug\obj\fsl_gpio_hal.o</file>
+      <file>$PROJ_DIR$\debug\obj\fsl_ltc_hal.o</file>
+      <file>$PROJ_DIR$\debug\obj\fsl_lpuart_hal.o</file>
+      <file>$PROJ_DIR$\debug\obj\fsl_dmamux_hal.o</file>
+      <file>$PROJ_DIR$\debug\obj\fsl_sim_hal_MKW30Z4.o</file>
+      <file>$PROJ_DIR$\debug\obj\fsl_llwu_hal.o</file>
+      <file>$PROJ_DIR$\debug\obj\fsl_rcm_hal.o</file>
+      <file>$PROJ_DIR$\debug\obj\fsl_i2c_hal.o</file>
+      <file>$PROJ_DIR$\debug\obj\fsl_mcg_hal.o</file>
+      <file>$PROJ_DIR$\debug\obj\fsl_pit_hal.o</file>
+      <file>$PROJ_DIR$\debug\obj\fsl_smc_hal.o</file>
+      <file>$PROJ_DIR$\debug\obj\fsl_mcg_hal_modes.o</file>
+      <file>$PROJ_DIR$\debug\obj\fsl_tpm_hal.o</file>
+      <file>$PROJ_DIR$\debug\obj\fsl_trng_hal.o</file>
+      <file>$PROJ_DIR$\debug\obj\fsl_tsi_hal.o</file>
+      <file>$PROJ_DIR$\debug\obj\fsl_tsi_v4_hal_specific.o</file>
+      <file>$PROJ_DIR$\debug\obj\fsl_port_hal.o</file>
+      <file>$PROJ_DIR$\debug\obj\fsl_port_hal.pbi</file>
+      <file>$PROJ_DIR$\debug\obj\fsl_tsi_hal.pbi</file>
+      <file>$PROJ_DIR$\debug\obj\fsl_rcm_hal.pbi</file>
+      <file>$PROJ_DIR$\debug\obj\fsl_sim_hal_MKW30Z4.pbi</file>
+      <file>$PROJ_DIR$\debug\obj\fsl_tsi_v4_hal_specific.pbi</file>
+      <file>$PROJ_DIR$\debug\obj\fsl_trng_hal.pbi</file>
+      <file>$PROJ_DIR$\debug\obj\fsl_pit_hal.pbi</file>
+      <file>$PROJ_DIR$\debug\obj\fsl_tpm_hal.pbi</file>
+      <file>$PROJ_DIR$\debug\obj\fsl_mcg_hal_modes.pbi</file>
+      <file>$PROJ_DIR$\debug\obj\fsl_lptmr_hal.pbi</file>
+      <file>$PROJ_DIR$\debug\obj\fsl_ltc_hal.pbi</file>
+      <file>$PROJ_DIR$\debug\obj\ksdk_hal_lib.pbd</file>
+      <file>$PROJ_DIR$\debug\obj\fsl_i2c_hal.pbi</file>
+      <file>$PROJ_DIR$\debug\obj\fsl_lpuart_hal.pbi</file>
+      <file>$PROJ_DIR$\debug\obj\fsl_rtc_hal.pbi</file>
+      <file>$PROJ_DIR$\debug\obj\fsl_dspi_hal.pbi</file>
+      <file>$PROJ_DIR$\debug\obj\fsl_mcg_hal.pbi</file>
+      <file>$PROJ_DIR$\debug\obj\fsl_smc_hal.pbi</file>
+      <file>$PROJ_DIR$\debug\obj\fsl_gpio_hal.pbi</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\devices\MKW30Z4\include\MKW30Z4.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\ycheck.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\DLib_Product.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\devices\MKW30Z4\include\MKW30Z4_extension.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\devices\fsl_device_registers.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\CMSIS\Include\core_cm0plus.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\devices\MKW30Z4\include\fsl_bitaccess.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\stdint.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\yvals.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\devices\MKW30Z4\startup\system_MKW30Z4.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\stdlib.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\xencoding_limits.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\DLib_Defaults.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\stdbool.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\DLib_Config_Normal.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\intrinsics.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\devices\MKW30Z4\include\MKW30Z4_features.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\cmsis_iar.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\CMSIS\Include\core_cmInstr.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\ysizet.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\DLib_Threads.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\assert.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\CMSIS\Include\core_cmFunc.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\hal\inc\fsl_adc16_hal.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\hal\src\cmp\fsl_cmp_hal.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\hal\src\adc16\fsl_adc16_hal.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\hal\inc\fsl_mcg_hal.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\hal\inc\fsl_cmp_hal.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\hal\inc\fsl_lpuart_hal.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\hal\inc\fsl_cmt_hal.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\hal\inc\fsl_gpio_hal.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\hal\src\cmt\fsl_cmt_hal.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\hal\inc\fsl_llwu_hal.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\hal\src\mcg\fsl_mcg_hal_modes.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\hal\inc\fsl_mcg_hal_modes.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\hal\inc\fsl_dma_hal.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\hal\inc\fsl_pit_hal.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\hal\src\port\fsl_port_hal.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\hal\inc\fsl_lptmr_hal.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\hal\inc\fsl_port_hal.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\hal\src\pit\fsl_pit_hal.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\hal\inc\fsl_dac_hal.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\hal\src\dma\fsl_dma_hal.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\hal\src\gpio\fsl_gpio_hal.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\hal\src\cop\fsl_cop_hal.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\hal\src\ltc\fsl_ltc_hal.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\hal\src\i2c\fsl_i2c_hal.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\hal\inc\fsl_cop_hal.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\hal\inc\fsl_i2c_hal.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\hal\src\llwu\fsl_llwu_hal.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\hal\inc\fsl_ltc_hal.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\hal\src\dac\fsl_dac_hal.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\hal\src\dmamux\fsl_dmamux_hal.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\hal\inc\fsl_dmamux_hal.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\hal\src\lpuart\fsl_lpuart_hal.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\hal\src\lptmr\fsl_lptmr_hal.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\hal\src\mcg\fsl_mcg_hal.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\hal\inc\fsl_smc_hal.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\hal\inc\fsl_tsi_hal.h</file>
+      <file>$PROJ_DIR$\debug\obj\fsl_adc16_hal.o</file>
+      <file>$PROJ_DIR$\debug\obj\fsl_cmt_hal.o</file>
+      <file>$PROJ_DIR$\debug\obj\fsl_cmt_hal.pbi</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\hal\src\smc\fsl_smc_hal.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\hal\inc\fsl_sim_hal.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\hal\src\tsi\fsl_tsi_hal.c</file>
+      <file>$PROJ_DIR$\debug\obj\fsl_cmp_hal.o</file>
+      <file>$PROJ_DIR$\debug\obj\fsl_dac_hal.pbi</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\hal\src\rcm\fsl_rcm_hal.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\hal\src\tsi\fsl_tsi_v4_hal_specific.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\hal\src\rtc\fsl_rtc_hal.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\hal\src\tpm\fsl_tpm_hal.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\hal\src\dspi\fsl_dspi_hal.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\hal\inc\fsl_tsi_v4_hal_specific.h</file>
+      <file>$PROJ_DIR$\debug\obj\fsl_adc16_hal.pbi</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\hal\inc\fsl_tpm_hal.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\hal\src\sim\MKW30Z4\fsl_sim_hal_MKW30Z4.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\hal\inc\fsl_rtc_hal.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\hal\src\trng\fsl_trng_hal.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\hal\inc\fsl_dspi_hal.h</file>
+      <file>$PROJ_DIR$\debug\obj\fsl_cmp_hal.pbi</file>
+      <file>$PROJ_DIR$\debug\obj\fsl_cop_hal.pbi</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\hal\inc\fsl_rcm_hal.h</file>
+      <file>$PROJ_DIR$\debug\obj\fsl_cop_hal.o</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\hal\inc\fsl_trng_hal.h</file>
+      <file>$PROJ_DIR$\debug\libksdk_hal.a</file>
+      <file>$PROJ_DIR$\debug\obj\fsl_dmamux_hal.pbi</file>
+      <file>$PROJ_DIR$\debug\obj\fsl_dma_hal.pbi</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\utilities\inc\fsl_misc_utilities.h</file>
+      <file>$PROJ_DIR$\debug\obj\fsl_adc16_hal.__cstat.et</file>
+      <file>$PROJ_DIR$\debug\obj\fsl_cmp_hal.__cstat.et</file>
+      <file>$PROJ_DIR$\debug\obj\fsl_cmt_hal.__cstat.et</file>
+      <file>$PROJ_DIR$\debug\obj\fsl_cop_hal.__cstat.et</file>
+      <file>$PROJ_DIR$\debug\obj\fsl_dac_hal.__cstat.et</file>
+      <file>$TOOLKIT_DIR$\inc\c\string.h</file>
+      <file>$PROJ_DIR$\debug\obj\fsl_lpuart_hal.__cstat.et</file>
+      <file>$PROJ_DIR$\debug\obj\fsl_llwu_hal.__cstat.et</file>
+      <file>$PROJ_DIR$\debug\obj\fsl_ltc_hal.__cstat.et</file>
+      <file>$PROJ_DIR$\debug\obj\fsl_mcg_hal_modes.__cstat.et</file>
+      <file>$PROJ_DIR$\debug\obj\fsl_port_hal.__cstat.et</file>
+      <file>$PROJ_DIR$\debug\obj\fsl_gpio_hal.__cstat.et</file>
+      <file>$PROJ_DIR$\debug\obj\fsl_dmamux_hal.__cstat.et</file>
+      <file>$PROJ_DIR$\debug\obj\fsl_dma_hal.__cstat.et</file>
+      <file>$PROJ_DIR$\debug\obj\fsl_dspi_hal.__cstat.et</file>
+      <file>$PROJ_DIR$\debug\obj\fsl_rcm_hal.__cstat.et</file>
+      <file>$PROJ_DIR$\debug\obj\fsl_rtc_hal.__cstat.et</file>
+      <file>$PROJ_DIR$\debug\obj\fsl_i2c_hal.__cstat.et</file>
+      <file>$PROJ_DIR$\debug\obj\fsl_pit_hal.__cstat.et</file>
+      <file>$PROJ_DIR$\debug\obj\fsl_lptmr_hal.__cstat.et</file>
+      <file>$TOOLKIT_DIR$\inc\c\DLib_Product_string.h</file>
+      <file>$PROJ_DIR$\debug\obj\fsl_mcg_hal.__cstat.et</file>
+      <file>$PROJ_DIR$\debug\obj\fsl_tsi_hal.__cstat.et</file>
+      <file>$PROJ_DIR$\debug\obj\fsl_smc_hal.__cstat.et</file>
+      <file>$PROJ_DIR$\debug\obj\fsl_trng_hal.__cstat.et</file>
+      <file>$PROJ_DIR$\debug\obj\fsl_tpm_hal.__cstat.et</file>
+      <file>$PROJ_DIR$\debug\obj\fsl_sim_hal_MKW30Z4.__cstat.et</file>
+      <file>$PROJ_DIR$\debug\obj\fsl_tsi_v4_hal_specific.__cstat.et</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\hal\src\sim\MKW30Z4\fsl_sim_hal_MKW30Z4.h</file>
+    </outputs>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\platform\hal\src\cmp\fsl_cmp_hal.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 121</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 107</file>
+        </tool>
+        <tool>
+          <name>__cstat</name>
+          <file> 131</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 43 50 49 58 63 62 42 47 55 46 54 53 56 44 45 51 64 57 48 69 60 59 52 61</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 69 49 43 50 54 56 44 53 62 55 63 46 42 47 60 59 57 64 51 45 48 52 61 58</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\platform\hal\src\adc16\fsl_adc16_hal.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 115</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 101</file>
+        </tool>
+        <tool>
+          <name>__cstat</name>
+          <file> 130</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 49 50 55 54 56 46 43 53 44 45 51 63 62 42 58 47 64 57 48 65 60 59 52 61</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 65 49 43 50 54 56 44 53 62 55 63 46 42 47 60 59 57 64 51 45 48 52 61 58</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\platform\hal\src\cmt\fsl_cmt_hal.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 103</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 102</file>
+        </tool>
+        <tool>
+          <name>__cstat</name>
+          <file> 132</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 49 63 43 50 55 62 45 51 46 54 53 56 44 42 58 47 64 57 48 71 60 59 52 61</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 71 63 43 50 54 56 44 53 62 49 55 46 42 47 60 59 57 64 51 45 48 52 61 58</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\platform\hal\src\mcg\fsl_mcg_hal_modes.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 31</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 17</file>
+        </tool>
+        <tool>
+          <name>__cstat</name>
+          <file> 139</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 49 54 56 55 50 45 51 68 43 53 44 46 63 62 42 58 47 64 57 48 76 60 59 52 61</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 76 49 43 50 54 56 44 53 62 55 63 68 46 42 47 60 59 57 64 51 45 48 52 61 58</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\platform\hal\src\port\fsl_port_hal.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 23</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 22</file>
+        </tool>
+        <tool>
+          <name>__cstat</name>
+          <file> 140</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 42 49 46 43 50 60 59 62 45 51 53 63 55 54 56 44 58 47 64 57 48 81 52 61</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 81 63 43 50 54 56 44 53 62 49 55 46 42 47 60 59 57 64 51 45 48 52 61 58</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\platform\hal\src\pit\fsl_pit_hal.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 29</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 15</file>
+        </tool>
+        <tool>
+          <name>__cstat</name>
+          <file> 148</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 45 43 55 51 59 62 50 63 49 60 42 53 46 54 56 44 58 47 64 57 48 78 52 61</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 78 63 43 50 54 56 44 53 62 49 55 46 42 47 60 59 57 64 51 45 48 52 61 58</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\platform\hal\src\dma\fsl_dma_hal.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 128</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 1</file>
+        </tool>
+        <tool>
+          <name>__cstat</name>
+          <file> 143</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 47 49 42 46 50 55 43 62 58 63 54 53 56 44 45 51 64 57 48 77 60 59 52 61</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 77 49 43 50 54 56 44 53 62 55 63 46 42 47 60 59 57 64 51 45 48 52 61 58</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\platform\hal\src\gpio\fsl_gpio_hal.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 41</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 6</file>
+        </tool>
+        <tool>
+          <name>__cstat</name>
+          <file> 141</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 55 48 43 50 53 44 42 47 64 63 54 56 58 49 57 46 62 45 51 60 59 72 52 61</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 72 63 43 50 54 56 44 53 62 49 55 46 42 47 60 59 57 64 51 45 48 52 61 58</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\platform\hal\src\cop\fsl_cop_hal.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 122</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 124</file>
+        </tool>
+        <tool>
+          <name>__cstat</name>
+          <file> 133</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 55 62 50 43 58 57 135 46 42 47 49 63 61 150 54 53 56 44 45 51 64 48 89 60 59 52</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 89 135 43 50 54 56 44 53 62 61 150 49 55 63 46 42 47 60 59 57 64 51 45 48 52 58</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\platform\hal\src\ltc\fsl_ltc_hal.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 33</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 7</file>
+        </tool>
+        <tool>
+          <name>__cstat</name>
+          <file> 138</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 135 43 50 54 56 44 53 62 61 150 92 49 55 63 46 42 47 60 59 57 64 51 45 48 52 58</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\platform\hal\src\i2c\fsl_i2c_hal.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 35</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 13</file>
+        </tool>
+        <tool>
+          <name>__cstat</name>
+          <file> 147</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 48 54 56 58 55 50 53 44 43 42 47 64 57 129 63 46 62 45 49 51 90 60 59 52 61</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 90 63 43 50 54 56 44 53 62 55 46 42 49 47 60 59 57 64 51 45 48 52 61 58 129</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\platform\hal\src\llwu\fsl_llwu_hal.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 2</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 11</file>
+        </tool>
+        <tool>
+          <name>__cstat</name>
+          <file> 137</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 55 43 53 44 45 51 48 46 54 56 50 49 60 59 63 62 42 58 47 64 57 74 52 61</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 74 49 43 50 54 56 44 53 62 55 63 46 42 47 60 59 57 64 51 45 48 52 61 58</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\platform\hal\src\dac\fsl_dac_hal.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 108</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 0</file>
+        </tool>
+        <tool>
+          <name>__cstat</name>
+          <file> 134</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 57 43 58 50 63 62 49 42 47 64 48 53 55 46 54 56 44 45 51 60 59 83 52 61</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 83 49 43 50 54 56 44 53 62 55 63 46 42 47 60 59 57 64 51 45 48 52 61 58</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\platform\hal\src\dmamux\fsl_dmamux_hal.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 127</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 9</file>
+        </tool>
+        <tool>
+          <name>__cstat</name>
+          <file> 142</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 42 63 47 64 48 49 50 43 62 58 57 53 55 46 54 56 44 45 51 60 59 95 52 61</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 95 49 43 50 54 56 44 53 62 55 63 46 42 47 60 59 57 64 51 45 48 52 61 58</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\platform\hal\src\lpuart\fsl_lpuart_hal.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 36</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 8</file>
+        </tool>
+        <tool>
+          <name>__cstat</name>
+          <file> 136</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 62 50 49 55 43 58 46 42 47 63 54 53 56 44 45 51 64 57 48 70 60 59 52 61</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 70 49 43 50 54 56 44 53 62 55 63 46 42 47 60 59 57 64 51 45 48 52 61 58</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\platform\hal\src\lptmr\fsl_lptmr_hal.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 32</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 4</file>
+        </tool>
+        <tool>
+          <name>__cstat</name>
+          <file> 149</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 62 50 49 43 45 51 46 63 55 54 53 56 44 42 58 47 64 57 48 80 60 59 52 61</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 80 63 43 50 54 56 44 53 62 49 55 46 42 47 60 59 57 64 51 45 48 52 61 58</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\platform\hal\src\mcg\fsl_mcg_hal.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 39</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 14</file>
+        </tool>
+        <tool>
+          <name>__cstat</name>
+          <file> 151</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 45 53 44 49 43 51 55 50 46 54 56 63 62 42 58 47 64 57 48 68 60 59 52 61</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 68 49 43 50 54 56 44 53 62 55 63 46 42 47 60 59 57 64 51 45 48 52 61 58</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\platform\hal\src\smc\fsl_smc_hal.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 40</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 16</file>
+        </tool>
+        <tool>
+          <name>__cstat</name>
+          <file> 153</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 47 64 42 46 48 55 50 43 62 58 49 57 53 63 54 56 44 45 51 60 59 99 52 61</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 99 49 43 50 54 56 44 53 62 55 63 46 42 47 60 59 57 64 51 45 48 52 61 58</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\platform\hal\src\tsi\fsl_tsi_hal.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 24</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 20</file>
+        </tool>
+        <tool>
+          <name>__cstat</name>
+          <file> 152</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 50 43 114 42 47 48 49 62 58 64 57 53 46 63 54 56 44 45 51 100 60 59 52 61</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 100 63 43 50 54 56 44 53 62 49 46 42 47 60 59 57 64 51 45 48 52 61 58 114</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\platform\hal\src\rcm\fsl_rcm_hal.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 25</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 12</file>
+        </tool>
+        <tool>
+          <name>__cstat</name>
+          <file> 145</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 49 62 50 46 43 58 57 55 42 47 64 48 53 63 54 56 44 45 51 60 59 123 52 61</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 123 49 43 50 54 56 44 53 62 55 63 46 42 47 60 59 57 64 51 45 48 52 61 58</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\platform\hal\src\tsi\fsl_tsi_v4_hal_specific.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 27</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 21</file>
+        </tool>
+        <tool>
+          <name>__cstat</name>
+          <file> 157</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 47 42 49 61 43 50 60 52 114 62 58 63 46 54 53 56 44 45 51 59 100 64 57 48</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 100 63 43 50 54 56 44 53 62 49 46 42 47 60 59 57 64 51 45 48 52 61 58 114</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\platform\hal\src\rtc\fsl_rtc_hal.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 37</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 3</file>
+        </tool>
+        <tool>
+          <name>__cstat</name>
+          <file> 146</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 55 43 50 53 44 42 47 64 48 63 54 56 58 49 57 46 62 45 51 60 59 118 52 61</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 118 63 43 50 54 56 44 53 62 49 55 46 42 47 60 59 57 64 51 45 48 52 61 58</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\platform\hal\src\tpm\fsl_tpm_hal.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 30</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 18</file>
+        </tool>
+        <tool>
+          <name>__cstat</name>
+          <file> 155</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 49 43 42 47 53 44 50 55 58 46 63 45 51 54 56 64 57 48 116 62 60 59 52 61</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 116 46 42 49 43 50 54 56 44 53 62 47 60 59 57 64 51 45 48 52 61 58 55 63</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\platform\hal\src\dspi\fsl_dspi_hal.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 38</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 5</file>
+        </tool>
+        <tool>
+          <name>__cstat</name>
+          <file> 144</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 50 62 51 49 45 55 43 46 54 53 56 44 42 58 47 64 57 48 120 60 59 52 61</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 120 49 43 50 54 56 44 53 62 55 46 42 47 60 59 57 64 51 45 48 52 61 58</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\platform\hal\src\sim\MKW30Z4\fsl_sim_hal_MKW30Z4.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 26</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 10</file>
+        </tool>
+        <tool>
+          <name>__cstat</name>
+          <file> 156</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 43 53 44 61 158 105 42 47 55 54 56 58 59 52 46 50 62 45 49 51 60 64 57 48 63</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 49 43 50 54 56 44 53 62 52 61 55 46 42 47 60 59 57 64 51 45 48 58 105 63 158</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\platform\hal\src\trng\fsl_trng_hal.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 28</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 19</file>
+        </tool>
+        <tool>
+          <name>__cstat</name>
+          <file> 154</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 43 49 55 50 53 44 42 47 63 54 56 58 46 62 45 51 64 57 48 125 60 59 52 61</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 125 63 43 50 54 56 44 53 62 49 55 46 42 47 60 59 57 64 51 45 48 52 61 58</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>[ROOT_NODE]</name>
+      <outputs>
+        <tool>
+          <name>IARCHIVE</name>
+          <file> 126</file>
+        </tool>
+      </outputs>
+    </file>
+  </configuration>
+  <configuration>
+    <name>Release</name>
+    <outputs>
+      <file>$PROJ_DIR$\release\libksdk_hal.a</file>
+      <file>$PROJ_DIR$\release\obj\fsl_cmp_hal.o</file>
+      <file>$PROJ_DIR$\release\obj\fsl_cmt_hal.o</file>
+      <file>$PROJ_DIR$\release\obj\fsl_adc16_hal.o</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\devices\MKW30Z4\include\MKW30Z4.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\ycheck.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\DLib_Product.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\devices\MKW30Z4\include\MKW30Z4_extension.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\devices\fsl_device_registers.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\CMSIS\Include\core_cm0plus.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\devices\MKW30Z4\include\fsl_bitaccess.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\stdint.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\yvals.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\devices\MKW30Z4\startup\system_MKW30Z4.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\stdlib.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\xencoding_limits.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\DLib_Defaults.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\stdbool.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\DLib_Config_Normal.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\intrinsics.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\devices\MKW30Z4\include\MKW30Z4_features.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\cmsis_iar.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\CMSIS\Include\core_cmInstr.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\ysizet.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\DLib_Threads.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\assert.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\CMSIS\Include\core_cmFunc.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\hal\inc\fsl_adc16_hal.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\hal\src\cmp\fsl_cmp_hal.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\hal\src\adc16\fsl_adc16_hal.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\hal\inc\fsl_mcg_hal.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\hal\inc\fsl_cmp_hal.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\hal\inc\fsl_lpuart_hal.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\hal\inc\fsl_cmt_hal.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\hal\inc\fsl_gpio_hal.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\hal\src\cmt\fsl_cmt_hal.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\hal\inc\fsl_llwu_hal.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\hal\src\mcg\fsl_mcg_hal_modes.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\hal\inc\fsl_mcg_hal_modes.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\hal\inc\fsl_dma_hal.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\hal\inc\fsl_pit_hal.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\hal\src\port\fsl_port_hal.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\hal\inc\fsl_lptmr_hal.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\hal\inc\fsl_port_hal.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\hal\src\pit\fsl_pit_hal.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\hal\inc\fsl_dac_hal.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\hal\src\dma\fsl_dma_hal.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\hal\src\gpio\fsl_gpio_hal.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\hal\src\cop\fsl_cop_hal.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\hal\src\ltc\fsl_ltc_hal.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\hal\src\i2c\fsl_i2c_hal.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\hal\inc\fsl_cop_hal.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\hal\inc\fsl_i2c_hal.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\hal\src\llwu\fsl_llwu_hal.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\hal\inc\fsl_ltc_hal.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\hal\src\dac\fsl_dac_hal.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\hal\src\dmamux\fsl_dmamux_hal.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\hal\inc\fsl_dmamux_hal.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\hal\src\lpuart\fsl_lpuart_hal.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\hal\src\lptmr\fsl_lptmr_hal.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\hal\src\mcg\fsl_mcg_hal.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\hal\inc\fsl_smc_hal.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\hal\inc\fsl_tsi_hal.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\hal\src\smc\fsl_smc_hal.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\hal\inc\fsl_sim_hal.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\hal\src\tsi\fsl_tsi_hal.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\hal\src\rcm\fsl_rcm_hal.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\hal\src\tsi\fsl_tsi_v4_hal_specific.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\hal\src\rtc\fsl_rtc_hal.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\hal\src\tpm\fsl_tpm_hal.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\hal\src\dspi\fsl_dspi_hal.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\hal\inc\fsl_tsi_v4_hal_specific.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\hal\inc\fsl_tpm_hal.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\hal\src\sim\MKW30Z4\fsl_sim_hal_MKW30Z4.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\hal\inc\fsl_rtc_hal.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\hal\src\trng\fsl_trng_hal.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\hal\inc\fsl_dspi_hal.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\hal\inc\fsl_rcm_hal.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\hal\inc\fsl_trng_hal.h</file>
+      <file>$PROJ_DIR$\release\obj\fsl_dac_hal.o</file>
+      <file>$PROJ_DIR$\release\obj\fsl_dma_hal.o</file>
+      <file>$PROJ_DIR$\release\obj\fsl_dmamux_hal.o</file>
+      <file>$PROJ_DIR$\release\obj\fsl_dspi_hal.o</file>
+      <file>$PROJ_DIR$\release\obj\fsl_i2c_hal.o</file>
+      <file>$PROJ_DIR$\release\obj\fsl_gpio_hal.o</file>
+      <file>$PROJ_DIR$\release\obj\fsl_cop_hal.o</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\utilities\inc\fsl_misc_utilities.h</file>
+      <file>$PROJ_DIR$\release\obj\fsl_smc_hal.o</file>
+      <file>$TOOLKIT_DIR$\inc\c\string.h</file>
+      <file>$PROJ_DIR$\release\obj\fsl_tsi_hal.o</file>
+      <file>$PROJ_DIR$\release\obj\fsl_tsi_v4_hal_specific.o</file>
+      <file>$PROJ_DIR$\release\obj\fsl_tpm_hal.o</file>
+      <file>$PROJ_DIR$\release\obj\fsl_port_hal.o</file>
+      <file>$PROJ_DIR$\release\obj\fsl_mcg_hal_modes.o</file>
+      <file>$PROJ_DIR$\release\obj\fsl_pit_hal.o</file>
+      <file>$TOOLKIT_DIR$\inc\c\DLib_Product_string.h</file>
+      <file>$PROJ_DIR$\release\obj\fsl_rcm_hal.o</file>
+      <file>$PROJ_DIR$\release\obj\fsl_rtc_hal.o</file>
+      <file>$PROJ_DIR$\release\obj\fsl_sim_hal_MKW30Z4.o</file>
+      <file>$PROJ_DIR$\release\obj\fsl_trng_hal.o</file>
+      <file>$PROJ_DIR$\release\obj\fsl_smc_hal.pbi</file>
+      <file>$PROJ_DIR$\release\obj\fsl_dmamux_hal.pbi</file>
+      <file>$PROJ_DIR$\release\obj\fsl_cmp_hal.pbi</file>
+      <file>$PROJ_DIR$\release\obj\fsl_tpm_hal.pbi</file>
+      <file>$PROJ_DIR$\release\obj\fsl_dac_hal.pbi</file>
+      <file>$PROJ_DIR$\release\obj\fsl_trng_hal.pbi</file>
+      <file>$PROJ_DIR$\release\obj\fsl_sim_hal_MKW30Z4.pbi</file>
+      <file>$PROJ_DIR$\release\obj\fsl_tsi_hal.pbi</file>
+      <file>$PROJ_DIR$\release\obj\fsl_cop_hal.pbi</file>
+      <file>$PROJ_DIR$\release\obj\fsl_i2c_hal.pbi</file>
+      <file>$PROJ_DIR$\release\obj\fsl_llwu_hal.pbi</file>
+      <file>$PROJ_DIR$\release\obj\fsl_ltc_hal.pbi</file>
+      <file>$PROJ_DIR$\release\obj\fsl_mcg_hal.pbi</file>
+      <file>$PROJ_DIR$\release\obj\fsl_mcg_hal_modes.pbi</file>
+      <file>$PROJ_DIR$\release\obj\fsl_adc16_hal.pbi</file>
+      <file>$PROJ_DIR$\release\obj\fsl_dma_hal.pbi</file>
+      <file>$PROJ_DIR$\release\obj\fsl_dspi_hal.pbi</file>
+      <file>$PROJ_DIR$\release\obj\fsl_gpio_hal.pbi</file>
+      <file>$PROJ_DIR$\release\obj\fsl_pit_hal.pbi</file>
+      <file>$PROJ_DIR$\release\obj\fsl_port_hal.pbi</file>
+      <file>$PROJ_DIR$\release\obj\fsl_rcm_hal.pbi</file>
+      <file>$PROJ_DIR$\release\obj\fsl_rtc_hal.pbi</file>
+      <file>$PROJ_DIR$\release\obj\fsl_lptmr_hal.pbi</file>
+      <file>$PROJ_DIR$\release\obj\fsl_cmt_hal.pbi</file>
+      <file>$PROJ_DIR$\release\obj\fsl_lpuart_hal.pbi</file>
+      <file>$PROJ_DIR$\release\obj\fsl_tsi_v4_hal_specific.pbi</file>
+      <file>$PROJ_DIR$\release\obj\ksdk_hal_lib.pbd</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\hal\src\sim\MKW30Z4\fsl_sim_hal_MKW30Z4.h</file>
+      <file>$PROJ_DIR$\release\obj\fsl_llwu_hal.o</file>
+      <file>$PROJ_DIR$\release\obj\fsl_cmp_hal.__cstat.et</file>
+      <file>$PROJ_DIR$\release\obj\fsl_cop_hal.__cstat.et</file>
+      <file>$PROJ_DIR$\release\obj\fsl_dac_hal.__cstat.et</file>
+      <file>$PROJ_DIR$\release\obj\fsl_cmt_hal.__cstat.et</file>
+      <file>$PROJ_DIR$\release\obj\fsl_adc16_hal.__cstat.et</file>
+      <file>$PROJ_DIR$\release\obj\fsl_lptmr_hal.__cstat.et</file>
+      <file>$PROJ_DIR$\release\obj\fsl_ltc_hal.__cstat.et</file>
+      <file>$PROJ_DIR$\release\obj\fsl_mcg_hal.__cstat.et</file>
+      <file>$PROJ_DIR$\release\obj\fsl_mcg_hal_modes.__cstat.et</file>
+      <file>$PROJ_DIR$\release\obj\fsl_pit_hal.__cstat.et</file>
+      <file>$PROJ_DIR$\release\obj\fsl_port_hal.__cstat.et</file>
+      <file>$PROJ_DIR$\release\obj\fsl_smc_hal.__cstat.et</file>
+      <file>$PROJ_DIR$\release\obj\fsl_tpm_hal.__cstat.et</file>
+      <file>$PROJ_DIR$\release\obj\fsl_lpuart_hal.__cstat.et</file>
+      <file>$PROJ_DIR$\release\obj\fsl_tsi_v4_hal_specific.__cstat.et</file>
+      <file>$PROJ_DIR$\release\obj\fsl_gpio_hal.__cstat.et</file>
+      <file>$PROJ_DIR$\release\obj\fsl_i2c_hal.__cstat.et</file>
+      <file>$PROJ_DIR$\release\obj\fsl_rcm_hal.__cstat.et</file>
+      <file>$PROJ_DIR$\release\obj\fsl_trng_hal.__cstat.et</file>
+      <file>$PROJ_DIR$\release\obj\fsl_sim_hal_MKW30Z4.__cstat.et</file>
+      <file>$PROJ_DIR$\release\obj\fsl_dma_hal.__cstat.et</file>
+      <file>$PROJ_DIR$\release\obj\fsl_rtc_hal.__cstat.et</file>
+      <file>$PROJ_DIR$\release\obj\fsl_llwu_hal.__cstat.et</file>
+      <file>$PROJ_DIR$\release\obj\fsl_tsi_hal.__cstat.et</file>
+      <file>$PROJ_DIR$\release\obj\fsl_dmamux_hal.__cstat.et</file>
+      <file>$PROJ_DIR$\release\obj\fsl_dspi_hal.__cstat.et</file>
+      <file>$PROJ_DIR$\release\obj\fsl_lptmr_hal.o</file>
+      <file>$PROJ_DIR$\release\obj\fsl_lpuart_hal.o</file>
+      <file>$PROJ_DIR$\release\obj\fsl_ltc_hal.o</file>
+      <file>$PROJ_DIR$\release\obj\fsl_mcg_hal.o</file>
+    </outputs>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\platform\hal\src\cmp\fsl_cmp_hal.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 102</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 1</file>
+        </tool>
+        <tool>
+          <name>__cstat</name>
+          <file> 129</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 5 12 11 25 24 7 13 17 8 16 15 18 6 4 20 9 26 19 10 31 22 21 14 23</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 31 11 5 12 16 18 6 15 24 17 25 8 4 9 22 21 19 26 13 7 10 14 23 20</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\platform\hal\src\adc16\fsl_adc16_hal.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 114</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 3</file>
+        </tool>
+        <tool>
+          <name>__cstat</name>
+          <file> 133</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 24 12 11 25 5 7 13 17 8 16 15 18 6 4 20 9 26 19 10 27 22 21 14 23</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 27 11 5 12 16 18 6 15 24 17 25 8 4 9 22 21 19 26 13 7 10 14 23 20</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\platform\hal\src\cmt\fsl_cmt_hal.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 123</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 2</file>
+        </tool>
+        <tool>
+          <name>__cstat</name>
+          <file> 132</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 5 15 6 9 11 4 25 12 17 16 18 20 8 24 7 13 26 19 10 33 22 21 14 23</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 33 25 5 12 16 18 6 15 24 11 17 8 4 9 22 21 19 26 13 7 10 14 23 20</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\platform\hal\src\mcg\fsl_mcg_hal_modes.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 113</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 93</file>
+        </tool>
+        <tool>
+          <name>__cstat</name>
+          <file> 137</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 38 11 5 12 16 18 6 15 24 17 25 30 8 4 9 22 21 19 26 13 7 10 14 23 20</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\platform\hal\src\port\fsl_port_hal.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 119</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 92</file>
+        </tool>
+        <tool>
+          <name>__cstat</name>
+          <file> 139</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 43 25 5 12 16 18 6 15 24 11 17 8 4 9 22 21 19 26 13 7 10 14 23 20</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\platform\hal\src\pit\fsl_pit_hal.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 118</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 94</file>
+        </tool>
+        <tool>
+          <name>__cstat</name>
+          <file> 138</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 40 25 5 12 16 18 6 15 24 11 17 8 4 9 22 21 19 26 13 7 10 14 23 20</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\platform\hal\src\dma\fsl_dma_hal.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 115</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 80</file>
+        </tool>
+        <tool>
+          <name>__cstat</name>
+          <file> 149</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 39 11 5 12 16 18 6 15 24 17 25 8 4 9 22 21 19 26 13 7 10 14 23 20</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\platform\hal\src\gpio\fsl_gpio_hal.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 117</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 84</file>
+        </tool>
+        <tool>
+          <name>__cstat</name>
+          <file> 144</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 34 25 5 12 16 18 6 15 24 11 17 8 4 9 22 21 19 26 13 7 10 14 23 20</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\platform\hal\src\cop\fsl_cop_hal.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 108</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 85</file>
+        </tool>
+        <tool>
+          <name>__cstat</name>
+          <file> 130</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 17 11 24 12 5 19 88 8 7 13 25 23 95 16 15 18 6 4 20 9 26 10 51 22 21 14</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 51 88 5 12 16 18 6 15 24 23 95 11 17 25 8 4 9 22 21 19 26 13 7 10 14 20</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\platform\hal\src\ltc\fsl_ltc_hal.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 111</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 157</file>
+        </tool>
+        <tool>
+          <name>__cstat</name>
+          <file> 135</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 88 5 12 16 18 6 15 24 23 95 54 11 17 25 8 4 9 22 21 19 26 13 7 10 14 20</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\platform\hal\src\i2c\fsl_i2c_hal.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 109</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 83</file>
+        </tool>
+        <tool>
+          <name>__cstat</name>
+          <file> 145</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 52 25 5 12 16 18 6 15 24 17 8 4 11 9 22 21 19 26 13 7 10 14 23 20 86</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\platform\hal\src\llwu\fsl_llwu_hal.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 110</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 128</file>
+        </tool>
+        <tool>
+          <name>__cstat</name>
+          <file> 151</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 36 11 5 12 16 18 6 15 24 17 25 8 4 9 22 21 19 26 13 7 10 14 23 20</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\platform\hal\src\dac\fsl_dac_hal.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 104</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 79</file>
+        </tool>
+        <tool>
+          <name>__cstat</name>
+          <file> 131</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 45 11 5 12 16 18 6 15 24 17 25 8 4 9 22 21 19 26 13 7 10 14 23 20</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\platform\hal\src\dmamux\fsl_dmamux_hal.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 101</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 81</file>
+        </tool>
+        <tool>
+          <name>__cstat</name>
+          <file> 153</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 57 11 5 12 16 18 6 15 24 17 25 8 4 9 22 21 19 26 13 7 10 14 23 20</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\platform\hal\src\lpuart\fsl_lpuart_hal.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 124</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 156</file>
+        </tool>
+        <tool>
+          <name>__cstat</name>
+          <file> 142</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 32 11 5 12 16 18 6 15 24 17 25 8 4 9 22 21 19 26 13 7 10 14 23 20</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\platform\hal\src\lptmr\fsl_lptmr_hal.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 122</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 155</file>
+        </tool>
+        <tool>
+          <name>__cstat</name>
+          <file> 134</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 42 25 5 12 16 18 6 15 24 11 17 8 4 9 22 21 19 26 13 7 10 14 23 20</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\platform\hal\src\mcg\fsl_mcg_hal.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 112</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 158</file>
+        </tool>
+        <tool>
+          <name>__cstat</name>
+          <file> 136</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 30 11 5 12 16 18 6 15 24 17 25 8 4 9 22 21 19 26 13 7 10 14 23 20</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\platform\hal\src\smc\fsl_smc_hal.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 100</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 87</file>
+        </tool>
+        <tool>
+          <name>__cstat</name>
+          <file> 140</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 61 11 5 12 16 18 6 15 24 17 25 8 4 9 22 21 19 26 13 7 10 14 23 20</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\platform\hal\src\tsi\fsl_tsi_hal.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 107</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 89</file>
+        </tool>
+        <tool>
+          <name>__cstat</name>
+          <file> 152</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 62 25 5 12 16 18 6 15 24 11 8 4 9 22 21 19 26 13 7 10 14 23 20 71</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\platform\hal\src\rcm\fsl_rcm_hal.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 120</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 96</file>
+        </tool>
+        <tool>
+          <name>__cstat</name>
+          <file> 146</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 77 11 5 12 16 18 6 15 24 17 25 8 4 9 22 21 19 26 13 7 10 14 23 20</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\platform\hal\src\tsi\fsl_tsi_v4_hal_specific.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 125</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 90</file>
+        </tool>
+        <tool>
+          <name>__cstat</name>
+          <file> 143</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 62 25 5 12 16 18 6 15 24 11 8 4 9 22 21 19 26 13 7 10 14 23 20 71</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\platform\hal\src\rtc\fsl_rtc_hal.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 121</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 97</file>
+        </tool>
+        <tool>
+          <name>__cstat</name>
+          <file> 150</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 74 25 5 12 16 18 6 15 24 11 17 8 4 9 22 21 19 26 13 7 10 14 23 20</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\platform\hal\src\tpm\fsl_tpm_hal.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 103</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 91</file>
+        </tool>
+        <tool>
+          <name>__cstat</name>
+          <file> 141</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 72 8 4 11 5 12 16 18 6 15 24 9 22 21 19 26 13 7 10 14 23 20 17 25</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\platform\hal\src\dspi\fsl_dspi_hal.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 116</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 82</file>
+        </tool>
+        <tool>
+          <name>__cstat</name>
+          <file> 154</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 76 11 5 12 16 18 6 15 24 17 8 4 9 22 21 19 26 13 7 10 14 23 20</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\platform\hal\src\sim\MKW30Z4\fsl_sim_hal_MKW30Z4.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 106</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 98</file>
+        </tool>
+        <tool>
+          <name>__cstat</name>
+          <file> 148</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 11 5 12 16 18 6 15 24 14 23 17 8 4 9 22 21 19 26 13 7 10 20 64 25 127</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\platform\hal\src\trng\fsl_trng_hal.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 105</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 99</file>
+        </tool>
+        <tool>
+          <name>__cstat</name>
+          <file> 147</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 78 25 5 12 16 18 6 15 24 11 17 8 4 9 22 21 19 26 13 7 10 14 23 20</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>[ROOT_NODE]</name>
+      <outputs>
+        <tool>
+          <name>IARCHIVE</name>
+          <file> 0</file>
+        </tool>
+      </outputs>
+    </file>
+  </configuration>
+</project>
+
+

@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<project>
+  <fileVersion>2</fileVersion>
+  <fileChecksum>417576817</fileChecksum>
+  <configuration>
+    <name>Debug</name>
+    <outputs>
+      <file>$PROJ_DIR$\..\..\..\..\platform\CMSIS\Include\core_cmInstr.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\devices\fsl_device_registers.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\intrinsics.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\ycheck.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\DLib_Config_Normal.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\devices\MKW30Z4\startup\system_MKW30Z4.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\CMSIS\Include\core_cmFunc.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\stdint.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\devices\MKW30Z4\include\fsl_bitaccess.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\DLib_Threads.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\xencoding_limits.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\devices\MKW30Z4\include\MKW30Z4_features.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\devices\MKW30Z4\include\MKW30Z4_extension.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\yvals.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\cmsis_iar.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\stdlib.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\DLib_Defaults.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\devices\MKW30Z4\include\MKW30Z4.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\CMSIS\Include\core_cm0plus.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\DLib_Product.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\ysizet.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\devices\MKW30Z4\startup\iar\startup_MKW30Z4.s</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\devices\startup.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\devices\MKW30Z4\startup\system_MKW30Z4.c</file>
+      <file>$PROJ_DIR$\debug\obj\ksdk_startup_lib.pbd</file>
+      <file>$PROJ_DIR$\debug\obj\startup.o</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\devices\startup.h</file>
+      <file>$PROJ_DIR$\debug\libksdk_startup.a</file>
+      <file>$PROJ_DIR$\debug\obj\system_MKW30Z4.o</file>
+      <file>$PROJ_DIR$\debug\obj\startup_MKW30Z4.o</file>
+      <file>$PROJ_DIR$\debug\obj\startup.pbi</file>
+      <file>$PROJ_DIR$\debug\obj\system_MKW30Z4.pbi</file>
+      <file>$PROJ_DIR$\debug\obj\startup.__cstat.et</file>
+      <file>$PROJ_DIR$\debug\obj\system_MKW30Z4.__cstat.et</file>
+    </outputs>
+    <file>
+      <name>[ROOT_NODE]</name>
+      <outputs>
+        <tool>
+          <name>IARCHIVE</name>
+          <file> 27</file>
+        </tool>
+      </outputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\platform\devices\MKW30Z4\startup\iar\startup_MKW30Z4.s</name>
+      <outputs>
+        <tool>
+          <name>AARM</name>
+          <file> 29</file>
+        </tool>
+      </outputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\platform\devices\startup.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 30</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 25</file>
+        </tool>
+        <tool>
+          <name>__cstat</name>
+          <file> 32</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 10 19 3 7 17 18 2 11 16 4 6 8 1 12 5 13 9 0 14 26 15 20</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 26 1 17 7 3 13 16 4 19 10 9 18 0 14 2 6 5 12 8 15 20 11</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\platform\devices\MKW30Z4\startup\system_MKW30Z4.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 31</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 28</file>
+        </tool>
+        <tool>
+          <name>__cstat</name>
+          <file> 33</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 18 6 17 8 13 3 9 11 7 2 10 1 16 4 19 12 5 0 14 15 20</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 7 3 13 16 4 19 10 9 1 17 18 0 14 2 6 5 12 8 15 20 11</file>
+        </tool>
+      </inputs>
+    </file>
+  </configuration>
+  <configuration>
+    <name>Release</name>
+    <outputs>
+      <file>$PROJ_DIR$\..\..\..\..\platform\CMSIS\Include\core_cmInstr.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\devices\fsl_device_registers.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\intrinsics.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\ycheck.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\DLib_Config_Normal.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\devices\MKW30Z4\startup\system_MKW30Z4.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\CMSIS\Include\core_cmFunc.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\stdint.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\devices\MKW30Z4\include\fsl_bitaccess.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\DLib_Threads.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\xencoding_limits.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\devices\MKW30Z4\include\MKW30Z4_features.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\devices\MKW30Z4\include\MKW30Z4_extension.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\yvals.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\cmsis_iar.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\stdlib.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\DLib_Defaults.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\devices\MKW30Z4\include\MKW30Z4.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\CMSIS\Include\core_cm0plus.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\DLib_Product.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\ysizet.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\devices\MKW30Z4\startup\iar\startup_MKW30Z4.s</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\devices\startup.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\devices\MKW30Z4\startup\system_MKW30Z4.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\platform\devices\startup.h</file>
+      <file>$PROJ_DIR$\release\obj\system_MKW30Z4.o</file>
+      <file>$PROJ_DIR$\release\obj\startup.pbi</file>
+      <file>$PROJ_DIR$\release\libksdk_startup.a</file>
+      <file>$PROJ_DIR$\release\obj\ksdk_startup_lib.pbd</file>
+      <file>$PROJ_DIR$\release\obj\startup_MKW30Z4.o</file>
+      <file>$PROJ_DIR$\release\obj\system_MKW30Z4.pbi</file>
+      <file>$PROJ_DIR$\release\obj\startup.o</file>
+      <file>$PROJ_DIR$\release\obj\system_MKW30Z4.__cstat.et</file>
+      <file>$PROJ_DIR$\release\obj\startup.__cstat.et</file>
+    </outputs>
+    <file>
+      <name>[ROOT_NODE]</name>
+      <outputs>
+        <tool>
+          <name>IARCHIVE</name>
+          <file> 27</file>
+        </tool>
+      </outputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\platform\devices\MKW30Z4\startup\iar\startup_MKW30Z4.s</name>
+      <outputs>
+        <tool>
+          <name>AARM</name>
+          <file> 29</file>
+        </tool>
+      </outputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\platform\devices\startup.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 26</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 31</file>
+        </tool>
+        <tool>
+          <name>__cstat</name>
+          <file> 33</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 10 19 3 7 17 18 2 11 16 4 6 8 1 12 5 13 9 0 14 24 15 20</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 24 1 17 7 3 13 16 4 19 10 9 18 0 14 2 6 5 12 8 15 20 11</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\platform\devices\MKW30Z4\startup\system_MKW30Z4.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 30</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 25</file>
+        </tool>
+        <tool>
+          <name>__cstat</name>
+          <file> 32</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 18 6 17 8 13 3 9 11 7 2 10 1 16 4 19 12 5 0 14 15 20</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 7 3 13 16 4 19 10 9 1 17 18 0 14 2 6 5 12 8 15 20 11</file>
+        </tool>
+      </inputs>
+    </file>
+  </configuration>
+</project>
+
+

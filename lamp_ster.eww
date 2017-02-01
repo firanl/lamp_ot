@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<workspace>
+  <project>
+    <path>$WS_DIR$\lib\ksdk_platform_lib\iar\KW30Z4\ksdk_platform_lib.ewp</path>
+  </project>
+  <project>
+    <path>$WS_DIR$\lamp_ster.ewp</path>
+  </project>
+  <batchBuild>
+    <batchDefinition>
+      <name>all</name>
+      <member>
+        <project>ksdk_platform_lib</project>
+        <configuration>Debug</configuration>
+      </member>
+      <member>
+        <project>ksdk_platform_lib</project>
+        <configuration>Release</configuration>
+      </member>
+      <member>
+        <project>lamp_ster</project>
+        <configuration>Debug</configuration>
+      </member>
+      <member>
+        <project>lamp_ster</project>
+        <configuration>Release</configuration>
+      </member>
+    </batchDefinition>
+    <batchDefinition>
+      <name>Debug</name>
+      <member>
+        <project>ksdk_platform_lib</project>
+        <configuration>Debug</configuration>
+      </member>
+      <member>
+        <project>lamp_ster</project>
+        <configuration>Debug</configuration>
+      </member>
+    </batchDefinition>
+    <batchDefinition>
+      <name>Release</name>
+      <member>
+        <project>ksdk_platform_lib</project>
+        <configuration>Release</configuration>
+      </member>
+      <member>
+        <project>lamp_ster</project>
+        <configuration>Release</configuration>
+      </member>
+    </batchDefinition>
+  </batchBuild>
+</workspace>
+
+
