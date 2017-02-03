@@ -2793,25 +2793,25 @@
   <group>
     <name>KSDK</name>
     <file>
-      <name>$PROJ_DIR$\boards\frdmkw40z\board.c</name>
+      <name>$PROJ_DIR$\boards\lamp30z_hw1\board.c</name>
     </file>
     <file>
-      <name>$PROJ_DIR$\boards\frdmkw40z\board.h</name>
+      <name>$PROJ_DIR$\boards\lamp30z_hw1\board.h</name>
     </file>
     <file>
-      <name>$PROJ_DIR$\boards\frdmkw40z\gpio_pins.c</name>
+      <name>$PROJ_DIR$\boards\lamp30z_hw1\gpio_pins.c</name>
     </file>
     <file>
-      <name>$PROJ_DIR$\boards\frdmkw40z\gpio_pins.h</name>
+      <name>$PROJ_DIR$\boards\lamp30z_hw1\gpio_pins.h</name>
     </file>
     <file>
-      <name>$PROJ_DIR$\boards\frdmkw40z\hardware_init.c</name>
+      <name>$PROJ_DIR$\boards\lamp30z_hw1\hardware_init.c</name>
     </file>
     <file>
-      <name>$PROJ_DIR$\boards\frdmkw40z\pin_mux.c</name>
+      <name>$PROJ_DIR$\boards\lamp30z_hw1\pin_mux.c</name>
     </file>
     <file>
-      <name>$PROJ_DIR$\boards\frdmkw40z\pin_mux.h</name>
+      <name>$PROJ_DIR$\boards\lamp30z_hw1\pin_mux.h</name>
     </file>
   </group>
   <group>

@@ -19,6 +19,8 @@ EnableCache=1
 LoggingEnabled=_ 0
 LogFile=_ ""
 Category=_ 0
+[JLinkDriver]
+CStepIntDis=_ 0
 [Disassemble mode]
 mode=0
 [Breakpoints2]
@@ -26,5 +28,3 @@ Count=0
 [Aliases]
 Count=0
 SuppressDialog=0
-[JLinkDriver]
-CStepIntDis=_ 0

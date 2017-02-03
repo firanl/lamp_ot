@@ -41,9 +41,14 @@
 /*! *********************************************************************************
  * 	Drivers Configuration
  ********************************************************************************** */
- /* Defines the number of available keys for the keyboard module */
+
+/* GPIO KeyBoard support */
+#define gKeyBoardSupported_d    1
+/* Defines the number of available keys for the keyboard module */
 #define gKBD_KeysCount_c        1
 
+/* GPIO Led support */
+#define gLEDSupported_d         TRUE
 /* Specifies the number of physical LEDs on the target board */
 #define gLEDsOnTargetBoardCnt_c 3
 
