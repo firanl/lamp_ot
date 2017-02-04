@@ -2813,6 +2813,12 @@
     <file>
       <name>$PROJ_DIR$\boards\lamp30z_hw1\pin_mux.h</name>
     </file>
+    <file>
+      <name>$PROJ_DIR$\lamp\bluetooth\addons\tpm_pwm_led\tpm_pwm_led_ctrl.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\lamp\bluetooth\addons\tpm_pwm_led\tpm_pwm_led_ctrl.h</name>
+    </file>
   </group>
   <group>
     <name>RTOS</name>

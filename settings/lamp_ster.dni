@@ -15,16 +15,18 @@ DisableInterrupts=0
 MultiCoreRunAll=0
 [ArmDriver]
 EnableCache=1
-[Log file]
-LoggingEnabled=_ 0
-LogFile=_ ""
-Category=_ 0
 [JLinkDriver]
 CStepIntDis=_ 0
+[DebugChecksum]
+Checksum=325255208
 [Disassemble mode]
 mode=0
 [Breakpoints2]
 Count=0
+[Log file]
+LoggingEnabled=_ 0
+LogFile=_ ""
+Category=_ 0
 [Aliases]
 Count=0
 SuppressDialog=0
