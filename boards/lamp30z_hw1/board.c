@@ -217,9 +217,9 @@ void BOARD_InitAdc(void)
 #endif     
 }
 
-uint8_t BOARD_GetBatteryLevel(void)
+uint16_t BOARD_GetBatteryLevel(void)
 {
-    uint16_t batVal, bgVal, batLvl, batVolt, bgVolt = 100; /*cV*/
+    uint16_t batVal, bgVal, batVolt, bgVolt = 0; /*cV*/
     
     bgVal = ADC16_BgLvl();
     DCDC_AdjustVbatDiv4(); /* Bat voltage  divided by 4 */
@@ -227,8 +227,7 @@ uint8_t BOARD_GetBatteryLevel(void)
     
     batVolt = bgVolt * batVal / bgVal;
     
-    batLvl = (batVolt - MIN_VOLT_BUCK) * (FULL_BAT - EMPTY_BAT) / (MAX_VOLT_BUCK - MIN_VOLT_BUCK);
-    return ((batLvl <= 100) ? batLvl:100);    
+    return batVolt;    
 }
 
 uint16_t BOARD_GetPotentiometerLevel(void)
@@ -251,11 +250,11 @@ void BOARD_ClockInit(void)
     /* Setup board clock source. */
     // Setup OSC0 if used.
     // Configure OSC0 pin mux.
-    PORT_HAL_SetMuxMode(EXTAL0_PORT, EXTAL0_PIN, EXTAL0_PINMUX);
-    PORT_HAL_SetMuxMode(XTAL0_PORT, XTAL0_PIN, XTAL0_PINMUX);
+    PORT_HAL_SetMuxMode(EXTAL32K_PORT, EXTAL32K_PIN, EXTAL32K_PINMUX);
+    PORT_HAL_SetMuxMode( XTAL32K_PORT,  XTAL32K_PIN,  XTAL32K_PINMUX);
 
     BOARD_InitOsc0();
-    BOARD_InitRtcOsc();
+//    BOARD_InitRtcOsc();
 
     /* Set system clock configuration. */
 #if (CLOCK_INIT_CONFIG == CLOCK_VLPR)

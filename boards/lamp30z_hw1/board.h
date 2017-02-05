@@ -87,15 +87,23 @@
 #define APP_DCDC_VBAT_MONITOR_INTERVAL    (50000)
 #endif
 
-/* EXTAL0 PTA18 */
-#define EXTAL0_PORT   PORTB
-#define EXTAL0_PIN    17
-#define EXTAL0_PINMUX kPortPinDisabled
+/* RTC pinout setup
+ALT0 kPortPinDisabled,  ALT1 kPortMuxAsGpio
+48QFN,32QFN,PinName,DEFAULT    ,ALT0     ,ALT1  ,ALT2 ,ALT3    ,ALT4 ,ALT5     ,ALT6 ,ALT7
+21,15,PTB16        ,EXTAL32K   ,EXTAL32K ,PTB16 ,—    ,I2C1_SCL,—    ,TPM2_CH0 ,—    ,—   
+22,16,PTB17        ,XTAL32K    ,XTAL32K  ,PTB17 ,—    ,I2C1_SDA,—    ,TPM2_CH1 ,—    ,—   
+*/
+/* EXTAL0 PTB16 */
+#define EXTAL32K_PORT   PORTB
+#define EXTAL32K_PIN    16
+#define EXTAL32K_PINMUX kPortMuxAsGpio
 
-/* XTAL0 PTA19 */
-#define XTAL0_PORT   PORTB
-#define XTAL0_PIN    16
-#define XTAL0_PINMUX kPortPinDisabled
+/* XTAL32K PTB17 */
+#define XTAL32K_PORT   PORTB
+#define XTAL32K_PIN    17
+#define XTAL32K_PINMUX kPortMuxAsGpio
+
+
 
 /* RTC external clock configuration. */
 #define RTC_XTAL_FREQ   32768U
@@ -215,7 +223,7 @@ void BOARD_InitAdc(void);
 void BOARD_DCDCInit(void);
 
 /* Function to read battery level on board configuration. */
-uint8_t BOARD_GetBatteryLevel(void);
+uint16_t BOARD_GetBatteryLevel(void);
 
 /* Function to read potentiometer level on board configuration. */
 uint16_t BOARD_GetPotentiometerLevel(void);

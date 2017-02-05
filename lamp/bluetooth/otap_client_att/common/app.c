@@ -375,7 +375,7 @@ static void BleApp_Config()
 	/* Start services */
     OtapCS_Start(&otapServiceConfig);
     
-    basServiceConfig.batteryLevel = BOARD_GetBatteryLevel();
+    basServiceConfig.batteryLevel = 50;
     Bas_Start(&basServiceConfig);
     Dis_Start(&disServiceConfig);
 
@@ -1864,7 +1864,7 @@ static otapStatus_t OtapClient_IsImageFileHeaderValid (bleOtaImageFileHeader_t* 
 
 static void BatteryMeasurementTimerCallback(void * pParam)
 {
-    basServiceConfig.batteryLevel = BOARD_GetBatteryLevel();
+    basServiceConfig.batteryLevel = 50;
     Bas_RecordBatteryMeasurement(basServiceConfig.serviceHandle, basServiceConfig.batteryLevel);
 }
 

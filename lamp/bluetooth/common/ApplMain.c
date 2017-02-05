@@ -340,6 +340,9 @@ void main_task(uint32_t param)
         PWR_Init();
         PWR_DisallowDeviceToSleep();
 #else    
+        TurnOffLeds();
+        TurnOnLeds();
+        
         Led1Flashing();
         Led2Flashing();
         Led3Flashing();
