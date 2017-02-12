@@ -2799,19 +2799,7 @@
       <name>$PROJ_DIR$\boards\lamp30z_hw1\board.h</name>
     </file>
     <file>
-      <name>$PROJ_DIR$\boards\lamp30z_hw1\gpio_pins.c</name>
-    </file>
-    <file>
       <name>$PROJ_DIR$\boards\lamp30z_hw1\gpio_pins.h</name>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\boards\lamp30z_hw1\hardware_init.c</name>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\boards\lamp30z_hw1\pin_mux.c</name>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\boards\lamp30z_hw1\pin_mux.h</name>
     </file>
     <file>
       <name>$PROJ_DIR$\lamp\bluetooth\addons\tpm_pwm_led\tpm_pwm_led_ctrl.c</name>

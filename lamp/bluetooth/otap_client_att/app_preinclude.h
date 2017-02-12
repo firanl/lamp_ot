@@ -43,7 +43,7 @@
  ********************************************************************************** */
 
 /* GPIO KeyBoard support */
-#define gKeyBoardSupported_d    1
+#define gKeyBoardSupported_d    TRUE
 /* Defines the number of available keys for the keyboard module */
 #define gKBD_KeysCount_c        1
 
@@ -95,7 +95,7 @@
 #define cPWR_UsePowerDownMode           0
 
 /* Enable/Disable BLE Link Layer DSM */
-#define cPWR_BLE_LL_Enable              1
+#define cPWR_BLE_LL_Enable              FALSE
 
 /* Default Deep Sleep Mode*/
 #define cPWR_DeepSleepMode              3

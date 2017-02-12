@@ -56,7 +56,7 @@
 #define gUseServiceSecurity_d  FALSE
 #endif
 
-#define gPasskeyValue_c                999999
+#define gPasskeyValue_c                1234
 
 /* Profile Parameters */
 

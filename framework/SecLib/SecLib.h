@@ -50,7 +50,11 @@
 ********************************************************************************** */
 
 #ifndef gSecLib_DisallowMcuSleep_d
-#define gSecLib_DisallowMcuSleep_d (0)
+  #define gSecLib_DisallowMcuSleep_d (0)
+#endif
+
+#ifndef BOARD_LTC_INSTANCE 
+  #define BOARD_LTC_INSTANCE              0
 #endif
 
 /* CCM operation */

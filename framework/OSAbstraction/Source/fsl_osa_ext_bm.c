@@ -49,15 +49,15 @@
 *************************************************************************************
 ********************************************************************************** */
 #ifdef DEBUG_ASSERT
-#define OS_ASSERT(condition) if(!(condition))while(1);
+ #define OS_ASSERT(condition) if(!(condition))while(1);
 #else
-#define OS_ASSERT(condition) (void)(condition);
+ #define OS_ASSERT(condition) (void)(condition);
 #endif
 
 #if (osNumberOfSemaphores || osNumberOfMutexes || osNumberOfEvents || osNumberOfMessageQs)
-#define osObjectAlloc_c 1
+ #define osObjectAlloc_c 1
 #else
-#define osObjectAlloc_c 0
+ #define osObjectAlloc_c 0
 #endif
 /************************************************************************************
 *************************************************************************************
@@ -801,7 +801,7 @@ void OSA_EXT_InterruptEnable(void)
  *END**************************************************************************/
 void OSA_EXT_InterruptDisable(void)
 {
-OSA_EnterCritical(kCriticalDisableInt);
+  OSA_EnterCritical(kCriticalDisableInt);
 }
 
 /*FUNCTION**********************************************************************
@@ -833,17 +833,17 @@ return (void*)OSA_InstallIntHandler((int32_t)IRQNumber,handler);
 ********************************************************************************** */
 osaTimerId_t OSA_EXT_TimerCreate (osaTimerDef_t *timer_def, osaTimer_t type, void *argument)
 {
-#if osNumberOfTimers  
-(void)timer_def;
-(void)type;
-(void)argument;  
-return NULL;
-#else
-(void)timer_def;
-(void)type;
-(void)argument;  
-return NULL;
-#endif  
+  #if osNumberOfTimers  
+    (void)timer_def;
+    (void)type;
+    (void)argument;  
+    return NULL;
+    #else
+    (void)timer_def;
+    (void)type;
+    (void)argument;  
+    return NULL;
+  #endif  
 }
 
 /*! *********************************************************************************
@@ -865,14 +865,14 @@ return NULL;
 osaStatus_t OSA_EXT_TimerStart (osaTimerId_t timer_id, uint32_t millisec)
 {
   #if osNumberOfTimers  
-  (void)timer_id;
-  (void)millisec;
-  return osaStatus_Error;
-#else
-  (void)timer_id;
-  (void)millisec;
-  return osaStatus_Error;
-#endif  
+    (void)timer_id;
+    (void)millisec;
+    return osaStatus_Error;
+  #else
+    (void)timer_id;
+    (void)millisec;
+    return osaStatus_Error;
+  #endif  
 }
 
 /*! *********************************************************************************
@@ -894,12 +894,12 @@ osaStatus_t OSA_EXT_TimerStart (osaTimerId_t timer_id, uint32_t millisec)
 osaStatus_t OSA_EXT_TimerStop (osaTimerId_t timer_id)
 {
   #if osNumberOfTimers  
-  (void)timer_id;
-  return osaStatus_Error;
-#else
-  (void)timer_id;
-  return osaStatus_Error;
-#endif  
+    (void)timer_id;
+    return osaStatus_Error;
+  #else
+    (void)timer_id;
+    return osaStatus_Error;
+  #endif  
 }
 
 /*! *********************************************************************************
@@ -921,12 +921,12 @@ osaStatus_t OSA_EXT_TimerStop (osaTimerId_t timer_id)
 osaStatus_t OSA_EXT_TimerDestroy (osaTimerId_t timer_id)
 {
   #if osNumberOfTimers  
-  (void)timer_id;
-  return osaStatus_Error;
-#else
-  (void)timer_id;
-  return osaStatus_Error;
-#endif  
+    (void)timer_id;
+    return osaStatus_Error;
+  #else
+    (void)timer_id;
+    return osaStatus_Error;
+  #endif  
 }
 /*! *********************************************************************************
 *************************************************************************************

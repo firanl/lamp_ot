@@ -35,35 +35,7 @@
 #include "fsl_ltc_driver.h"
 #include "Flash_Adapter.h"
 
-void hardware_init(void) {
 
-  if((PMC->REGSC & PMC_REGSC_ACKISO_MASK) != 0x00U)
-  {
-    PMC->REGSC |= PMC_REGSC_ACKISO_MASK; /* Release hold with ACKISO:  Only has an effect if recovering from VLLSx.*/
-    /*clear power management registers after recovery from vlls*/
-    SMC_BWR_STOPCTRL_LLSM(SMC, 0);
-    SMC_BWR_PMCTRL_STOPM(SMC, 0);
-    SMC_BWR_PMCTRL_RUNM(SMC, 0);
-  }
-  /* enable clock for PORTs */
-  CLOCK_SYS_EnablePortClock(PORTA_IDX);
-  CLOCK_SYS_EnablePortClock(PORTB_IDX);
-  CLOCK_SYS_EnablePortClock(PORTC_IDX);
-
-  /* Init board clock */
-  BOARD_ClockInit();
-  //dbg_uart_init();
-  
-  /* Init DCDC module */
-  BOARD_DCDCInit();
-  
-  /* Install callbacks to handle enter and exit low power */
-#if cPWR_UsePowerDownMode
-  BOARD_InstallLowPowerCallbacks();
-#endif
-  
-  NV_ReadHWParameters(&gHardwareParameters);
-}
 
 /*!
 ** @}

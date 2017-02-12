@@ -52,7 +52,7 @@
 #include <math.h>
 #endif
 
-#ifdef gXcvrXtalTrimEnabled_d
+#if (gXcvrXtalTrimEnabled_d)
 #include "Flash_Adapter.h"
 #endif
 
@@ -304,7 +304,7 @@ void XcvrDelay(uint32_t time);
 void XcvrInit ( radio_mode_t radioMode )
 {
     XcvrInit_ModeChg_Common(radioMode,FIRST_INIT);
-#ifdef gXcvrXtalTrimEnabled_d
+#if (gXcvrXtalTrimEnabled_d)
   if( 0xFFFFFFFF != gHardwareParameters.xtalTrim )
   {
       XcvrSetXtalTrim( (uint8_t)gHardwareParameters.xtalTrim );

@@ -87,7 +87,7 @@
 *************************************************************************************
 ************************************************************************************/
 #ifndef mAppUseNvm_d
-#define mAppUseNvm_d    TRUE
+  #define mAppUseNvm_d    TRUE
 #endif
 
 /* Application Events */
@@ -252,11 +252,11 @@ static anchor_t mHostAppInputQueue;
 
 static uint8_t platformInitialized = 0;
 
-static gapAdvertisingCallback_t pfAdvCallback = NULL;
-static gapScanningCallback_t pfScanCallback = NULL;
-static gapConnectionCallback_t  pfConnCallback = NULL;
-static gattServerCallback_t pfGattServerCallback = NULL;
-static gattClientProcedureCallback_t pfGattClientProcCallback = NULL;
+static gapAdvertisingCallback_t         pfAdvCallback = NULL;
+static gapScanningCallback_t            pfScanCallback = NULL;
+static gapConnectionCallback_t          pfConnCallback = NULL;
+static gattServerCallback_t             pfGattServerCallback = NULL;
+static gattClientProcedureCallback_t    pfGattClientProcCallback = NULL;
 static gattClientNotificationCallback_t pfGattClientNotifCallback = NULL;
 static gattClientNotificationCallback_t pfGattClientIndCallback = NULL;
 static l2caLeCbDataCallback_t           pfL2caLeCbDataCallback = NULL;
@@ -284,9 +284,9 @@ extern void BleApp_Init(void);
 extern void BleApp_HandleKeys(key_event_t events);
 
 #if gUseHciTransportUpward_d
-#define BleApp_GenericCallback(param)  
+  #define BleApp_GenericCallback(param)  
 #else
-extern void BleApp_GenericCallback (gapGenericEvent_t* pGenericEvent);
+  extern void BleApp_GenericCallback (gapGenericEvent_t* pGenericEvent);
 #endif
 
 extern void (*pfBLE_SignalFromISR)(void);
@@ -343,12 +343,14 @@ void main_task(uint32_t param)
         TurnOffLeds();
         TurnOnLeds();
         
-        Led1Flashing();
+        Led1Flashing(); 
         Led2Flashing();
         Led3Flashing();
         //Led4Flashing();           
 #endif    
        
+       
+        
         /* Initialize peripheral drivers specific to the application */
         BleApp_Init();
         
@@ -511,7 +513,7 @@ void App_StartAdvertising(
     gapConnectionCallback_t     connectionCallback
 )
 {
-    pfAdvCallback = advertisingCallback;
+    pfAdvCallback  = advertisingCallback;
     pfConnCallback = connectionCallback;
     
     Gap_StartAdvertising(App_AdvertisingCallback, App_ConnectionCallback);

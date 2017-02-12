@@ -37,10 +37,10 @@
 *************************************************************************************
 ********************************************************************************** */
 #include "SPI_Adapter.h"
-#include "pin_mux.h"
 #include "panic.h"
 #include "fsl_clock_manager.h"
 #include "fsl_os_abstraction.h"
+#include "fsl_port_hal.h"
 
 #if FSL_FEATURE_SOC_DSPI_COUNT
 #include "fsl_dspi_hal.h"
@@ -76,6 +76,7 @@ static bool_t Spi_IsMaster(SPI_Type*);
 static void Spi_SetIntState(SPI_Type*, bool_t);
 static uint32_t Spi_ReadData(SPI_Type* baseAddr);
 static void Spi_WriteData(SPI_Type*, spiState_t*, uint32_t);
+static void Spi_configure_pins(uint32_t instance);
 
 
 /*! *********************************************************************************
@@ -134,7 +135,7 @@ spiStatus_t Spi_Init(uint32_t instance, spiState_t* pSpiState, pfSPIx_TRxCB_t pf
     }
 
     /* set SPI Pin Mux */    
-    configure_spi_pins(instance);
+    Spi_configure_pins(instance);
     /* Enable SPI clock */
     CLOCK_SYS_EnableSpiClock(instance);
     /* Basic SPI initialization */
@@ -688,4 +689,41 @@ static void Spi_SetIntState(SPI_Type* baseAddr, bool_t state)
 #else
     SPI_HAL_SetReceiveAndFaultIntCmd(baseAddr, state);
 #endif
+}
+
+/*! *********************************************************************************
+* \brief   SPI method sets registers according routing settings.Call
+**         this method code to route desired pins into:   SPI0,SPI1
+**         peripheral.
+*
+* \param[in] instance  set 0 for SPI0 or 1 for SPI1
+*
+*
+********************************************************************************** */
+void Spi_configure_pins(uint32_t instance)
+{
+  switch(instance) {
+    case 0:                          /* SPI0 */
+      /* PORTC_PCR18 */
+      PORT_HAL_SetMuxMode(PORTC,18u,kPortMuxAlt2); /* MOSI */
+      /* PORTC_PCR17 */
+      PORT_HAL_SetMuxMode(PORTC,17u,kPortMuxAlt2); /* MISO */
+      /* PORTC_PCR16 */
+      PORT_HAL_SetMuxMode(PORTC,16u,kPortMuxAlt2); /* CLK */
+      /* PORTC_PCR19 */
+      PORT_HAL_SetMuxMode(PORTC,19u,kPortMuxAlt2); /* PCS0 */
+      break;
+    case 1:                          /* SPI1 */
+      /* PORTA_PCR16 */
+      PORT_HAL_SetMuxMode(PORTA,16u,kPortMuxAlt2); /* MISO */
+      /* PORTA_PCR17 */
+      PORT_HAL_SetMuxMode(PORTA,17u,kPortMuxAlt2); /* MOSI */
+      /* PORTA_PCR18 */
+      PORT_HAL_SetMuxMode(PORTA,18u,kPortMuxAlt2); /* SCK */
+      /* PORTA_PCR19 */
+      PORT_HAL_SetMuxMode(PORTA,19u,kPortMuxAlt2); /* PCS0 */
+      break;
+    default:
+      break;
+  }
 }

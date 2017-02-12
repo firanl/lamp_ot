@@ -27,10 +27,9 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
 /************************************************************************************
-*************************************************************************************
 * Include
-*************************************************************************************
 ************************************************************************************/
 #include "EmbeddedTypes.h"
 #include "board.h"
@@ -40,6 +39,10 @@
 #include "pin_mux.h"
 #include "fsl_adc16_driver.h"
 #include "fsl_pmc_hal.h"
+#include "Flash_Adapter.h"
+#include "gpio_pins.h"
+
+
 
 #if cPWR_UsePowerDownMode
 #include "PWR_Interface.h"
@@ -49,10 +52,9 @@
 #include "DCDC.h"
 #endif
 
+
 /************************************************************************************
-*************************************************************************************
 * Private type definitions and macros
-*************************************************************************************
 ************************************************************************************/
 #define ADC16_INSTANCE                (0)   /* ADC instance */
 #define ADC16_CHN_GROUP               (0)   /* ADC group configuration selection */
@@ -71,9 +73,7 @@
 #define EMPTY_BAT     0
 
 /************************************************************************************
-*************************************************************************************
 * Private memory declarations
-*************************************************************************************
 ************************************************************************************/
 uint32_t offsetVdd = 0;               
 adc16_converter_config_t adcUserConfig;   // structure for user config
@@ -81,83 +81,67 @@ adc16_converter_config_t adcUserConfig;   // structure for user config
 static uint32_t adcValue = 0; /* ADC value */
 static adc16_converter_config_t adcUserConfig; /* structure for user config */
 
-/* Configuration for enter VLPR mode. Core clock = 4MHz. */
-const clock_manager_user_config_t g_defaultClockConfigVlpr =
-{
-    .mcgConfig =
+
+
+
+
+/* Declare Input GPIO pins */
+gpio_input_pin_user_config_t switchPins[] = {
     {
-        .mcg_mode           = kMcgModeBLPI,   // Work in BLPI mode.
-        .irclkEnable        = true,  // MCGIRCLK enable.
-        .irclkEnableInStop  = false, // MCGIRCLK disable in STOP mode.
-        .ircs               = kMcgIrcFast, // Select IRC4M.
-        .fcrdiv             = 0U,    // FCRDIV is 0.
-
-        .frdiv   = 5U,
-        .drs     = kMcgDcoRangeSelLow,  // Low frequency range
-        .dmx32   = kMcgDmx32Default,    // DCO has a default range of 25%
-        .oscsel  = kMcgOscselOsc,       // Select OSC
-
+        .pinName = kGpioSW1,
+        .config.isPullEnable = true,
+        .config.pullSelect = kPortPullUp,
+        .config.isPassiveFilterEnabled = false,
+        .config.interrupt = kPortIntFallingEdge,
     },
-    .simConfig =
     {
-        .er32kSrc  = kClockEr32kSrcOsc0,     // ERCLK32K selection, use OSC0.
-        .outdiv1   = 0U,
-        .outdiv4   = 4U,
+        .pinName = kGpioSW2,
+        .config.isPullEnable = true,
+        .config.pullSelect = kPortPullUp,
+        .config.isPassiveFilterEnabled = false,
+        .config.interrupt = kPortIntFallingEdge
+    },
+    {
+        .pinName = GPIO_PINS_OUT_OF_RANGE,
     }
 };
 
-/* Configuration for enter RUN mode. Core clock = 16MHz / 32MHz. */
-const clock_manager_user_config_t g_defaultClockConfigRun =
-{
-    .mcgConfig =
+/* Declare Output GPIO pins */
+gpio_output_pin_user_config_t ledPins[] = {
     {
-        .mcg_mode           = kMcgModeBLPE, // Work in BLPE mode.
-        .irclkEnable        = true,  // MCGIRCLK enable.
-        .irclkEnableInStop  = false, // MCGIRCLK disable in STOP mode.
-        .ircs               = kMcgIrcSlow, // Select IRC32k.
-        .fcrdiv             = 0U,    // FCRDIV is 0.
-
-        .frdiv   = 5U,
-        .drs     = kMcgDcoRangeSelLow,  // Low frequency range
-        .dmx32   = kMcgDmx32Default,    // DCO has a default range of 25%
-        .oscsel  = kMcgOscselOsc,       // Select 
+        .pinName = kGpioLED1,
+        .config.outputLogic = 1,
+        .config.slewRate = kPortSlowSlewRate,
+        .config.driveStrength = kPortLowDriveStrength,
     },
-    .simConfig =
     {
-        .pllFllSel = kClockPllFllSelFll,    // PLLFLLSEL select FLL.
-        .er32kSrc  = kClockEr32kSrcOsc0,     // ERCLK32K selection, use OSC0.
-#if CLOCK_INIT_CONFIG == CLOCK_RUN_16        
-        .outdiv1   = 1U,
-        .outdiv4   = 0U,
-#else
-        .outdiv1   = 0U,
-        .outdiv4   = 1U,
-#endif        
+        .pinName = kGpioLED2,
+        .config.outputLogic = 1,
+        .config.slewRate = kPortSlowSlewRate,
+        .config.driveStrength = kPortLowDriveStrength,
+    },
+    {
+        .pinName = kGpioLED3,
+        .config.outputLogic = 1,
+        .config.slewRate = kPortSlowSlewRate,
+        .config.driveStrength = kPortLowDriveStrength,
+    },
+    {
+        .pinName = kGpioLED4,
+        .config.outputLogic = 1,
+        .config.slewRate = kPortSlowSlewRate,
+        .config.driveStrength = kPortLowDriveStrength,
+    },
+    {
+        .pinName = GPIO_PINS_OUT_OF_RANGE,
     }
 };
 
-#if gDCDC_Enabled_d == 1
-const dcdcConfig_t mDcdcDefaultConfig = 
-{
-#if APP_DCDC_MODE == gDCDC_Mode_Buck_c
-  .vbatMin = 1800,
-  .vbatMax = 4200,
-#elif APP_DCDC_MODE == gDCDC_Mode_Boost_c
-  .vbatMin = 900,
-  .vbatMax = 1800,
-#endif  
-  .dcdcMode = APP_DCDC_MODE,
-  .vBatMonitorIntervalMs = APP_DCDC_VBAT_MONITOR_INTERVAL,
-  .pfDCDCAppCallback = NULL, /* .pfDCDCAppCallback = DCDCCallback, */
-  .dcdc1P45OutputTargetVal = gDCDC_1P45OutputTargetVal_1_450_c,
-  .dcdc1P8OutputTargetVal = gDCDC_1P8OutputTargetVal_1_800_c
-};
-#endif
+
+
 
 /************************************************************************************
-*************************************************************************************
 * Private functions prototypes
-*************************************************************************************
 ************************************************************************************/
 static void ADC16_CalibrateParams(void);
 static inline uint32_t ADC16_Measure(void);
@@ -167,25 +151,40 @@ static uint16_t ADC16_ReadValue(adc16_chn_t chnIdx, uint8_t diffMode);
 static void DCDC_AdjustVbatDiv4();
 static void CLOCK_SetBootConfig(clock_manager_user_config_t const* config);
 /************************************************************************************
-*************************************************************************************
 * Public functions prototypes
-*************************************************************************************
 ************************************************************************************/
-void BOARD_InstallLowPowerCallbacks(void);
-void BOARD_EnterLowPowerCb(void);
-void BOARD_ExitLowPowerCb(void);
+
+
 /************************************************************************************
-*************************************************************************************
 * Public functions
-*************************************************************************************
 ************************************************************************************/
+
+void hardware_init(void) {
+
+  if((PMC->REGSC & PMC_REGSC_ACKISO_MASK) != 0x00U)
+  {
+    PMC->REGSC |= PMC_REGSC_ACKISO_MASK; /* Release hold with ACKISO:  Only has an effect if recovering from VLLSx.*/
+    /*clear power management registers after recovery from vlls*/
+    SMC_BWR_STOPCTRL_LLSM(SMC, 0);
+    SMC_BWR_PMCTRL_STOPM(SMC, 0);
+    SMC_BWR_PMCTRL_RUNM(SMC, 0);
+  }
+  /* enable clock for PORTs */
+  CLOCK_SYS_EnablePortClock(PORTA_IDX);
+  CLOCK_SYS_EnablePortClock(PORTB_IDX);
+  CLOCK_SYS_EnablePortClock(PORTC_IDX);
+
+  /* Init board clock */
+  BOARD_ClockInit();
+  
+  
+  NV_ReadHWParameters(&gHardwareParameters);
+}
 
 /* Function to initialize OSC0 base on board configuration. */
 void BOARD_InitOsc0(void)
 {
-    // OSC0 has not configuration register, only set frequency
-    MCG_WR_C2_RANGE(MCG,kOscRangeHigh);
-    g_xtal0ClkFreq = 32000000U;
+
 }
 
 /* Function to initialize RTC external clock base on board configuration. */
@@ -206,15 +205,14 @@ void BOARD_InitRtcOsc(void)
 
 void BOARD_InitAdc(void)
 {
-#if gDCDC_Enabled_d == 0
-        SIM_HAL_EnableClock(SIM, kSimClockGateDcdc);
-        CLOCK_SYS_EnableAdcClock(0);
-        ADC16_DRV_StructInitUserConfigDefault(&adcUserConfig);
-        adcUserConfig.resolution = kAdc16ResolutionBitOfDiffModeAs13;
-        adcUserConfig.refVoltSrc = kAdc16RefVoltSrcOfVref;
-        ADC16_DRV_Init(ADC16_INSTANCE, &adcUserConfig);
-        ADC16_CalibrateParams();
-#endif     
+  SIM_HAL_EnableClock(SIM, kSimClockGateDcdc);
+  CLOCK_SYS_EnableAdcClock(0);
+  ADC16_DRV_StructInitUserConfigDefault(&adcUserConfig);
+  adcUserConfig.resolution = kAdc16ResolutionBitOfDiffModeAs13;
+  adcUserConfig.refVoltSrc = kAdc16RefVoltSrcOfVref;
+  ADC16_DRV_Init(ADC16_INSTANCE, &adcUserConfig);
+  ADC16_CalibrateParams();
+  
 }
 
 uint16_t BOARD_GetBatteryLevel(void)
@@ -230,20 +228,40 @@ uint16_t BOARD_GetBatteryLevel(void)
     return batVolt;    
 }
 
-uint16_t BOARD_GetPotentiometerLevel(void)
-{
-    uint16_t value;
-	    
-    value = ADC16_Measure();
-	
-	value = (0x8000 & value) ? 0 : value;
-        
-    return value;
-}
 
 /* Initialize clock. */
 void BOARD_ClockInit(void)
 {
+    /* Configuration for enter RUN mode. Core clock = 16MHz / 32MHz. */
+    const clock_manager_user_config_t g_defaultClockConfigRun =
+    {
+        .mcgConfig =
+        {
+            .mcg_mode           = kMcgModeBLPE, // Work in BLPE mode.
+            .irclkEnable        = true,  // MCGIRCLK enable.
+            .irclkEnableInStop  = false, // MCGIRCLK disable in STOP mode.
+            .ircs               = kMcgIrcSlow, // Select IRC32k.
+            .fcrdiv             = 0U,    // FCRDIV is 0.
+
+            .frdiv   = 5U,
+            .drs     = kMcgDcoRangeSelLow,  // Low frequency range
+            .dmx32   = kMcgDmx32Default,    // DCO has a default range of 25%
+            .oscsel  = kMcgOscselOsc,       // Select 
+        },
+        .simConfig =
+        {
+            .pllFllSel = kClockPllFllSelFll,    // PLLFLLSEL select FLL.
+            .er32kSrc  = kClockEr32kSrcOsc0,     // ERCLK32K selection, use OSC0.
+    #if CLOCK_INIT_CONFIG == CLOCK_RUN_16        
+            .outdiv1   = 1U,
+            .outdiv4   = 0U,
+    #else
+            .outdiv1   = 0U,
+            .outdiv4   = 1U,
+    #endif        
+        }
+    };
+    
     /* Set allowed power mode, allow all. */
     SMC_HAL_SetProtection(SMC, kAllowPowerModeAll);
 
@@ -253,51 +271,24 @@ void BOARD_ClockInit(void)
     PORT_HAL_SetMuxMode(EXTAL32K_PORT, EXTAL32K_PIN, EXTAL32K_PINMUX);
     PORT_HAL_SetMuxMode( XTAL32K_PORT,  XTAL32K_PIN,  XTAL32K_PINMUX);
 
-    BOARD_InitOsc0();
-//    BOARD_InitRtcOsc();
+    // OSC0 has not configuration register, only set frequency
+    MCG_WR_C2_RANGE(MCG,kOscRangeHigh);
+    g_xtal0ClkFreq = 32000000U;
+
 
     /* Set system clock configuration. */
-#if (CLOCK_INIT_CONFIG == CLOCK_VLPR)
-    CLOCK_SetBootConfig(&g_defaultClockConfigVlpr);
-#else
     CLOCK_SetBootConfig(&g_defaultClockConfigRun);
-#endif
     
+    /* set TPM clock */
     CLOCK_SYS_SetTpmSrc(0, kClockTpmSrcOsc0erClk);
 }
 
-/* Initialize DCDC. */
-void BOARD_DCDCInit(void)
-{
-#if gDCDC_Enabled_d == 1
-    /* Initialize DCDC module */
-    DCDC_Init(&mDcdcDefaultConfig); 
-#endif
-}
 
-void dbg_uart_init(void)
-{
-    configure_lpuart_pins(BOARD_DEBUG_UART_INSTANCE);
 
-    // Select different clock source for LPSCI. */
-#if (CLOCK_INIT_CONFIG == CLOCK_VLPR)
-    CLOCK_SYS_SetLpuartSrc(BOARD_DEBUG_UART_INSTANCE, kClockLpuartSrcMcgIrClk);
-#else
-    CLOCK_SYS_SetLpuartSrc(BOARD_DEBUG_UART_INSTANCE, kClockLpuartSrcMcgFllClk);
-#endif
 
-//    DbgConsole_Init(BOARD_DEBUG_UART_INSTANCE, BOARD_DEBUG_UART_BAUD, kDebugConsoleLPUART);
-}
-
-int debug_printf( char const * s, ... )
-{
-    return 0;
-}
 
 /************************************************************************************
-*************************************************************************************
 * Private functions
-*************************************************************************************
 ************************************************************************************/
 
 /*!
@@ -306,13 +297,12 @@ int debug_printf( char const * s, ... )
  * This function used BANDGAP as reference voltage to measure vdd and
  * calibrate V_TEMP25 with that vdd value.
  */
-#if gDCDC_Enabled_d == 0
 static const adc16_hw_average_config_t adcHwAverageConfig =
 {
   .hwAverageEnable = true, /*!< Enable the hardware average function. */
   .hwAverageCountMode = kAdc16HwAverageCountOf16 /*!< Select the count of conversion result for accumulator. */
 } ;
-#endif
+
 
 void ADC16_CalibrateParams(void)
 {
@@ -322,10 +312,8 @@ void ADC16_CalibrateParams(void)
     ADC16_DRV_GetAutoCalibrationParam(ADC16_INSTANCE, &adcCalibraitionParam);
     ADC16_DRV_SetCalibrationParam(ADC16_INSTANCE, &adcCalibraitionParam);
 #endif /* FSL_FEATURE_ADC16_HAS_CALIBRATION */
-  
-#if gDCDC_Enabled_d == 0    
+    
   ADC16_DRV_ConfigHwAverage(0, &adcHwAverageConfig);
-#endif
   
     pmc_bandgap_buffer_config_t pmcBandgapConfig = {
         .enable = true,
@@ -339,18 +327,6 @@ void ADC16_CalibrateParams(void)
     
     // Enable BANDGAP reference voltage
     PMC_HAL_BandgapBufferConfig(PMC_BASE_PTR, &pmcBandgapConfig);
-}
-
-
-/*!
- * @brief Gets the current voltage of divider (potentiometer)
- *
- * This function measure the ADC channel corresponding to external potentiometer
- */
-static inline uint32_t ADC16_Measure(void)
-{
-    adcValue = ADC16_ReadValue((adc16_chn_t)ADC16_POTENTIOMETER_CHN, true);
-    return adcValue;
 }
 
 
@@ -428,94 +404,7 @@ static void CLOCK_SetBootConfig(clock_manager_user_config_t const* config)
     SystemCoreClock = CORE_CLOCK_FREQ;
 }
 
-void BOARD_InstallLowPowerCallbacks()
-{
-#if cPWR_UsePowerDownMode
-  PWR_RegisterLowPowerEnterCallback((pfPWRCallBack_t)BOARD_EnterLowPowerCb);
-  PWR_RegisterLowPowerExitCallback((pfPWRCallBack_t)BOARD_ExitLowPowerCb); 
-#endif
-}
 
-void BOARD_TogglePins(bool isLowPower)
-{
-    if(isLowPower)
-    {
-        PORT_HAL_SetMuxMode(PORTA,16u,kPortPinDisabled);
-        PORT_HAL_SetMuxMode(PORTA,17u,kPortPinDisabled);
-
-        PORT_HAL_SetMuxMode(PORTB,1u,kPortPinDisabled);
-        PORT_HAL_SetMuxMode(PORTB,2u,kPortPinDisabled);
-        PORT_HAL_SetMuxMode(PORTB,3u,kPortPinDisabled);
-        PORT_HAL_SetMuxMode(PORTB,16u,kPortPinDisabled);
-        PORT_HAL_SetMuxMode(PORTB,17u,kPortPinDisabled);
-
-        PORT_HAL_SetMuxMode(PORTC,2u,kPortPinDisabled);
-        PORT_HAL_SetMuxMode(PORTC,3u,kPortPinDisabled);
-        PORT_HAL_SetMuxMode(PORTC,6u,kPortPinDisabled);
-        PORT_HAL_SetMuxMode(PORTC,7u,kPortPinDisabled);
-
-        /* LEDs */
-        PORT_HAL_SetMuxMode(PORTC,0u,kPortPinDisabled);
-        PORT_HAL_SetMuxMode(PORTC,1u,kPortPinDisabled);
-        PORT_HAL_SetMuxMode(PORTC,4u,kPortPinDisabled);
-        PORT_HAL_SetMuxMode(PORTC,5u,kPortPinDisabled);
-
-        PORT_HAL_SetMuxMode(PORTC,16u,kPortPinDisabled);
-        PORT_HAL_SetMuxMode(PORTC,17u,kPortPinDisabled);
-        PORT_HAL_SetMuxMode(PORTC,18u,kPortPinDisabled);
-        PORT_HAL_SetMuxMode(PORTC,19u,kPortPinDisabled);
-
-        //NMI
-        PORT_HAL_SetMuxMode(PORTB,18u,kPortPinDisabled);
-
-        //SWD pins
-        PORT_HAL_SetMuxMode(PORTA,0u,kPortPinDisabled);
-        PORT_HAL_SetMuxMode(PORTA,1u,kPortPinDisabled);
-    }
-    else
-    {
-        //SWD pins
-        PORT_HAL_SetMuxMode(PORTA,0u,kPortMuxAlt7);
-        PORT_HAL_SetPullMode(PORTA,0u,kPortPullUp);
-        PORT_HAL_SetPullCmd(PORTA,0u, true);
-        
-        PORT_HAL_SetMuxMode(PORTA,1u,kPortMuxAlt7);
-        PORT_HAL_SetSlewRateMode(PORTA,1u,kPortSlowSlewRate);
-        PORT_HAL_SetPullMode(PORTA,1u,kPortPullDown);
-        PORT_HAL_SetPullCmd(PORTA,1u, true);
-
-        /* LEDs */
-        PORT_HAL_SetMuxMode(PORTC,0u,kPortMuxAsGpio);
-        PORT_HAL_SetMuxMode(PORTC,1u,kPortMuxAsGpio);
-        PORT_HAL_SetMuxMode(PORTC,4u,kPortMuxAsGpio);
-        PORT_HAL_SetMuxMode(PORTC,5u,kPortMuxAsGpio);
-        
-        configure_lpuart_pins(0);
-    }
-}
-
-void BOARD_EnterLowPowerCb()
-{
-#if APP_DISABLE_PINS_IN_LOW_POWER  
-    BOARD_TogglePins(TRUE);
-#endif
-    
-#if gDCDC_Enabled_d
-    DCDC_BWR_REG0_DCDC_VBAT_DIV_CTRL(DCDC_BASE_PTR, 0);
-    DCDC_PrepareForPulsedMode();
-#endif
-}
-
-void BOARD_ExitLowPowerCb()
-{  
-#if APP_DISABLE_PINS_IN_LOW_POWER  
-  BOARD_TogglePins(FALSE);
-#endif
-  
-#if gDCDC_Enabled_d
-    DCDC_PrepareForContinuousMode();
-#endif
-}
 /*******************************************************************************
  * EOF
  ******************************************************************************/

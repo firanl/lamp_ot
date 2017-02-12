@@ -35,26 +35,20 @@
 */
 
 /************************************************************************************
-*************************************************************************************
 * Include
-*************************************************************************************
 ************************************************************************************/
 #include "gap_interface.h"
 #include "ble_constants.h"
 #include "gatt_db_handles.h"
 
 /************************************************************************************
-*************************************************************************************
 * Private macros
-*************************************************************************************
 ************************************************************************************/
 #define smpEdiv                 0x1F99
 #define mcEncryptionKeySize_c   16
 
 /************************************************************************************
-*************************************************************************************
 * Public memory declarations
-*************************************************************************************
 ************************************************************************************/
 
 /* Scanning and Advertising Data */
@@ -111,7 +105,7 @@ gapAdvertisingParameters_t gAdvParameters =
 /* SMP Data */
 gapPairingParameters_t gPairingParameters = {
     TRUE,
-    gSecurityMode_1_Level_2_c,
+    gSecurityMode_1_Level_1_c,
     mcEncryptionKeySize_c,
     gIoDisplayOnly_c,
     TRUE,
@@ -149,11 +143,12 @@ gapSmpKeys_t gSmpKeys = {
 };
 
 /* Device Security Requirements */
+#define GAP_SERVICE_CNT 3
 static const gapSecurityRequirements_t        masterSecurity = gGapDefaultSecurityRequirements_d;
-static const gapServiceSecurityRequirements_t serviceSecurity[3] = {
+static const gapServiceSecurityRequirements_t serviceSecurity[GAP_SERVICE_CNT] = {
   {
     .requirements = {
-        .securityModeLevel = gSecurityMode_1_Level_3_c,
+        .securityModeLevel = gSecurityMode_1_Level_1_c,
         .authorization = FALSE,
         .minimumEncryptionKeySize = gDefaultEncryptionKeySize_d
     },
@@ -161,7 +156,7 @@ static const gapServiceSecurityRequirements_t serviceSecurity[3] = {
   },
   {
     .requirements = {
-        .securityModeLevel = gSecurityMode_1_Level_3_c,
+        .securityModeLevel = gSecurityMode_1_Level_1_c,
         .authorization = FALSE,
         .minimumEncryptionKeySize = gDefaultEncryptionKeySize_d
     },
@@ -169,7 +164,7 @@ static const gapServiceSecurityRequirements_t serviceSecurity[3] = {
   },
   {
     .requirements = {
-        .securityModeLevel = gSecurityMode_1_Level_3_c,
+        .securityModeLevel = gSecurityMode_1_Level_1_c,
         .authorization = FALSE,
         .minimumEncryptionKeySize = gDefaultEncryptionKeySize_d
     },
@@ -179,6 +174,6 @@ static const gapServiceSecurityRequirements_t serviceSecurity[3] = {
 
 gapDeviceSecurityRequirements_t deviceSecurityRequirements = {
     .pMasterSecurityRequirements    = (void*)&masterSecurity,
-    .cNumServices                   = 3,
+    .cNumServices                   = GAP_SERVICE_CNT,
     .aServiceSecurityRequirements   = (void*)serviceSecurity
 };

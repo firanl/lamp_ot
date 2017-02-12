@@ -148,8 +148,9 @@ static bool_t   mSendDataAfterEncStart = FALSE;
 
 /* Service Data */
 static basConfig_t basServiceConfig = {service_battery, 0};
-static disConfig_t disServiceConfig = {service_device_info};
+static disConfig_t disServiceConfig         = {service_device_info};
 static otapClientConfig_t otapServiceConfig = {service_otap};
+
 static uint16_t otapWriteNotifHandles[] = {value_otap_control_point,
                                            value_otap_data};
 
@@ -192,12 +193,14 @@ static tmrTimerID_t mBatteryMeasurementTimerId;
 *************************************************************************************
 ************************************************************************************/
 
+static void BleApp_Config();
+
 /* Gatt and Att callbacks */
 static void BleApp_AdvertisingCallback (gapAdvertisingEvent_t* pAdvertisingEvent);
 static void BleApp_ConnectionCallback (deviceId_t peerDeviceId, gapConnectionEvent_t* pConnectionEvent);
 static void BleApp_GattServerCallback (deviceId_t deviceId, gattServerEvent_t* pServerEvent);
 
-static void BleApp_Config();
+
 
 static void BleApp_CccdWritten (deviceId_t deviceId, uint16_t handle, gattCccdFlags_t cccd);
 static void BleApp_AttributeWritten (deviceId_t deviceId, uint16_t handle, uint16_t length, uint8_t* pValue);
@@ -251,7 +254,7 @@ void BleApp_Init(void)
 ********************************************************************************** */
 void BleApp_Start(void)
 {
-    Led1On();
+    //Led1On();
     
     if (mPeerDeviceId == gInvalidDeviceId_c)
     {
@@ -273,8 +276,29 @@ void BleApp_Start(void)
 * \param[in]    events    Key event structure.
 ********************************************************************************** */
 void BleApp_HandleKeys(key_event_t events)
-{
-    BleApp_Start();
+{     
+  switch (events)
+      {
+        
+          case gKBD_EventPressPB1_c:
+          {
+
+            BleApp_Start();
+          }  break;
+          
+          
+          case gKBD_EventLongPB1_c:
+          {
+
+          }  break;
+
+          default:
+          {
+              if (mPeerDeviceId != gInvalidDeviceId_c)
+                  Gap_Disconnect(mPeerDeviceId);
+          }  break;
+      }
+    
 }
 
 /*! *********************************************************************************
@@ -313,7 +337,7 @@ void BleApp_GenericCallback (gapGenericEvent_t* pGenericEvent)
 
         case gInternalError_c:
         {
-            Led2On();
+            //Led2On();
             panic(0,0,0,0);
         }
         break;
@@ -336,6 +360,8 @@ void BleApp_GenericCallback (gapGenericEvent_t* pGenericEvent)
 ********************************************************************************** */
 static void BleApp_Config()
 {  
+    tmrErrCode_t tmrerr = gTmrInvalidId_c;
+  
     /* Read public address from controller */
     Gap_ReadPublicDeviceAddress();
 
@@ -372,16 +398,25 @@ static void BleApp_Config()
 #endif
 
     mAdvState.advOn = FALSE;
-	/* Start services */
+
+    /* Start services */
+    Dis_Start(&disServiceConfig);
+    
     OtapCS_Start(&otapServiceConfig);
     
     basServiceConfig.batteryLevel = 50;
     Bas_Start(&basServiceConfig);
-    Dis_Start(&disServiceConfig);
+    
 
     /* Allocate aplication timer */
     appTimerId = TMR_AllocateTimer();  
     mBatteryMeasurementTimerId = TMR_AllocateTimer();
+    /* Start battery measurements */
+    tmrerr = TMR_StartLowPowerTimer(mBatteryMeasurementTimerId, gTmrLowPowerIntervalMillisTimer_c,
+               TmrSeconds(mBatteryLevelReportInterval_c), BatteryMeasurementTimerCallback, NULL);       
+    
+    // start advertising
+    BleApp_Start();
 }
 
 /*! *********************************************************************************
@@ -405,15 +440,14 @@ static void BleApp_AdvertisingCallback (gapAdvertisingEvent_t* pAdvertisingEvent
 
             if(mAdvState.advOn)
             {
-                LED_StopFlashingAllLeds();
-                Led1Flashing();
+
             }
         }
         break;
 
         case gAdvertisingCommandFailed_c:
         {
-            Led2On();
+
             panic(0,0,0,0);
         }
         break;
@@ -438,12 +472,12 @@ static void BleApp_ConnectionCallback (deviceId_t peerDeviceId, gapConnectionEve
 #endif  
             /* Advertising stops when connected */
             mAdvState.advOn = FALSE;
-            TMR_StopTimer(appTimerId);         
+         
             
-	        /* Subscribe client*/
+	    /* Subscribe client*/
             mPeerDeviceId = peerDeviceId;
-	        Bas_Subscribe(peerDeviceId);		
-	        OtapCS_Subscribe(peerDeviceId);
+	    Bas_Subscribe(peerDeviceId);		
+	    OtapCS_Subscribe(peerDeviceId);
 				
             mSendDataAfterEncStart = FALSE;
             if (gBleSuccess_c == Gap_CheckIfBonded(peerDeviceId, &isBonded) &&
@@ -453,18 +487,10 @@ static void BleApp_ConnectionCallback (deviceId_t peerDeviceId, gapConnectionEve
                 mSendDataAfterEncStart = TRUE;
             }
             
-			/* UI */            
-            LED_StopFlashingAllLeds();
-            Led1On();        
-            
-            /* Device does not need to sleep until some information is exchanged with the peer. */
-            PWR_DisallowDeviceToSleep();
-            
+	    /* UI */            
             OtapClient_HandleConnectionEvent (peerDeviceId);
 
-            /* Start battery measurements */
-            TMR_StartLowPowerTimer(mBatteryMeasurementTimerId, gTmrLowPowerIntervalMillisTimer_c,
-                       TmrSeconds(mBatteryLevelReportInterval_c), BatteryMeasurementTimerCallback, NULL);            
+         
         }
         break;
         
@@ -476,11 +502,6 @@ static void BleApp_ConnectionCallback (deviceId_t peerDeviceId, gapConnectionEve
             OtapCS_Unsubscribe();
             
             /* UI */
-            LED_StopFlashingAllLeds();
-            Led1Flashing();
-            Led2Flashing();
-            Led3Flashing();
-            //Led4Flashing();
             
             /* Restart advertising*/
             BleApp_Start();
@@ -587,38 +608,38 @@ static void BleApp_GattServerCallback (deviceId_t deviceId, gattServerEvent_t* p
 {
     switch (pServerEvent->eventType)
     {
-    case gEvtCharacteristicCccdWritten_c:
-        {
-            Gap_SaveCccd (deviceId,
-                          pServerEvent->eventData.charCccdWrittenEvent.handle,
-                          pServerEvent->eventData.charCccdWrittenEvent.newCccd);
-            
-            BleApp_CccdWritten (deviceId,
-                                pServerEvent->eventData.charCccdWrittenEvent.handle,
-                                pServerEvent->eventData.charCccdWrittenEvent.newCccd) ;
-        }
-        break;
-        
-    case gEvtAttributeWritten_c:
-            BleApp_AttributeWritten (deviceId,
-                                     pServerEvent->eventData.attributeWrittenEvent.handle,
-                                     pServerEvent->eventData.attributeWrittenEvent.cValueLength,
-                                     pServerEvent->eventData.attributeWrittenEvent.aValue);
-        break;
-        
-    case gEvtAttributeWrittenWithoutResponse_c:
-            BleApp_AttributeWrittenWithoutResponse (deviceId,
-                                                    pServerEvent->eventData.attributeWrittenEvent.handle,
-                                                    pServerEvent->eventData.attributeWrittenEvent.cValueLength,
-                                                    pServerEvent->eventData.attributeWrittenEvent.aValue);
-        break;
-        
-    case gEvtHandleValueConfirmation_c:
-            BleApp_HandleValueConfirmation (deviceId);
-        break;
-        
-    default:
-        break;
+      case gEvtCharacteristicCccdWritten_c:
+          {
+              Gap_SaveCccd (deviceId,
+                            pServerEvent->eventData.charCccdWrittenEvent.handle,
+                            pServerEvent->eventData.charCccdWrittenEvent.newCccd);
+              
+              BleApp_CccdWritten (deviceId,
+                                  pServerEvent->eventData.charCccdWrittenEvent.handle,
+                                  pServerEvent->eventData.charCccdWrittenEvent.newCccd) ;
+          }
+          break;
+          
+      case gEvtAttributeWritten_c:
+              BleApp_AttributeWritten (deviceId,
+                                       pServerEvent->eventData.attributeWrittenEvent.handle,
+                                       pServerEvent->eventData.attributeWrittenEvent.cValueLength,
+                                       pServerEvent->eventData.attributeWrittenEvent.aValue);
+          break;
+          
+      case gEvtAttributeWrittenWithoutResponse_c:
+              BleApp_AttributeWrittenWithoutResponse (deviceId,
+                                                      pServerEvent->eventData.attributeWrittenEvent.handle,
+                                                      pServerEvent->eventData.attributeWrittenEvent.cValueLength,
+                                                      pServerEvent->eventData.attributeWrittenEvent.aValue);
+          break;
+          
+      case gEvtHandleValueConfirmation_c:
+              BleApp_HandleValueConfirmation (deviceId);
+          break;
+          
+      default:
+          break;
     }
 }
 

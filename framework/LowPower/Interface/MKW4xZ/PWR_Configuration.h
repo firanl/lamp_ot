@@ -85,15 +85,16 @@
 //   FALSE = 0: Don't use PowerDown. Will cut variables and code out. But
 //              functions still exist. Useful for debugging and test purposes
 #ifndef cPWR_UsePowerDownMode
-  #define cPWR_UsePowerDownMode                   FALSE
+  #define cPWR_UsePowerDownMode              FALSE
 #endif
 
-
+/* Enable/Disable BLE Link Layer DSM */
 #ifndef cPWR_BLE_LL_Enable
-#define cPWR_BLE_LL_Enable               FALSE
+	#define cPWR_BLE_LL_Enable               FALSE
 #endif
+
 #ifndef cPWR_Zigbee_Enable
-#define cPWR_Zigbee_Enable               FALSE
+	#define cPWR_Zigbee_Enable               FALSE
 #endif
 
 //-----------------------------------------------------------------------------
@@ -183,9 +184,9 @@
 //        Radio in normal mode.
 
 #ifndef cPWR_SleepMode
-#define cPWR_SleepMode                            1
+	#define cPWR_SleepMode                            1
 #endif
-
+	
 //-----------------------------------------------------------------------------
 // The deep sleep duration in ms. 
 #ifndef cPWR_DeepSleepDurationMs
@@ -214,7 +215,7 @@
 // BLE LL DEEP SLEEP MODE DEFINES
 /* Number of slots(625us) before the wake up instant before which the hardware needs to exit from deep sleep mode. */
 #ifndef cPWR_BLE_LL_OffsetToWakeupInstant
-#define cPWR_BLE_LL_OffsetToWakeupInstant                   (3)
+	#define cPWR_BLE_LL_OffsetToWakeupInstant                   (3)
 #endif
 
 /*Oscillator stabilization/startup delay. This is in X.Y for-mat where X is in terms of number of BT slots (625 us) and Y is in terms of number of clock periods of 16KHz clock input, required for RF oscillator to stabilize the clock output to the controller on its output pin, after os-cillator is turned ON. In this period the clock is assumed to be unstable, and so the controller does not turn on the clock to internal logic till this period is over. This means, the wake up from deep sleep mode must ac-count for this delay before the wakeup instant.
