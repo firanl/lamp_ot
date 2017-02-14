@@ -222,10 +222,18 @@ LED_OpMode_t operation
         switch(operation)
         {
         case gLedOn_c:
-            GPIO_DRV_ClearPinOutput(kGpioLED1);
+            #if (mLEDInvertedOut_c)
+              GPIO_DRV_ClearPinOutput(kGpioLED1);
+            #else
+              GPIO_DRV_SetPinOutput(kGpioLED1);
+            #endif /* mLEDInvertedOut_c */
             break;
         case gLedOff_c:
-            GPIO_DRV_SetPinOutput(kGpioLED1);
+            #if (mLEDInvertedOut_c)
+              GPIO_DRV_SetPinOutput(kGpioLED1);
+            #else
+              GPIO_DRV_ClearPinOutput(kGpioLED1);
+            #endif /* mLEDInvertedOut_c */
             break;
         case gLedToggle_c:
             GPIO_DRV_TogglePinOutput(kGpioLED1);
@@ -241,10 +249,18 @@ LED_OpMode_t operation
         switch(operation)
         {
         case gLedOn_c:
-            GPIO_DRV_ClearPinOutput(kGpioLED2);
+            #if (mLEDInvertedOut_c)
+              GPIO_DRV_ClearPinOutput(kGpioLED2);
+            #else
+              GPIO_DRV_SetPinOutput(kGpioLED2);
+            #endif /* mLEDInvertedOut_c */
             break;
         case gLedOff_c:
-            GPIO_DRV_SetPinOutput(kGpioLED2);
+            #if (mLEDInvertedOut_c)
+              GPIO_DRV_SetPinOutput(kGpioLED2);
+            #else
+              GPIO_DRV_ClearPinOutput(kGpioLED2);
+            #endif /* mLEDInvertedOut_c */
             break;
         case gLedToggle_c:
             GPIO_DRV_TogglePinOutput(kGpioLED2);
@@ -260,10 +276,18 @@ LED_OpMode_t operation
         switch(operation)
         {
         case gLedOn_c:
-            GPIO_DRV_ClearPinOutput(kGpioLED3);
+            #if (mLEDInvertedOut_c)
+              GPIO_DRV_ClearPinOutput(kGpioLED3);
+            #else
+              GPIO_DRV_SetPinOutput(kGpioLED3);
+            #endif /* mLEDInvertedOut_c */
             break;
         case gLedOff_c:
-            GPIO_DRV_SetPinOutput(kGpioLED3);
+            #if (mLEDInvertedOut_c)
+              GPIO_DRV_SetPinOutput(kGpioLED3);
+            #else
+              GPIO_DRV_ClearPinOutput(kGpioLED3);
+            #endif /* mLEDInvertedOut_c */
             break;
         case gLedToggle_c:
             GPIO_DRV_TogglePinOutput(kGpioLED3);
@@ -279,10 +303,18 @@ LED_OpMode_t operation
         switch(operation)
         {
         case gLedOn_c:
-            GPIO_DRV_ClearPinOutput(kGpioLED4);
+            #if (mLEDInvertedOut_c)
+              GPIO_DRV_ClearPinOutput(kGpioLED4);
+            #else
+              GPIO_DRV_SetPinOutput(kGpioLED4);
+            #endif /* mLEDInvertedOut_c */
             break;
         case gLedOff_c:
-            GPIO_DRV_SetPinOutput(kGpioLED4);
+            #if (mLEDInvertedOut_c)
+              GPIO_DRV_SetPinOutput(kGpioLED4);
+            #else
+              GPIO_DRV_ClearPinOutput(kGpioLED4);
+            #endif /* mLEDInvertedOut_c */
             break;
         case gLedToggle_c:
             GPIO_DRV_TogglePinOutput(kGpioLED4);

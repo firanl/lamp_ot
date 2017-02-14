@@ -51,6 +51,8 @@
 #define gLEDSupported_d         TRUE
 /* Specifies the number of physical LEDs on the target board */
 #define gLEDsOnTargetBoardCnt_c 1
+/* LED output normal or inverted */
+#define mLEDInvertedOut_c       FALSE
 
 /* Specifies the type of EEPROM available on the target board */
 #define gEepromType_d           gEepromDevice_AT45DB021E_c

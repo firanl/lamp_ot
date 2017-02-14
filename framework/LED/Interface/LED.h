@@ -38,7 +38,7 @@
 
 
 #ifndef gLEDSupported_d
-#define gLEDSupported_d                TRUE
+  #define gLEDSupported_d                TRUE
 #endif
 
 /*
@@ -47,7 +47,7 @@
 *              generic target board
 */
 #ifndef gLEDsOnTargetBoardDefault_c
-#define gLEDsOnTargetBoardDefault_c    4
+  #define gLEDsOnTargetBoardDefault_c    4
 #endif
 
 /*
@@ -55,7 +55,7 @@
 * Description: Specifies the number of physical LEDs on the target board
 */
 #ifndef gLEDsOnTargetBoardCnt_c
-#define gLEDsOnTargetBoardCnt_c        gLEDsOnTargetBoardDefault_c
+  #define gLEDsOnTargetBoardCnt_c        gLEDsOnTargetBoardDefault_c
 #endif
 
 /*
@@ -63,7 +63,7 @@
 * Description: Specifies if blip (blink) is supported by the LED module
 */
 #ifndef gLEDBlipEnabled_d
-#define gLEDBlipEnabled_d              TRUE
+  #define gLEDBlipEnabled_d              TRUE
 #endif
 
 /*
@@ -73,7 +73,22 @@
 */
 
 #ifndef mLEDInterval_c
-#define mLEDInterval_c                 100
+  #define mLEDInterval_c                 1200
+#endif
+
+/*
+* Name: mLEDInvertedOut
+* Description: Led outpus inverted. Default value TRUE.
+*               TRUE 
+*                LedOn  -> GPIO_DRV_ClearPinOutput(kGpioLEDx)
+*                LedOff -> GPIO_DRV_SetPinOutput(kGpioLEDx)
+*               FALSE 
+*                LedOn   -> GPIO_DRV_SetPinOutput(kGpioLEDx)
+*                LedOff  -> GPIO_DRV_ClearPinOutput(kGpioLEDx)              
+*/
+
+#ifndef mLEDInvertedOut_c
+  #define mLEDInvertedOut_c                TRUE
 #endif
 
 /*

@@ -61,7 +61,7 @@
 
 /* Default EEPROM type used */
 #ifndef gEepromType_d
-#define gEepromType_d gEepromDevice_None_c
+	#define gEepromType_d gEepromDevice_None_c
 #endif
 
 /* Characteristics of the EEPROM device */
@@ -92,17 +92,17 @@
 
 
 #ifndef gEepromParams_StartOffset_c
-#define gEepromParams_StartOffset_c            0xFFFFFFFF /* Not defined */
+	#define gEepromParams_StartOffset_c            0xFFFFFFFF /* Not defined */
 #endif
 
 #ifndef gEepromParams_WriteAlignment_c
-#define gEepromParams_WriteAlignment_c         1 /* bytes */
+	#define gEepromParams_WriteAlignment_c         1 /* bytes */
 #endif
 
 #if (gEepromParams_WriteAlignment_c > 1)
-#define gEepromAlignAddr_d(x) ((((x)+gEepromParams_WriteAlignment_c-1)/gEepromParams_WriteAlignment_c)*gEepromParams_WriteAlignment_c)
+	#define gEepromAlignAddr_d(x) ((((x)+gEepromParams_WriteAlignment_c-1)/gEepromParams_WriteAlignment_c)*gEepromParams_WriteAlignment_c)
 #else
-#define gEepromAlignAddr_d(x) (x)
+	#define gEepromAlignAddr_d(x) (x)
 #endif
 
 

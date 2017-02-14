@@ -13,7 +13,6 @@ PRIMARY_SERVICE(service_gap, gBleSig_GenericAccessProfile_d)
 
 
 
-
 PRIMARY_SERVICE(service_device_info, gBleSig_DeviceInformationService_d)
     CHARACTERISTIC(char_manuf_name, gBleSig_ManufacturerNameString_d, (gGattCharPropRead_c) )
         VALUE(value_manuf_name, gBleSig_ManufacturerNameString_d, (gPermissionFlagReadable_c), 9, "Freescale")
@@ -27,6 +26,39 @@ PRIMARY_SERVICE(service_device_info, gBleSig_DeviceInformationService_d)
         VALUE(value_fw_rev, gBleSig_FirmwareRevisionString_d, (gPermissionFlagReadable_c), 5, "1.1.1")
     CHARACTERISTIC(char_sw_rev, gBleSig_SoftwareRevisionString_d, (gGattCharPropRead_c) )
         VALUE(value_sw_rev, gBleSig_SoftwareRevisionString_d, (gPermissionFlagReadable_c), 5, "1.1.4")
+          
+PRIMARY_SERVICE_UUID128(service_lamp, uuid_service_lamp)
+    CHARACTERISTIC_UUID128(char_lamp_Control, uuid_char_lamp_Control, (gGattCharPropNotify_c | gGattCharPropRead_c | gGattCharPropWrite_c | gGattCharPropWriteWithoutRsp_c) )
+        VALUE_UUID128(value_lamp_Control, uuid_char_lamp_Control, (gPermissionFlagReadable_c | gPermissionFlagWritable_c), 1, LA_LAMP_CONTROL)
+        CCCD(cccd_lamp_Control)
+
+    CHARACTERISTIC_UUID128(char_lamp_White, uuid_char_lamp_White, (gGattCharPropNotify_c | gGattCharPropRead_c | gGattCharPropWrite_c | gGattCharPropWriteWithoutRsp_c) )
+        VALUE_UUID128(value_lamp_White, uuid_char_lamp_White, (gPermissionFlagReadable_c | gPermissionFlagWritable_c),  2, LA_LAMP_WHITE)
+        DESCRIPTOR(desc_lamp_White, gBleSig_CharPresFormatDescriptor_d, (gPermissionFlagReadable_c), gBleSig_CharPresFormatDescriptorBytes_d, gBleSig_unsigned_16_bit_integer_d, gBleSig_Exponent_0_d, gBleSig_percentage_d, gBleSig_No_Namespaces_d, gBleSig_unknown_d)
+        CCCD(cccd_White)
+
+    CHARACTERISTIC_UUID128(char_lamp_RGB, uuid_char_lamp_RGB, (gGattCharPropRead_c | gGattCharPropWrite_c | gGattCharPropWriteWithoutRsp_c) )
+        VALUE_UUID128(value_lamp_RGB, uuid_char_lamp_RGB, (gPermissionFlagReadable_c | gPermissionFlagWritable_c), 3, LA_LAMP_RGB)
+ 
+    CHARACTERISTIC(char_core_temperature, gBleSig_Temperature_d, (gGattCharPropRead_c | gGattCharPropNotify_c))
+        VALUE(value_core_temperature, gBleSig_Temperature_d, (gPermissionFlagReadable_c), 2, 0xD1, 0x07)
+        DESCRIPTOR(desc_core_temperature, gBleSig_CharPresFormatDescriptor_d, (gPermissionFlagReadable_c), gBleSig_CharPresFormatDescriptorBytes_d, gBleSig_signed_16_bit_integer_d, gBleSig_Exponent_neg2_d, gBleSig_Celsius_temperature_d, gBleSig_No_Namespaces_d, gBleSig_unknown_d)
+        CCCD(cccd_core_temperature)          
+
+    CHARACTERISTIC_UUID128(char_core_voltage, uuid_char_core_voltage, (gGattCharPropNotify_c | gGattCharPropRead_c | gGattCharPropWrite_c | gGattCharPropWriteWithoutRsp_c) )
+        VALUE_UUID128(value_core_voltage, uuid_char_core_voltage, (gPermissionFlagReadable_c ),  2, 0x0D, 0x02)
+        DESCRIPTOR(desc_core_voltage, gBleSig_CharPresFormatDescriptor_d, (gPermissionFlagReadable_c), gBleSig_CharPresFormatDescriptorBytes_d, gBleSig_signed_16_bit_integer_d, gBleSig_Exponent_neg3_d, gBleSig_electric_potential_difference_d, gBleSig_No_Namespaces_d, gBleSig_unknown_d)
+        CCCD(cccd_core_voltage)
+             
+    CHARACTERISTIC(char_lamp_clock, gBleSig_Date_Time_d, (gGattCharPropNotify_c | gGattCharPropRead_c | gGattCharPropWrite_c) )
+        VALUE(value_lamp_clock,  gBleSig_Date_Time_d, (gPermissionFlagReadable_c | gPermissionFlagWritable_c), 7, 0x00, 0x00,  0x00, 0x00, 0x00, 0x00, 0x00 )
+        CCCD(cccd_lamp_clock) 
+ 
+    CHARACTERISTIC_UUID128(char_lamp_onHHMM, uuid_char_lamp_onHHMM, (gGattCharPropRead_c | gGattCharPropWrite_c | gGattCharPropWriteWithoutRsp_c) )
+        VALUE_UUID128(value_lamp_onHHMM, uuid_char_lamp_onHHMM, (gPermissionFlagReadable_c | gPermissionFlagWritable_c), 2, 0x00, 0x00)
+ 
+    CHARACTERISTIC_UUID128(char_lamp_offHHMM, uuid_char_lamp_offHHMM, (gGattCharPropRead_c | gGattCharPropWrite_c | gGattCharPropWriteWithoutRsp_c) )
+        VALUE_UUID128(value_lamp_offHHMM, uuid_char_lamp_offHHMM, (gPermissionFlagReadable_c | gPermissionFlagWritable_c), 2, 0x00, 0x00)          
 
 PRIMARY_SERVICE_UUID128(service_otap, uuid_service_otap)
     CHARACTERISTIC_UUID128(char_otap_control_point, uuid_char_otap_control_point, (gGattCharPropWrite_c | gGattCharPropIndicate_c))

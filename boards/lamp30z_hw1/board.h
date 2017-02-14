@@ -80,12 +80,12 @@
   /* EXTAL0 PTB16 */
   #define EXTAL32K_PORT   PORTB
   #define EXTAL32K_PIN    16
-  #define EXTAL32K_PINMUX kPortMuxAsGpio
+  #define EXTAL32K_PINMUX kPortPinDisabled
 
   /* XTAL32K PTB17 */
   #define XTAL32K_PORT   PORTB
   #define XTAL32K_PIN    17
-  #define XTAL32K_PINMUX kPortMuxAsGpio
+  #define XTAL32K_PINMUX kPortPinDisabled
 
   /* RTC external clock configuration. */
   #define RTC_XTAL_FREQ   32768U
@@ -99,6 +99,10 @@
   #define BOARD_RTC_FUNC_INSTANCE         0
 
 
+/* service_lamp db defaults */
+#define LA_LAMP_CONTROL      0xA0
+#define LA_LAMP_WHITE        0x00, 0x00
+#define LA_LAMP_RGB          0x00, 0x05, 0x00
 
 
 

@@ -63,7 +63,7 @@
  *              the ISR's code, this macro shall be set to FALSE (recommended).
  */      
 #ifndef gNvDisableIntCmdSeq_c
-#define gNvDisableIntCmdSeq_c           (1)
+  #define gNvDisableIntCmdSeq_c           (1)
 #endif
 
 /* size of array to copy__Launch_Command function to.*/

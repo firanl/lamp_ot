@@ -33,13 +33,14 @@
 #ifndef _KEYBOARD_INTERFACE_H_
 #define _KEYBOARD_INTERFACE_H_
 
+#include "EmbeddedTypes.h"
 
 /*
  * Name: gKeyBoardSupported_d
  * Description: Enables/disables the switches based keyboard
  */
 #ifndef gKeyBoardSupported_d
-#define gKeyBoardSupported_d                1
+  #define gKeyBoardSupported_d                TRUE
 #endif
 
 /*
@@ -47,7 +48,7 @@
  * Description: Defines the number of available keys for the keyboard module
  */
 #ifndef gKBD_KeysCount_c
-#define gKBD_KeysCount_c 4
+  #define gKBD_KeysCount_c 4
 #endif
 
 /*
@@ -74,56 +75,53 @@
  *              the event notification mode
  */
 #ifndef gKeyEventNotificationMode_d
-#define gKeyEventNotificationMode_d         gKbdEventShortLongPressMode_c
+  #define gKeyEventNotificationMode_d         gKbdEventShortLongPressMode_c
 #endif
 
 #if gKeyEventNotificationMode_d > gKbdEventPressHoldReleaseMode_c
-#error "Keyboard notification method not supported"
+  #error "Keyboard notification method not supported"
 #endif
 
 #if (gKeyEventNotificationMode_d == gKbdEventShortLongPressMode_c)
-#if gKeyBoardSupported_d
-/*
- * Name: gKbdLongKeyIterations_c
- * Description: The iterations required for key long press detection
- *              The detection threshold is gKbdLongKeyIterations_c x gKeyScanInterval_c milliseconds
- */
-#ifndef gKbdLongKeyIterations_c
-#define gKbdLongKeyIterations_c             20
-#endif
-#endif /* gKeyBoardSupported_d */
-
+  #if gKeyBoardSupported_d
+    /*
+     * Name: gKbdLongKeyIterations_c
+     * Description: The iterations required for key long press detection
+     *              The detection threshold is gKbdLongKeyIterations_c x gKeyScanInterval_c milliseconds
+     */
+    #ifndef gKbdLongKeyIterations_c
+      #define gKbdLongKeyIterations_c             20
+    #endif
+  #endif /* gKeyBoardSupported_d */
 #elif (gKeyEventNotificationMode_d == gKbdEventPressHoldReleaseMode_c)
-#if gKeyBoardSupported_d
-/*
- * Name: gKbdFirstHoldDetectIterations_c
- * Description: The iterations required for key hold detection
- */
-#ifndef gKbdFirstHoldDetectIterations_c
-#define gKbdFirstHoldDetectIterations_c     20 /* 1 second, if gKeyScanInterval_c = 50ms */
-#endif
-
-/*
- * Name: gKbdHoldDetectIterations_c
- * Description: The iterations required for key hold detection (repetitive generation of event)
- *              May be the same value as  gKbdFirstHoldDetectIterations_c
- */
-#ifndef gKbdHoldDetectIterations_c
-#define gKbdHoldDetectIterations_c          20 /* 1 second, if gKeyScanInterval_c = 50ms */
-#endif
-#endif /* gKeyBoardSupported_d */
+  #if gKeyBoardSupported_d
+    /*
+     * Name: gKbdFirstHoldDetectIterations_c
+     * Description: The iterations required for key hold detection
+     */
+    #ifndef gKbdFirstHoldDetectIterations_c
+      #define gKbdFirstHoldDetectIterations_c     20 /* 1 second, if gKeyScanInterval_c = 50ms */
+    #endif
+    /*
+     * Name: gKbdHoldDetectIterations_c
+     * Description: The iterations required for key hold detection (repetitive generation of event)
+     *              May be the same value as  gKbdFirstHoldDetectIterations_c
+     */
+    #ifndef gKbdHoldDetectIterations_c
+      #define gKbdHoldDetectIterations_c          20 /* 1 second, if gKeyScanInterval_c = 50ms */
+    #endif
+  #endif /* gKeyBoardSupported_d */
 #endif /*gKeyEventNotificationMode_d == gKbdEventPressHoldReleaseMode_c */
 
 #if gKeyBoardSupported_d
-/*
- * Name: gKeyScanInterval_c
- * Description: Constant for a key press. A short key will be returned after this
- * number of millisecond if pressed make sure this constant is long enough for debounce time
- */
-#ifndef gKeyScanInterval_c
-#define gKeyScanInterval_c                  50 /* default is 50 milliseconds */
-#endif
-
+  /*
+   * Name: gKeyScanInterval_c
+   * Description: Constant for a key press. A short key will be returned after this
+   * number of millisecond if pressed make sure this constant is long enough for debounce time
+   */
+  #ifndef gKeyScanInterval_c
+    #define gKeyScanInterval_c                  50 /* default is 50 milliseconds */
+  #endif
 #endif /* gKeyBoardSupported_d */
 
 /******************************************************************************

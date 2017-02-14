@@ -184,7 +184,8 @@ void hardware_init(void) {
 /* Function to initialize OSC0 base on board configuration. */
 void BOARD_InitOsc0(void)
 {
-
+    MCG_WR_C2_RANGE(MCG,kOscRangeHigh);
+    g_xtal0ClkFreq = 32000000U;
 }
 
 /* Function to initialize RTC external clock base on board configuration. */
@@ -272,8 +273,7 @@ void BOARD_ClockInit(void)
     PORT_HAL_SetMuxMode( XTAL32K_PORT,  XTAL32K_PIN,  XTAL32K_PINMUX);
 
     // OSC0 has not configuration register, only set frequency
-    MCG_WR_C2_RANGE(MCG,kOscRangeHigh);
-    g_xtal0ClkFreq = 32000000U;
+    BOARD_InitOsc0();
 
 
     /* Set system clock configuration. */

@@ -356,6 +356,7 @@
           <state>$PROJ_DIR$/bluetooth/profiles/battery</state>
           <state>$PROJ_DIR$/bluetooth/profiles/device_info</state>
           <state>$PROJ_DIR$/bluetooth/profiles/otap</state>
+          <state>$PROJ_DIR$/bluetooth/profiles/lamp_basic</state>
           <state>$PROJ_DIR$/framework/XCVR/MKW30Z4</state>
           <state>$PROJ_DIR$/lamp/bluetooth/otap_client_att/common</state>
           <state>$PROJ_DIR$/framework/DCDC/Interface</state>
@@ -746,7 +747,6 @@
         <option>
           <name>IlinkConfigDefines</name>
           <state>gUseNVMLink_d=1</state>
-          <state>gUseBootloaderLink_d=1</state>
           <state>gUseInternalStorageLink_d=0</state>
           <state>__ram_vector_table__=1</state>
         </option>
@@ -2255,7 +2255,16 @@
           <name>$PROJ_DIR$\bluetooth\profiles\device_info\device_info_interface.h</name>
         </file>
         <file>
+          <name>$PROJ_DIR$\bluetooth\profiles\lamp_basic\lamp_interface.h</name>
+        </file>
+        <file>
           <name>$PROJ_DIR$\bluetooth\profiles\otap\otap_interface.h</name>
+        </file>
+      </group>
+      <group>
+        <name>lamp_basic</name>
+        <file>
+          <name>$PROJ_DIR$\bluetooth\profiles\lamp_basic\lamp_service.c</name>
         </file>
       </group>
       <group>

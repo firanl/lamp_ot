@@ -19,7 +19,7 @@
           
           
           
-        <Column0>229</Column0><Column1>27</Column1><Column2>27</Column2><Column3>27</Column3></ColumnWidths>
+        <Column0>345</Column0><Column1>27</Column1><Column2>27</Column2><Column3>27</Column3></ColumnWidths>
       </Workspace>
       <Disassembly>
         <col-names>
@@ -49,7 +49,7 @@
         
         
       <ColumnWidth0>664</ColumnWidth0><ColumnWidth1>94</ColumnWidth1><ColumnWidth2>1138</ColumnWidth2></Find-All-References>
-    <QuickWatch><PreferedWindows><Position>4</Position><ScreenPosX>-1241</ScreenPosX><ScreenPosY>319</ScreenPosY><Windows/></PreferedWindows></QuickWatch><WATCH_1><PreferedWindows><Position>4</Position><ScreenPosX>-674</ScreenPosX><ScreenPosY>354</ScreenPosY><Windows/></PreferedWindows></WATCH_1></Static>
+    <QuickWatch><PreferedWindows><Position>4</Position><ScreenPosX>407</ScreenPosX><ScreenPosY>346</ScreenPosY><Windows/></PreferedWindows></QuickWatch><WATCH_1><PreferedWindows><Position>4</Position><ScreenPosX>-674</ScreenPosX><ScreenPosY>354</ScreenPosY><Windows/></PreferedWindows></WATCH_1><Select-Ambiguous-Definitions><ColumnWidth0>664</ColumnWidth0><ColumnWidth1>94</ColumnWidth1><ColumnWidth2>1138</ColumnWidth2></Select-Ambiguous-Definitions></Static>
     <Windows>
       
       
@@ -79,7 +79,7 @@
             <Factory>Find-All-References</Factory>
             <Session/>
           </Tab>
-        </Tabs>
+        <Tab><Identity>TabID-4283-4929</Identity><TabName>Ambiguous Definitions</TabName><Factory>Select-Ambiguous-Definitions</Factory><Session/></Tab></Tabs>
         
       <SelectedTab>0</SelectedTab></Wnd3><Wnd4>
         <Tabs>
@@ -89,7 +89,7 @@
             <Factory>Workspace</Factory>
             <Session>
               
-            <NodeDict><ExpandedNode>&lt;ws&gt;</ExpandedNode><ExpandedNode>&lt;ws&gt;/lamp_ster</ExpandedNode><ExpandedNode>&lt;ws&gt;/lamp_ster/app</ExpandedNode><ExpandedNode>&lt;ws&gt;/lamp_ster/app/common</ExpandedNode><ExpandedNode>&lt;ws&gt;/lamp_ster/app/otap_client_att</ExpandedNode><ExpandedNode>lamp_ster</ExpandedNode><ExpandedNode>lamp_ster/KSDK</ExpandedNode><ExpandedNode>lamp_ster/app</ExpandedNode></NodeDict></Session>
+            <NodeDict><ExpandedNode>&lt;ws&gt;</ExpandedNode><ExpandedNode>&lt;ws&gt;/lamp_ster</ExpandedNode><ExpandedNode>&lt;ws&gt;/lamp_ster/app</ExpandedNode><ExpandedNode>&lt;ws&gt;/lamp_ster/app/common</ExpandedNode><ExpandedNode>&lt;ws&gt;/lamp_ster/app/otap_client_att</ExpandedNode><ExpandedNode>lamp_ster</ExpandedNode><ExpandedNode>lamp_ster/KSDK</ExpandedNode><ExpandedNode>lamp_ster/Output</ExpandedNode><ExpandedNode>lamp_ster/app</ExpandedNode><ExpandedNode>lamp_ster/framework</ExpandedNode><ExpandedNode>lamp_ster/framework/Flash</ExpandedNode><ExpandedNode>lamp_ster/framework/Flash/External</ExpandedNode><ExpandedNode>lamp_ster/framework/Flash/External/Interface</ExpandedNode><ExpandedNode>lamp_ster/framework/Flash/External/Source</ExpandedNode><ExpandedNode>lamp_ster/framework/Flash/Internal</ExpandedNode></NodeDict></Session>
           </Tab>
         </Tabs>
         
@@ -109,14 +109,14 @@
       
       
       
-    <Pane><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\lamp\bluetooth\common\ApplMain.c</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd><XPos2>0</XPos2><YPos2>486</YPos2><SelStart2>16939</SelStart2><SelEnd2>16939</SelEnd2></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\lamp\bluetooth\otap_client_att\app_preinclude.h</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd><XPos2>0</XPos2><YPos2>62</YPos2><SelStart2>3410</SelStart2><SelEnd2>3410</SelEnd2></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\lamp\bluetooth\otap_client_att\common\app.h</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd><XPos2>0</XPos2><YPos2>32</YPos2><SelStart2>2432</SelStart2><SelEnd2>2451</SelEnd2></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\boards\lamp30z_hw1\board.c</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd><XPos2>0</XPos2><YPos2>213</YPos2><SelStart2>8239</SelStart2><SelEnd2>8239</SelEnd2></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\boards\lamp30z_hw1\board.h</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd><XPos2>0</XPos2><YPos2>41</YPos2><SelStart2>3254</SelStart2><SelEnd2>3254</SelEnd2></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\platform\osa\src\fsl_os_abstraction_bm.c</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd><XPos2>0</XPos2><YPos2>1037</YPos2><SelStart2>37825</SelStart2><SelEnd2>37825</SelEnd2></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\framework\OSAbstraction\Source\fsl_osa_ext_bm.c</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd><XPos2>0</XPos2><YPos2>903</YPos2><SelStart2>33129</SelStart2><SelEnd2>33129</SelEnd2></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\lamp\bluetooth\otap_client_att\common\app.c</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd><XPos2>0</XPos2><YPos2>557</YPos2><SelStart2>24278</SelStart2><SelEnd2>24278</SelEnd2></Tab><ActiveTab>7</ActiveTab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\framework\LED\Source\LED.c</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd><XPos2>0</XPos2><YPos2>532</YPos2><SelStart2>16966</SelStart2><SelEnd2>16966</SelEnd2></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\bluetooth\host\interface\ble_general.h</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd><XPos2>0</XPos2><YPos2>572</YPos2><SelStart2>37100</SelStart2><SelEnd2>37100</SelEnd2></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\lamp\bluetooth\otap_client_att\common\gatt_db.h</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd><XPos2>0</XPos2><YPos2>0</YPos2><SelStart2>3515</SelStart2><SelEnd2>3515</SelEnd2></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\lamp\bluetooth\otap_client_att\common\app_config.c</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd><XPos2>0</XPos2><YPos2>136</YPos2><SelStart2>5288</SelStart2><SelEnd2>5288</SelEnd2></Tab></Pane><ActivePane>0</ActivePane><Sizes><Pane><X>1000000</X><Y>1000000</Y></Pane></Sizes><SplitMode>1</SplitMode></Editor>
+    <Pane><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\framework\Flash\Internal\Flash_Adapter.h</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd><XPos2>0</XPos2><YPos2>96</YPos2><SelStart2>6422</SelStart2><SelEnd2>6422</SelEnd2></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\lamp\bluetooth\otap_client_att\common\gatt_db.h</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd><XPos2>0</XPos2><YPos2>18</YPos2><SelStart2>3809</SelStart2><SelEnd2>3809</SelEnd2></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\framework\OSAbstraction\Source\fsl_osa_ext_bm.c</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd><XPos2>0</XPos2><YPos2>914</YPos2><SelStart2>33129</SelStart2><SelEnd2>33129</SelEnd2></Tab><ActiveTab>2</ActiveTab></Pane><ActivePane>0</ActivePane><Sizes><Pane><X>1000000</X><Y>1000000</Y></Pane></Sizes><SplitMode>1</SplitMode></Editor>
     <Positions>
       
       
       
       
       
-    <Top><Row0><Sizes><Toolbar-051BAD18><key>iaridepm.enu1</key></Toolbar-051BAD18><Toolbar-0EFCE688><key>debuggergui.enu1</key></Toolbar-0EFCE688><Toolbar-17510E98><key>armjlink2.enu1</key></Toolbar-17510E98></Sizes></Row0></Top><Left><Row0><Sizes><Wnd4><Rect><Top>-2</Top><Left>-2</Left><Bottom>764</Bottom><Right>303</Right><x>-2</x><y>-2</y><xscreen>200</xscreen><yscreen>200</yscreen><sizeHorzCX>104167</sizeHorzCX><sizeHorzCY>198610</sizeHorzCY><sizeVertCX>158854</sizeVertCX><sizeVertCY>760675</sizeVertCY></Rect></Wnd4></Sizes></Row0></Left><Right><Row0><Sizes><Wnd5><Rect><Top>-2</Top><Left>-2</Left><Bottom>764</Bottom><Right>198</Right><x>-2</x><y>-2</y><xscreen>200</xscreen><yscreen>200</yscreen><sizeHorzCX>104167</sizeHorzCX><sizeHorzCY>198610</sizeHorzCY><sizeVertCX>104167</sizeVertCX><sizeVertCY>760675</sizeVertCY></Rect></Wnd5></Sizes></Row0></Right><Bottom><Row0><Sizes><Wnd3><Rect><Top>-2</Top><Left>-2</Left><Bottom>198</Bottom><Right>1922</Right><x>-2</x><y>-2</y><xscreen>1924</xscreen><yscreen>200</yscreen><sizeHorzCX>1002083</sizeHorzCX><sizeHorzCY>198610</sizeHorzCY><sizeVertCX>104167</sizeVertCX><sizeVertCY>198610</sizeVertCY></Rect></Wnd3></Sizes></Row0></Bottom><Float><Sizes/></Float></Positions>
+    <Top><Row0><Sizes><Toolbar-0488FB38><key>iaridepm.enu1</key></Toolbar-0488FB38><Toolbar-12F0A338><key>debuggergui.enu1</key></Toolbar-12F0A338></Sizes></Row0><Row1><Sizes><Toolbar-12F09DC0><key>armjlink2.enu1</key></Toolbar-12F09DC0></Sizes></Row1></Top><Left><Row0><Sizes><Wnd4><Rect><Top>-2</Top><Left>-2</Left><Bottom>802</Bottom><Right>436</Right><x>-2</x><y>-2</y><xscreen>142</xscreen><yscreen>138</yscreen><sizeHorzCX>73958</sizeHorzCX><sizeHorzCY>137041</sizeHorzCY><sizeVertCX>228125</sizeVertCX><sizeVertCY>798411</sizeVertCY></Rect></Wnd4></Sizes></Row0></Left><Right><Row0><Sizes><Wnd5><Rect><Top>-2</Top><Left>-2</Left><Bottom>802</Bottom><Right>140</Right><x>-2</x><y>-2</y><xscreen>142</xscreen><yscreen>138</yscreen><sizeHorzCX>73958</sizeHorzCX><sizeHorzCY>137041</sizeHorzCY><sizeVertCX>73958</sizeVertCX><sizeVertCY>798411</sizeVertCY></Rect></Wnd5></Sizes></Row0></Right><Bottom><Row0><Sizes><Wnd3><Rect><Top>-2</Top><Left>-2</Left><Bottom>136</Bottom><Right>1922</Right><x>-2</x><y>-2</y><xscreen>1924</xscreen><yscreen>138</yscreen><sizeHorzCX>1002083</sizeHorzCX><sizeHorzCY>137041</sizeHorzCY><sizeVertCX>73958</sizeVertCX><sizeVertCY>137041</sizeVertCY></Rect></Wnd3></Sizes></Row0></Bottom><Float><Sizes/></Float></Positions>
   </Desktop>
 </Project>
 
