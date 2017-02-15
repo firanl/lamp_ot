@@ -34,11 +34,9 @@
 * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-/************************************************************************************
-*************************************************************************************
+/* ***********************************************************************************
 * Include
-*************************************************************************************
-************************************************************************************/
+*********************************************************************************** */
 /* Framework / Drivers */
 #include "RNG_interface.h"
 #include "Keyboard.h"
@@ -60,33 +58,41 @@
 #include "gatt_db_handles.h"
 
 /* Profile / Services */
-#include "battery_interface.h"
 #include "device_info_interface.h"
 #include "otap_interface.h"
+#include "lamp_interface.h"
+
+#include "battery_interface.h"
+
+/* core temperature measurement, voltage reference measurement */
+#include "temperature_sensor.h"
+
 
 #include "board.h"
 #include "ApplMain.h"
 #include "app.h"
 
+/* ***********************************************************************************
+* Extern variables
+*********************************************************************************** */
+/* core temperature, exponent -2 */
+extern int16_t gCoreTemperature;
+/* core voltage reference, exponent -3 */
+extern int16_t g_vReference;
+
 /************************************************************************************
-*************************************************************************************
 * Extern functions
-*************************************************************************************
 ************************************************************************************/
 extern void ResetMCU(void);
 
 
 /************************************************************************************
-*************************************************************************************
 * Private macros
-*************************************************************************************
 ************************************************************************************/
-#define mBatteryLevelReportInterval_c   (10)        /* battery level report interval in seconds  */
+
 
 /************************************************************************************
-*************************************************************************************
 * Private type definitions
-*************************************************************************************
 ************************************************************************************/
 typedef struct advState_tag
 {
@@ -125,9 +131,7 @@ typedef struct otapClientAppData_tag
 } otapClientAppData_t;
 
 /************************************************************************************
-*************************************************************************************
 * Private memory declarations
-*************************************************************************************
 ************************************************************************************/
 
 /* Host Stack Data*/
@@ -135,13 +139,16 @@ static bleDeviceAddress_t   maBleDeviceAddress;
 
 /* Adv Parmeters */
 static advState_t  mAdvState;
+
+/* Timers */
 static tmrTimerID_t appTimerId;
+static tmrTimerID_t mMeasurementTimerId;
 
 static deviceId_t  mPeerDeviceId = gInvalidDeviceId_c;
 #if gBondingSupported_d
-static bleDeviceAddress_t   maPeerDeviceAddress;
-static uint8_t mcBondedDevices = 0;
-static bleAddressType_t     mPeerDeviceAddressType;
+  static bleDeviceAddress_t   maPeerDeviceAddress;
+  static uint8_t mcBondedDevices = 0;
+  static bleAddressType_t     mPeerDeviceAddressType;
 #endif
 
 static bool_t   mSendDataAfterEncStart = FALSE;
@@ -185,7 +192,7 @@ static otapClientAppData_t     otapClientData =
     .lastCmdSentToOtapServer = gOtapCmdIdNoCommand_c,
 };
 
-static tmrTimerID_t mBatteryMeasurementTimerId;
+
 
 /************************************************************************************
 *************************************************************************************
@@ -206,7 +213,7 @@ static void BleApp_CccdWritten (deviceId_t deviceId, uint16_t handle, gattCccdFl
 static void BleApp_AttributeWritten (deviceId_t deviceId, uint16_t handle, uint16_t length, uint8_t* pValue);
 static void BleApp_AttributeWrittenWithoutResponse (deviceId_t deviceId, uint16_t handle, uint16_t length, uint8_t* pValue);
 static void BleApp_HandleValueConfirmation (deviceId_t deviceId);
-static void BatteryMeasurementTimerCallback (void *);
+static void MeasurementTimerCallback (void *);
 
 static void BleApp_Advertise (void);
 
@@ -242,10 +249,14 @@ static otapStatus_t OtapClient_IsImageFileHeaderValid (bleOtaImageFileHeader_t* 
 ********************************************************************************** */
 void BleApp_Init(void)
 {
+     tmrErrCode_t tmrerr = gTmrInvalidId_c;
     /* Initialize application support for drivers */
-    BOARD_InitAdc();
+
 
     /* Initialize application specific peripher drivers here. */
+    mMeasurementTimerId = TMR_AllocateTimer();
+    /* Start 1 second measurements */
+    tmrerr = TMR_StartTimer(mMeasurementTimerId, gTmrIntervalTimer_c,TmrSeconds(1), MeasurementTimerCallback, NULL);
 }
 
 /*! *********************************************************************************
@@ -254,7 +265,6 @@ void BleApp_Init(void)
 ********************************************************************************** */
 void BleApp_Start(void)
 {
-    //Led1On();
     
     if (mPeerDeviceId == gInvalidDeviceId_c)
     {
@@ -407,13 +417,8 @@ static void BleApp_Config()
     basServiceConfig.batteryLevel = 50;
     Bas_Start(&basServiceConfig);
     
+ 
 
-    /* Allocate aplication timer */
-    appTimerId = TMR_AllocateTimer();  
-    mBatteryMeasurementTimerId = TMR_AllocateTimer();
-    /* Start battery measurements */
-    tmrerr = TMR_StartLowPowerTimer(mBatteryMeasurementTimerId, gTmrLowPowerIntervalMillisTimer_c,
-               TmrSeconds(mBatteryLevelReportInterval_c), BatteryMeasurementTimerCallback, NULL);       
     
     // start advertising
     BleApp_Start();
@@ -1883,8 +1888,9 @@ static otapStatus_t OtapClient_IsImageFileHeaderValid (bleOtaImageFileHeader_t* 
     return gOtapStatusSuccess_c;
 }
 
-static void BatteryMeasurementTimerCallback(void * pParam)
+static void MeasurementTimerCallback(void * pParam)
 {
+    measure_chip_temperature();
     basServiceConfig.batteryLevel = 50;
     Bas_RecordBatteryMeasurement(basServiceConfig.serviceHandle, basServiceConfig.batteryLevel);
 }

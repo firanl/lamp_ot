@@ -80,6 +80,11 @@ typedef enum temperatureSensorStatus{
 * Globals
 *******************************************************************************/
 
+/* core temperature at witch the sistem should disable all outputs, exponent -2 */
+#ifndef gCoreTemperatureFaliure_d 
+  #define gCoreTemperatureFaliure_d     7900
+#endif
+
 /******************************************************************************
 * Configuration options
 ******************************************************************************/
@@ -102,9 +107,11 @@ temperature_sensor_status_t temperature_sensor_init (void);
 *
 * \param[in]    None
 *
-* \return       Temperature measurement with a 0.01 °C resolution or 0xFFFF if an error occurred
+* \return       Temperature measurement with a 0.01 °C resolution or 
+*               0xFFFF if an error occurred to global gCoreTemperature
+*               Core Voltage reference g_vReference
 ****************************************************************************/
-int16_t temperature_sensor_get_chip_temperature (void);
+void measure_chip_temperature (void);
 
 /*!
  * @} End of temperature_sensor

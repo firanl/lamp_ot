@@ -106,6 +106,9 @@
 
 
 
+
+    
+
 #if defined(__cplusplus)
 extern "C" {
 #endif /* __cplusplus */
@@ -117,23 +120,6 @@ extern "C" {
 void hardware_init(void);
 
 
-/* Function to initialize clock base on board configuration. */
-void BOARD_ClockInit(void);
-
-/* Function to initialize OSC0 base on board configuration. */
-void BOARD_InitOsc0(void);
-
-/* Function to initialize RTC external clock base on board configuration. */
-void BOARD_InitRtcOsc(void);
-
-/* Function to initialize ADC on board configuration. */
-void BOARD_InitAdc(void);
-
-/* Function to initialize DCDC on board configuration. */
-void BOARD_DCDCInit(void);
-
-/* Function to read battery level on board configuration. */
-uint16_t BOARD_GetBatteryLevel(void);
 
 
 

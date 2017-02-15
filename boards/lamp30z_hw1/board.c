@@ -42,47 +42,31 @@
 #include "Flash_Adapter.h"
 #include "gpio_pins.h"
 
-
+/* core temperature measurement, voltage reference measurement */
+#include "temperature_sensor.h"
 
 #if cPWR_UsePowerDownMode
-#include "PWR_Interface.h"
+  #include "PWR_Interface.h"
 #endif
 
 #if gDCDC_Enabled_d
-#include "DCDC.h"
+  #include "DCDC.h"
 #endif
 
 
 /************************************************************************************
 * Private type definitions and macros
 ************************************************************************************/
-#define ADC16_INSTANCE                (0)   /* ADC instance */
-#define ADC16_CHN_GROUP               (0)   /* ADC group configuration selection */
-#define ADC16_POTENTIOMETER_CHN       (kAdc16Chn0) /* Potentiometer channel */
 
-#define ADC16_BATLVL_CHN              (kAdc16Chn23) /* Potentiometer channel */
-#define ADC16_BL_LOWER_LIMIT          (0) /* min percentage of battery charge */
-#define ADC16_BL_UPPER_LIMIT          (100) /* max percentage of battery charge */
-#define ADC16_BL_DYNAMIC_RANGE        (ADC16_BL_UPPER_LIMIT - ADC16_BL_LOWER_LIMIT) /* Range = [ADC16_HB_LOWER_LIMIT .. ADC16_HB_LOWER_LIMIT + ADC16_HB_DYNAMIC_RANGE] */
-
-#define ADC16_BANDGAP_CHN             (kAdc16Chn27) /* ADC channel of BANDGAP Voltage reference*/
-
-#define MIN_VOLT_BUCK 180
-#define MAX_VOLT_BUCK 310
-#define FULL_BAT      100
-#define EMPTY_BAT     0
 
 /************************************************************************************
 * Private memory declarations
 ************************************************************************************/
-uint32_t offsetVdd = 0;               
-adc16_converter_config_t adcUserConfig;   // structure for user config
-
-static uint32_t adcValue = 0; /* ADC value */
-static adc16_converter_config_t adcUserConfig; /* structure for user config */
 
 
 
+/* core temperature, exponent -3 */
+int16_t coreVoltage;
 
 
 /* Declare Input GPIO pins */
@@ -138,17 +122,12 @@ gpio_output_pin_user_config_t ledPins[] = {
 };
 
 
-
-
-/************************************************************************************
+/* ***********************************************************************************
 * Private functions prototypes
-************************************************************************************/
-static void ADC16_CalibrateParams(void);
-static inline uint32_t ADC16_Measure(void);
-static inline uint32_t ADC16_BatLvl(void);
-static inline uint32_t ADC16_BgLvl(void);
-static uint16_t ADC16_ReadValue(adc16_chn_t chnIdx, uint8_t diffMode);
-static void DCDC_AdjustVbatDiv4();
+*********************************************************************************** */
+static void BOARD_InitRtcOsc(void);
+static void BOARD_InitOsc0(void);
+static void BOARD_ClockInit(void);
 static void CLOCK_SetBootConfig(clock_manager_user_config_t const* config);
 /************************************************************************************
 * Public functions prototypes
@@ -160,6 +139,7 @@ static void CLOCK_SetBootConfig(clock_manager_user_config_t const* config);
 ************************************************************************************/
 
 void hardware_init(void) {
+  
 
   if((PMC->REGSC & PMC_REGSC_ACKISO_MASK) != 0x00U)
   {
@@ -179,17 +159,32 @@ void hardware_init(void) {
   
   
   NV_ReadHWParameters(&gHardwareParameters);
+  
+  
+  
+  /* core temperature measurement init */
+  temperature_sensor_init ();
+  /* init core temperature value */
+  measure_chip_temperature();
+  
+;
 }
 
-/* Function to initialize OSC0 base on board configuration. */
-void BOARD_InitOsc0(void)
-{
-    MCG_WR_C2_RANGE(MCG,kOscRangeHigh);
-    g_xtal0ClkFreq = 32000000U;
-}
+
+
+
+
+
+
+
+
+
+/* ***********************************************************************************
+* Private functions
+*********************************************************************************** */
 
 /* Function to initialize RTC external clock base on board configuration. */
-void BOARD_InitRtcOsc(void)
+static void BOARD_InitRtcOsc(void)
 {
     rtc_osc_user_config_t rtcOscConfig =
     {
@@ -204,34 +199,24 @@ void BOARD_InitRtcOsc(void)
     CLOCK_SYS_RtcOscInit(0U, &rtcOscConfig);
 }
 
-void BOARD_InitAdc(void)
+/* Function to initialize OSC0 base on board configuration. */
+static void BOARD_InitOsc0(void)
 {
-  SIM_HAL_EnableClock(SIM, kSimClockGateDcdc);
-  CLOCK_SYS_EnableAdcClock(0);
-  ADC16_DRV_StructInitUserConfigDefault(&adcUserConfig);
-  adcUserConfig.resolution = kAdc16ResolutionBitOfDiffModeAs13;
-  adcUserConfig.refVoltSrc = kAdc16RefVoltSrcOfVref;
-  ADC16_DRV_Init(ADC16_INSTANCE, &adcUserConfig);
-  ADC16_CalibrateParams();
-  
+    MCG_WR_C2_RANGE(MCG,kOscRangeHigh);
+    g_xtal0ClkFreq = 32000000U;
 }
 
-uint16_t BOARD_GetBatteryLevel(void)
+static void CLOCK_SetBootConfig(clock_manager_user_config_t const* config)
 {
-    uint16_t batVal, bgVal, batVolt, bgVolt = 0; /*cV*/
-    
-    bgVal = ADC16_BgLvl();
-    DCDC_AdjustVbatDiv4(); /* Bat voltage  divided by 4 */
-    batVal = ADC16_BatLvl() * 4; /* Need to multiply the value by 4 because the measured voltage is divided by 4*/
-    
-    batVolt = bgVolt * batVal / bgVal;
-    
-    return batVolt;    
+    CLOCK_SYS_SetSimConfigration(&config->simConfig);
+
+    CLOCK_SYS_SetMcgMode(&config->mcgConfig);
+
+    SystemCoreClock = CORE_CLOCK_FREQ;
 }
 
-
-/* Initialize clock. */
-void BOARD_ClockInit(void)
+/* Function to initialize clock base on board configuration. */
+static void BOARD_ClockInit(void)
 {
     /* Configuration for enter RUN mode. Core clock = 16MHz / 32MHz. */
     const clock_manager_user_config_t g_defaultClockConfigRun =
@@ -274,8 +259,8 @@ void BOARD_ClockInit(void)
 
     // OSC0 has not configuration register, only set frequency
     BOARD_InitOsc0();
-
-
+    
+    
     /* Set system clock configuration. */
     CLOCK_SetBootConfig(&g_defaultClockConfigRun);
     
@@ -287,122 +272,8 @@ void BOARD_ClockInit(void)
 
 
 
-/************************************************************************************
-* Private functions
-************************************************************************************/
-
-/*!
- * @brief Parameters calibration: VDD and ADCR_TEMP25
- *
- * This function used BANDGAP as reference voltage to measure vdd and
- * calibrate V_TEMP25 with that vdd value.
- */
-static const adc16_hw_average_config_t adcHwAverageConfig =
-{
-  .hwAverageEnable = true, /*!< Enable the hardware average function. */
-  .hwAverageCountMode = kAdc16HwAverageCountOf16 /*!< Select the count of conversion result for accumulator. */
-} ;
 
 
-void ADC16_CalibrateParams(void)
-{
-    adc16_calibration_param_t adcCalibraitionParam;   
-
-#if FSL_FEATURE_ADC16_HAS_CALIBRATION
-    ADC16_DRV_GetAutoCalibrationParam(ADC16_INSTANCE, &adcCalibraitionParam);
-    ADC16_DRV_SetCalibrationParam(ADC16_INSTANCE, &adcCalibraitionParam);
-#endif /* FSL_FEATURE_ADC16_HAS_CALIBRATION */
-    
-  ADC16_DRV_ConfigHwAverage(0, &adcHwAverageConfig);
-  
-    pmc_bandgap_buffer_config_t pmcBandgapConfig = {
-        .enable = true,
-#if FSL_FEATURE_PMC_HAS_BGEN
-        .enableInLowPower = false,
-#endif
-#if FSL_FEATURE_PMC_HAS_BGBDS
-        .drive = kPmcBandgapBufferDriveLow,
-#endif
-    };
-    
-    // Enable BANDGAP reference voltage
-    PMC_HAL_BandgapBufferConfig(PMC_BASE_PTR, &pmcBandgapConfig);
-}
-
-
-/*!
- * @brief Gets the current voltage of the battery
- *
- * This function measure the ADC channel corresponding to the battery
- */
-static inline uint32_t ADC16_BatLvl(void)
-{
-    adcValue = ADC16_ReadValue((adc16_chn_t)ADC16_BATLVL_CHN, false);
-    return adcValue;
-}
-
-/*!
- * @brief Gets the current bandgap voltage
- *
- * This function measure the ADC channel corresponding to the bandgap
- */
-static inline uint32_t ADC16_BgLvl(void)
-{
-    adcValue = ADC16_ReadValue((adc16_chn_t)ADC16_BANDGAP_CHN, false);
-    return adcValue;
-}
-
-
-/*!
- * @brief Reads the ADC value from the channel given as input
- *
- * This function measure the ADC channel given as input
- */
-static uint16_t ADC16_ReadValue(adc16_chn_t chnIdx, uint8_t diffMode)
-{
-  adc16_chn_config_t chnConfig;
-
-    /* Configure the conversion channel */
-    chnConfig.chnIdx     = chnIdx;
-#if FSL_FEATURE_ADC16_HAS_DIFF_MODE
-    chnConfig.diffConvEnable = diffMode;
-#endif
-    chnConfig.convCompletedIntEnable  = false;
-
-    /* Software trigger the conversion */
-    ADC16_DRV_ConfigConvChn(ADC16_INSTANCE, ADC16_CHN_GROUP, &chnConfig);
-
-    /* Wait for the conversion to be done */
-    ADC16_DRV_WaitConvDone(ADC16_INSTANCE, ADC16_CHN_GROUP);
-
-    /* Fetch the conversion value */
-    adcValue = (diffMode) ? ADC16_DRV_GetConvValueSigned(ADC16_INSTANCE, ADC16_CHN_GROUP) : ADC16_DRV_GetConvValueRAW(ADC16_INSTANCE, ADC16_CHN_GROUP);
-
-    /* Calculates adcValue in 16bit resolution from 12bit resolution 
-    in order to convert to reading */
-#if (FSL_FEATURE_ADC16_MAX_RESOLUTION < 16)
-    adcValue = adcValue << 4;
-#endif
-    /* Pause the conversion */
-    ADC16_DRV_PauseConv(ADC16_INSTANCE, ADC16_CHN_GROUP);
-    
-    return adcValue;
-}
-
-static void DCDC_AdjustVbatDiv4()
-{
-  const uint8_t vBatDiv = 3;
-  DCDC_BWR_REG0_DCDC_VBAT_DIV_CTRL(DCDC_BASE_PTR, vBatDiv);  
-}
-
-static void CLOCK_SetBootConfig(clock_manager_user_config_t const* config)
-{
-    CLOCK_SYS_SetSimConfigration(&config->simConfig);
-
-    CLOCK_SYS_SetMcgMode(&config->mcgConfig);
-
-    SystemCoreClock = CORE_CLOCK_FREQ;
-}
 
 
 /*******************************************************************************

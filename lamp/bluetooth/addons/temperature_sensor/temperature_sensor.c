@@ -91,6 +91,12 @@ const adc16_chn_config_t temperatureSensorBandgapVoltageChannel = {
 * Globals
 *******************************************************************************/
 
+/* core temperature, exponent -2 */
+int16_t gCoreTemperature;
+/* core voltage reference, exponent -3 */
+int16_t g_vReference;
+
+
 /******************************************************************************
 * Private Function prototypes
 ******************************************************************************/
@@ -100,6 +106,7 @@ const adc16_chn_config_t temperatureSensorBandgapVoltageChannel = {
 ******************************************************************************/
 
 temperature_sensor_status_t temperature_sensor_init (void){
+  
   adc16_status_t result;
   adc16_calibration_param_t adcCalibrationParameters;
   pmc_bandgap_buffer_config_t pmcBandgapConfiguration = {
@@ -129,46 +136,57 @@ temperature_sensor_status_t temperature_sensor_init (void){
   return kTemperatureSensorOk;
 }
 
-int16_t temperature_sensor_get_chip_temperature (void){
+void measure_chip_temperature (void){
   adc16_status_t result;
   int16_t bandgapVoltageAdcReading, temperatureChannelAdcReading;
-  int16_t vReference, vTemperatureSensor;
-  int16_t temperatureReading;
+  int16_t vTemperatureSensor;
+
   
   /* Start Bandgap Voltage Measurements */
   result = ADC16_DRV_ConfigConvChn(TEMPERATURE_SENSOR_ADC_INSTANCE, 0, &temperatureSensorBandgapVoltageChannel);
   
-  if(result != kStatus_ADC16_Success)
-    return kTemperatureSensorConversionStartError;
+  if(result != kStatus_ADC16_Success) {
+    gCoreTemperature = kTemperatureSensorConversionStartError;
+    g_vReference     = kTemperatureSensorConversionStartError;
+  }
+  else {
+        /* Wait for bandgap voltage measurement reading */
+        ADC16_DRV_WaitConvDone (TEMPERATURE_SENSOR_ADC_INSTANCE, 0);
+        
+        /* Get bandgap measurement */
+        bandgapVoltageAdcReading = ADC16_DRV_GetConvValueSigned (TEMPERATURE_SENSOR_ADC_INSTANCE, 0);  
+        
+        /* Start Temperature Channel Measurements */
+        result = ADC16_DRV_ConfigConvChn(TEMPERATURE_SENSOR_ADC_INSTANCE, 0, &temperatureSensorChipTemperatureChannel);
+        
+        if(result != kStatus_ADC16_Success) {
+          gCoreTemperature = kTemperatureSensorConversionStartError;
+          g_vReference     = kTemperatureSensorConversionStartError;
+        }
+        else { 
+              /* Wait for temperature channel measurement reading */
+              ADC16_DRV_WaitConvDone (TEMPERATURE_SENSOR_ADC_INSTANCE, 0);
+              
+              /* Get temperature channel measurement */
+              temperatureChannelAdcReading = ADC16_DRV_GetConvValueSigned (TEMPERATURE_SENSOR_ADC_INSTANCE, 0);
+              
+              /* Calculate Reference Voltage */
+              g_vReference = (int16_t)((TEMPERATURE_SENSOR_V_BANDGAP_mV * TEMPERATURE_SENSOR_ADC_RESOLUTION)/bandgapVoltageAdcReading);
+              
+              /* Calculate Temperature Sensor Voltage */
+              vTemperatureSensor = (int16_t)((g_vReference*temperatureChannelAdcReading)/TEMPERATURE_SENSOR_ADC_RESOLUTION);
+              
+              /* Obtain temperature measurement*/
+              gCoreTemperature = 2500 - (((vTemperatureSensor - TEMPERATURE_SENSOR_VTEMP25_mV)*1000*100)/TEMPERATURE_SENSOR_SLOPE_uV); 
+              
+              /* If failure temperature is reached stop all PWM TPM outputs and try to BT notify */
+              if(gCoreTemperature > gCoreTemperatureFaliure_d)
+              {
+                  //TPM_PWM_Off();
+              }
+        }
+  }
   
-  /* Wait for bandgap voltage measurement reading */
-  ADC16_DRV_WaitConvDone (TEMPERATURE_SENSOR_ADC_INSTANCE, 0);
-  
-  /* Get bandgap measurement */
-  bandgapVoltageAdcReading = ADC16_DRV_GetConvValueSigned (TEMPERATURE_SENSOR_ADC_INSTANCE, 0);  
-  
-  /* Start Temperature Channel Measurements */
-  result = ADC16_DRV_ConfigConvChn(TEMPERATURE_SENSOR_ADC_INSTANCE, 0, &temperatureSensorChipTemperatureChannel);
-  
-  if(result != kStatus_ADC16_Success)
-    return kTemperatureSensorConversionStartError;
-  
-  /* Wait for temperature channel measurement reading */
-  ADC16_DRV_WaitConvDone (TEMPERATURE_SENSOR_ADC_INSTANCE, 0);
-  
-  /* Get temperature channel measurement */
-  temperatureChannelAdcReading = ADC16_DRV_GetConvValueSigned (TEMPERATURE_SENSOR_ADC_INSTANCE, 0);
-  
-  /* Calculate Reference Voltage */
-  vReference = (int16_t)((TEMPERATURE_SENSOR_V_BANDGAP_mV * TEMPERATURE_SENSOR_ADC_RESOLUTION)/bandgapVoltageAdcReading);
-  
-  /* Calculate Temperature Sensor Voltage */
-  vTemperatureSensor = (int16_t)((vReference*temperatureChannelAdcReading)/TEMPERATURE_SENSOR_ADC_RESOLUTION);
-  
-  /* Obtain temperature measurement*/
-  temperatureReading = 2500 - (((vTemperatureSensor - TEMPERATURE_SENSOR_VTEMP25_mV)*1000*100)/TEMPERATURE_SENSOR_SLOPE_uV);
-  
-  return temperatureReading;
 }
 
 /******************************************************************************

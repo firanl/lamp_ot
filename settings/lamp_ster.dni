@@ -21,7 +21,7 @@ TraceBufferSize=0x00010000
 TraceStallIfFIFOFull=0x00000000
 TracePortSize=0x00000000
 [DebugChecksum]
-Checksum=-1048038815
+Checksum=-963321035
 [CodeCoverage]
 Enabled=_ 0
 [Exceptions]
@@ -54,12 +54,7 @@ ShowTiming=1
 [Disassemble mode]
 mode=0
 [Breakpoints2]
-Bp0=_ 0 "EMUL_CODE" "{$PROJ_DIR$\lamp\bluetooth\common\ApplMain.c}.1159.1" 0 0 1 "" 0 "" 0
-Bp1=_ 0 "EMUL_CODE" "{$PROJ_DIR$\boards\lamp30z_hw1\board.c}.181.3" 0 0 1 "" 0 "" 0
-Bp2=_ 0 "EMUL_CODE" "{$PROJ_DIR$\lamp\bluetooth\otap_client_att\common\app.c}.1546.9" 0 0 1 "" 0 "" 0
-Bp3=_ 0 "EMUL_CODE" "{$PROJ_DIR$\lamp\bluetooth\otap_client_att\common\app.c}.1634.9" 0 0 1 "" 0 "" 0
-Bp4=_ 0 "EMUL_CODE" "{$PROJ_DIR$\lamp\bluetooth\otap_client_att\common\app.c}.1798.9" 0 0 1 "" 0 "" 0
-Count=5
+Count=0
 [Aliases]
 Count=0
 SuppressDialog=0

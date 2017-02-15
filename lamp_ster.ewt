@@ -2811,6 +2811,12 @@
       <name>$PROJ_DIR$\boards\lamp30z_hw1\gpio_pins.h</name>
     </file>
     <file>
+      <name>$PROJ_DIR$\lamp\bluetooth\addons\temperature_sensor\temperature_sensor.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\lamp\bluetooth\addons\temperature_sensor\temperature_sensor.h</name>
+    </file>
+    <file>
       <name>$PROJ_DIR$\lamp\bluetooth\addons\tpm_pwm_led\tpm_pwm_led_ctrl.c</name>
     </file>
     <file>
