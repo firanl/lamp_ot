@@ -50,7 +50,7 @@
 /* GPIO Led support */
 #define gLEDSupported_d         TRUE
 /* Specifies the number of physical LEDs on the target board */
-#define gLEDsOnTargetBoardCnt_c 1
+#define gLEDsOnTargetBoardCnt_c  4
 /* LED output normal or inverted */
 #define mLEDInvertedOut_c       FALSE
 
@@ -91,10 +91,11 @@
 #define gTimestamp_Enabled_d            0
 
 /* Enable/Disable Low Power Timer */
-#define gTMR_EnableLowPowerTimers       0
+#define gTMR_EnableLowPowerTimers_d       1
+           
 
 /* Enable/Disable PowerDown functionality in PwrLib */
-#define cPWR_UsePowerDownMode           0
+#define cPWR_UsePowerDownMode           FALSE
 
 /* Enable/Disable BLE Link Layer DSM */
 #define cPWR_BLE_LL_Enable              FALSE
@@ -115,6 +116,12 @@
  * 	BLE Stack Configuration
  ********************************************************************************** */
 
+ /*  Public Device Address fariable type in ble_controller_task.c
+*           TRUE enables  const uint8_t gBDAddress_c[6] = {BD_ADDR};
+*           FALSE enables uint8_t gBDAddress_c[6] = {BD_ADDR};
+*/       
+#define useConstPublicDeviceAddress_d TRUE
+           
 #define BD_ADDR             0x13,0x00,0x00,0x9F,0x04,0x00
 
 

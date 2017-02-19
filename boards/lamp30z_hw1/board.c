@@ -41,9 +41,11 @@
 #include "fsl_pmc_hal.h"
 #include "Flash_Adapter.h"
 #include "gpio_pins.h"
+#include "FunctionLib.h"
 
 /* core temperature measurement, voltage reference measurement */
 #include "temperature_sensor.h"
+
 
 #if cPWR_UsePowerDownMode
   #include "PWR_Interface.h"
@@ -57,16 +59,13 @@
 /************************************************************************************
 * Private type definitions and macros
 ************************************************************************************/
-
+extern uint8_t gBDAddress_c[];
 
 /************************************************************************************
 * Private memory declarations
 ************************************************************************************/
 
 
-
-/* core temperature, exponent -3 */
-int16_t coreVoltage;
 
 
 /* Declare Input GPIO pins */
@@ -129,6 +128,11 @@ static void BOARD_InitRtcOsc(void);
 static void BOARD_InitOsc0(void);
 static void BOARD_ClockInit(void);
 static void CLOCK_SetBootConfig(clock_manager_user_config_t const* config);
+static void initHardwareParameters(void);
+static void clone_SIM_UIDL_private_static_MAC(void);
+static void clone_RSIM_private_static_MAC(void);
+static void clone_RSIM_r_private_static_MAC(void);
+static uint8_t test_MAC(void);
 /************************************************************************************
 * Public functions prototypes
 ************************************************************************************/
@@ -158,30 +162,92 @@ void hardware_init(void) {
   BOARD_ClockInit();
   
   
-  NV_ReadHWParameters(&gHardwareParameters);
-  
-  
-  
   /* core temperature measurement init */
   temperature_sensor_init ();
-  /* init core temperature value */
+  /* init core temperature value and voltage reference */
   measure_chip_temperature();
   
-;
+  //clone_RSIM_private_static_MAC();
+
+  
+  initHardwareParameters();
+ 
+
+  
+ 
 }
-
-
-
-
-
-
-
-
 
 
 /* ***********************************************************************************
 * Private functions
 *********************************************************************************** */
+
+static void initHardwareParameters(void)
+{
+  NV_ReadHWParameters(&gHardwareParameters);
+      
+}
+
+static void clone_RSIM_private_static_MAC(void)
+{
+    uint32_t *ptr;
+
+    ptr = (uint32_t *)(RSIM_BASE + 0x0C); // RSIM_MAC_LSB
+    gBDAddress_c[0] = (uint8_t) *ptr;
+    gBDAddress_c[1] = (uint8_t) ( *ptr >> 8); 
+    gBDAddress_c[2] = (uint8_t) ( *ptr >> 16); 
+    gBDAddress_c[3] = (uint8_t) ( *ptr >> 24);  
+    ptr = (uint32_t *)(RSIM_BASE + 0x08); // RSIM_MAC_MSB
+    gBDAddress_c[4] = (uint8_t) *ptr;
+    gBDAddress_c[5] = 0xC0;   // MSB is 11xx xxxx
+}
+
+static void clone_RSIM_r_private_static_MAC(void)
+{
+    uint32_t *ptr;
+
+    ptr = (uint32_t *)(RSIM_BASE + 0x0C); // RSIM_MAC_LSB
+    gBDAddress_c[4] = (uint8_t) *ptr;
+    gBDAddress_c[3] = (uint8_t) ( *ptr >> 8); 
+    gBDAddress_c[2] = (uint8_t) ( *ptr >> 16); 
+    gBDAddress_c[1] = (uint8_t) ( *ptr >> 24);  
+    ptr = (uint32_t *)(RSIM_BASE + 0x08); // RSIM_MAC_MSB
+    gBDAddress_c[0] = (uint8_t) *ptr;
+    gBDAddress_c[5] = 0xC0;   // MSB is 11xx xxxx
+}
+
+static void clone_SIM_UIDL_private_static_MAC(void)
+{
+    uint32_t *ptr;
+  
+    ptr = (uint32_t *)(SIM_BASE  + 0x1060); // Unique Identification Register Low (SIM_UIDL)
+    gBDAddress_c[0] = (uint8_t) *ptr;
+    gBDAddress_c[1] = (uint8_t) ( *ptr >> 8); 
+    gBDAddress_c[2] = (uint8_t) ( *ptr >> 16); 
+    gBDAddress_c[3] = (uint8_t) ( *ptr >> 24);  
+    ptr = (uint32_t *) (SIM_BASE + 0x105C); // Unique Identification Register Mid Low (SIM_UIDML)
+    gBDAddress_c[4] = (uint8_t) *ptr;
+    gBDAddress_c[5] = 0xC0;   // MSB is 11xx xxxx
+}
+
+static uint8_t test_MAC(void)
+{
+    int8_t i=6, j=0;
+      
+    /* check if bluetooth_address is valid */
+    while(i--)
+    {
+        if(gBDAddress_c[i] == 0xFF) j++;
+        else if(gBDAddress_c[i] == 0x00) j--;
+    }
+           
+    if( (j==6) || (j==(-6)) )
+    {
+       return 0;
+    }
+    
+    return 1;
+}
 
 /* Function to initialize RTC external clock base on board configuration. */
 static void BOARD_InitRtcOsc(void)
@@ -238,13 +304,8 @@ static void BOARD_ClockInit(void)
         {
             .pllFllSel = kClockPllFllSelFll,    // PLLFLLSEL select FLL.
             .er32kSrc  = kClockEr32kSrcOsc0,     // ERCLK32K selection, use OSC0.
-    #if CLOCK_INIT_CONFIG == CLOCK_RUN_16        
-            .outdiv1   = 1U,
-            .outdiv4   = 0U,
-    #else
             .outdiv1   = 0U,
-            .outdiv4   = 1U,
-    #endif        
+            .outdiv4   = 1U,        
         }
     };
     

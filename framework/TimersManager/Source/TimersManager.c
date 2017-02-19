@@ -621,7 +621,7 @@ void TMR_Init
     void
 )
 {
-	static uint8_t initialized = FALSE;
+    static uint8_t initialized = FALSE;
 
     /* Check if TMR is already initialized */
     if( initialized )

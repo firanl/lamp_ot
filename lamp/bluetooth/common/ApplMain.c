@@ -68,14 +68,17 @@
 #include "l2ca_cb_interface.h"
 #include "l2ca_interface.h"
 
+/* TPM PWM */
+#include "tpm_pwm_led_ctrl.h"
+
 #ifdef cPWR_UsePowerDownMode
-#if (cPWR_UsePowerDownMode)
-#include "PWR_Interface.h"
-#endif
+  #if (cPWR_UsePowerDownMode)
+    #include "PWR_Interface.h"
+  #endif
 #endif
 
 #ifdef FSL_RTOS_FREE_RTOS
-#include "FreeRTOSConfig.h"
+  #include "FreeRTOSConfig.h"
 #endif
 
 #include "ApplMain.h"
@@ -86,9 +89,7 @@
 * Private macros
 *************************************************************************************
 ************************************************************************************/
-#ifndef mAppUseNvm_d
-  #define mAppUseNvm_d    TRUE
-#endif
+
 
 /* Application Events */
 #define gAppEvtMsgFromHostStack_c       (1 << 0)
@@ -181,13 +182,13 @@ typedef struct appMsgFromHost_tag{
 *************************************************************************************
 ************************************************************************************/
 #if (cPWR_UsePowerDownMode)
-#ifdef FSL_RTOS_FREE_RTOS
-#define AppIdle_TaskInit()
-#define App_Idle_Task()
-#else
-static osaStatus_t AppIdle_TaskInit(void);
-static void App_Idle_Task(task_param_t argument);
-#endif
+  #ifdef FSL_RTOS_FREE_RTOS
+    #define AppIdle_TaskInit()
+    #define App_Idle_Task()
+  #else
+    static osaStatus_t AppIdle_TaskInit(void);
+    static void App_Idle_Task(task_param_t argument);
+  #endif
 #endif
 
 static void App_Thread (uint32_t param);
@@ -236,14 +237,14 @@ static void App_L2caLeControlCallback
 
 static void BLE_SignalFromISRCallback(void);
 /************************************************************************************
-*************************************************************************************
 * Private memory declarations
-*************************************************************************************
 ************************************************************************************/
+
 #if cPWR_UsePowerDownMode
-OSA_TASK_DEFINE( IDLE, gAppIdleTaskStackSize_c );
-task_handler_t gAppIdleTaskId = 0;
+  OSA_TASK_DEFINE( IDLE, gAppIdleTaskStackSize_c );
+  task_handler_t gAppIdleTaskId = 0;
 #endif  /* cPWR_UsePowerDownMode */
+  
   
 static event_t  mAppEvent;
 
@@ -262,14 +263,14 @@ static gattClientNotificationCallback_t pfGattClientIndCallback = NULL;
 static l2caLeCbDataCallback_t           pfL2caLeCbDataCallback = NULL;
 static l2caLeCbControlCallback_t        pfL2caLeCbControlCallback = NULL;
 
-/************************************************************************************
-*************************************************************************************
+/* ***********************************************************************************
 * Public memory declarations
-*************************************************************************************
-************************************************************************************/
+*********************************************************************************** */
+
 #if gRNG_HWSupport_d == gRNG_NoHWSupport_d
-extern uint32_t mRandomNumber;
+  extern uint32_t mRandomNumber;
 #endif
+  
 extern const uint8_t gUseRtos_c;
 extern uint32_t NV_STORAGE_END_ADDRESS[];
 uint32_t gNvmStartAddress_c;
@@ -299,20 +300,27 @@ extern void (*pfBLE_SignalFromISR)(void);
 *
 ********************************************************************************** */
 void main_task(uint32_t param)
-{  
+{   
     if (!platformInitialized)
     {
         osa_status_t status;
         uint8_t pseudoRNGSeed[20] = {0};
-		
+	
         platformInitialized = 1;
         
         hardware_init();
-        
+            
         /* Framework init */
         MEM_Init();
-        TMR_Init();       
+        TMR_Init();
+        
+       
         LED_Init();
+        #if (!gLEDSupported_d)
+          TPM_PWM_Init();    
+          TPM_PWM_On();
+        #endif
+          
         SecLib_Init();
         
         RNG_Init();   
@@ -323,9 +331,11 @@ void main_task(uint32_t param)
         RNG_GetRandomNo((uint32_t*)(&(pseudoRNGSeed[16])));
         RNG_SetPseudoRandomNoSeed(pseudoRNGSeed);
         
-        KBD_Init(App_KeyboardCallBack);
+        #if (gKeyBoardSupported_d)
+          KBD_Init(App_KeyboardCallBack);
+        #endif
 
-#if mAppUseNvm_d        
+#if gUseNVMLink_d       
         /* Initialize NV module */
         NV_Init();
         
@@ -340,13 +350,15 @@ void main_task(uint32_t param)
         PWR_Init();
         PWR_DisallowDeviceToSleep();
 #else    
-        TurnOffLeds();
-        TurnOnLeds();
-        
-        Led1Flashing(); 
-        Led2Flashing();
-        Led3Flashing();
-        //Led4Flashing();           
+        #if (gLEDSupported_d)
+          TurnOnLeds();
+          TurnOffLeds();
+          
+          //Led1Flashing(); 
+          //Led2Flashing();
+          Led3Flashing();
+          //Led4Flashing();  
+        #endif 
 #endif    
        
        
@@ -590,7 +602,7 @@ void App_NvmErase
     uint32_t nvmSize
 )
 {
-#if mAppUseNvm_d  
+#if gUseNVMLink_d  
 
    (void)nvmSize;
     
@@ -606,7 +618,7 @@ void App_NvmWrite
     uint32_t cDataSize
 )
 {
-#if mAppUseNvm_d  
+#if gUseNVMLink_d  
     NV_FlashProgramUnaligned(&gFlashConfig, nvmDestinationAddress, cDataSize, pvRamSource, gFlashLaunchCommand);
 #endif
 }
@@ -618,7 +630,7 @@ void App_NvmRead
     uint32_t cDataSize
 )
 {
-#if mAppUseNvm_d  
+#if gUseNVMLink_d  
     NV_FlashRead(nvmSourceAddress, pvRamDestination, cDataSize);
 #endif    
 }

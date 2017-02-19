@@ -53,36 +53,36 @@
 *************************************************************************************
 ************************************************************************************/
 #ifndef gHcitMaxPayloadLen_c
-#define gHcitMaxPayloadLen_c    (gHcLeAclDataPacketLengthDefault_c + gHciAclDataPacketHeaderLength_c)
+	#define gHcitMaxPayloadLen_c    (gHcLeAclDataPacketLengthDefault_c + gHciAclDataPacketHeaderLength_c)
 #endif
 
 /* Enables Upward HCI Transport. 
    The controller sends HCI packets to be transported through the serial interface */
 #ifndef gUseHciTransportUpward_d
-#define gUseHciTransportUpward_d      0
+	#define gUseHciTransportUpward_d      0
 #endif
 
 /* Enables Downward HCI Transport. 
    The Host sends HCI packets to be transported through the serial interface */
 #ifndef gUseHciTransportDownward_d
-#define gUseHciTransportDownward_d    0
+	#define gUseHciTransportDownward_d    0
 #endif
 
 #if (gUseHciTransportDownward_d) && (gUseHciTransportUpward_d)
-#error "Select maximum one HCI transport method!"
+	#error "Select maximum one HCI transport method!"
 #endif
 
 /* Interface configuration */
 #ifndef gHcitInterfaceType_d
-#define gHcitInterfaceType_d        (APP_SERIAL_INTERFACE_TYPE)
+	#define gHcitInterfaceType_d        (APP_SERIAL_INTERFACE_TYPE)
 #endif
 
 #ifndef gHcitInterfaceNumber_d
-#define gHcitInterfaceNumber_d      (APP_SERIAL_INTERFACE_INSTANCE)
+	#define gHcitInterfaceNumber_d      (APP_SERIAL_INTERFACE_INSTANCE)
 #endif
 
 #ifndef gHcitInterfaceSpeed_d
-#define gHcitInterfaceSpeed_d        (gUARTBaudRate115200_c)
+	#define gHcitInterfaceSpeed_d        (gUARTBaudRate115200_c)
 #endif
 
 /************************************************************************************

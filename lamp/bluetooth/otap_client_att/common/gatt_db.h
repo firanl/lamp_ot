@@ -33,7 +33,7 @@ PRIMARY_SERVICE_UUID128(service_lamp, uuid_service_lamp)
         CCCD(cccd_lamp_Control)
 
     CHARACTERISTIC_UUID128(char_lamp_White, uuid_char_lamp_White, (gGattCharPropNotify_c | gGattCharPropRead_c | gGattCharPropWrite_c | gGattCharPropWriteWithoutRsp_c) )
-        VALUE_UUID128(value_lamp_White, uuid_char_lamp_White, (gPermissionFlagReadable_c | gPermissionFlagWritable_c),  2, LA_LAMP_WHITE)
+        VALUE_UUID128(value_lamp_White, uuid_char_lamp_White, (gPermissionFlagReadable_c | gPermissionFlagWritable_c),  2, LA_LAMP_WARM_WHITE, LA_LAMP_COLD_WHITE)
         DESCRIPTOR(desc_lamp_White, gBleSig_CharPresFormatDescriptor_d, (gPermissionFlagReadable_c), gBleSig_CharPresFormatDescriptorBytes_d, gBleSig_unsigned_16_bit_integer_d, gBleSig_Exponent_0_d, gBleSig_percentage_d, gBleSig_No_Namespaces_d, gBleSig_unknown_d)
         CCCD(cccd_White)
 
@@ -42,10 +42,10 @@ PRIMARY_SERVICE_UUID128(service_lamp, uuid_service_lamp)
  
     CHARACTERISTIC(char_core_temperature, gBleSig_Temperature_d, (gGattCharPropRead_c | gGattCharPropNotify_c))
         VALUE(value_core_temperature, gBleSig_Temperature_d, (gPermissionFlagReadable_c), 2, 0xD1, 0x07)
-        DESCRIPTOR(desc_core_temperature, gBleSig_CharPresFormatDescriptor_d, (gPermissionFlagReadable_c), gBleSig_CharPresFormatDescriptorBytes_d, gBleSig_signed_16_bit_integer_d, gBleSig_Exponent_neg2_d, gBleSig_Celsius_temperature_d, gBleSig_No_Namespaces_d, gBleSig_unknown_d)
+        DESCRIPTOR(desc_core_temperature, gBleSig_CharPresFormatDescriptor_d, (gPermissionFlagReadable_c), gBleSig_CharPresFormatDescriptorBytes_d, gBleSig_signed_16_bit_integer_d, gBleSig_Exponent_neg2_d, gBleSig_Celsius_temperature_d, gBleSig_Bluetooth_SIG_Assigned_Numbers_d , gBleSig_unknown_d)
         CCCD(cccd_core_temperature)          
 
-    CHARACTERISTIC_UUID128(char_core_voltage, uuid_char_core_voltage, (gGattCharPropNotify_c | gGattCharPropRead_c | gGattCharPropWrite_c | gGattCharPropWriteWithoutRsp_c) )
+    CHARACTERISTIC_UUID128(char_core_voltage, uuid_char_core_voltage, (gGattCharPropNotify_c | gGattCharPropRead_c) )
         VALUE_UUID128(value_core_voltage, uuid_char_core_voltage, (gPermissionFlagReadable_c ),  2, 0x0D, 0x02)
         DESCRIPTOR(desc_core_voltage, gBleSig_CharPresFormatDescriptor_d, (gPermissionFlagReadable_c), gBleSig_CharPresFormatDescriptorBytes_d, gBleSig_signed_16_bit_integer_d, gBleSig_Exponent_neg3_d, gBleSig_electric_potential_difference_d, gBleSig_No_Namespaces_d, gBleSig_unknown_d)
         CCCD(cccd_core_voltage)

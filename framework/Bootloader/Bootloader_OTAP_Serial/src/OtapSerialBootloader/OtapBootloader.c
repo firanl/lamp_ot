@@ -84,7 +84,10 @@ __root const FlashConfig_t gFlashConfig @ "FlashConfig" =
 const FlashConfig_t gFlashConfig __attribute__ ((section(".cfmconfig"))) =
 #endif
 {
-    {0xFFFFFFFF, 0xFFFFFFFF, gFlashProtection_c, 0xFFFFFFFE}
+    {0xFFFFFFFF,
+     0xFFFFFFFF,
+     gFlashProtection_c,
+     gFlash_NMI_DIS_0_c }  
 };
 
 /* Variables used by the Bootloader */

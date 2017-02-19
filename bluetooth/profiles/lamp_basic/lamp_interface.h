@@ -56,7 +56,6 @@
 
 /* ***********************************************************************************
 * Public type definitions
-
 *********************************************************************************** */
 
 /*! Lamp Service - Configuration */
@@ -68,15 +67,7 @@ typedef struct lasConfig_tag
     uint32_t     lampRGB;  
 } lasConfig_t;
 
-/*! Temperature Client - Configuration */
-typedef struct lacConfig_tag
-{
-    uint16_t    hService;
-    uint16_t    hTemperature;
-    uint16_t    hTempCccd; 
-    uint16_t    hTempDesc; 
-    gattDbCharPresFormat_t  tempFormat;
-} lacConfig_t;
+
 
 /* ***********************************************************************************
 * Public memory declarations
@@ -137,6 +128,8 @@ bleResult_t Las_Unsubscribe();
 bleResult_t Las_RecordLampControl (uint16_t serviceHandle, uint8_t control_1B);
 bleResult_t Las_RecordLampWhite   (uint16_t serviceHandle, uint16_t white_2B);
 bleResult_t Las_RecordLampRGB     (uint16_t serviceHandle, uint32_t rgb_3B);
+
+bleResult_t Las_RecordMeasurementTV (uint16_t serviceHandle);
 
 #ifdef __cplusplus
 }

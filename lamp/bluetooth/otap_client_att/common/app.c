@@ -75,10 +75,10 @@
 /* ***********************************************************************************
 * Extern variables
 *********************************************************************************** */
-/* core temperature, exponent -2 */
-extern int16_t gCoreTemperature;
-/* core voltage reference, exponent -3 */
-extern int16_t g_vReference;
+
+/* core temperature T, signed exponent -2 */
+/* core voltage reference V, signed exponent -3 */
+extern chip_TempVoltage_t g_chip_TV;
 
 /************************************************************************************
 * Extern functions
@@ -154,9 +154,11 @@ static deviceId_t  mPeerDeviceId = gInvalidDeviceId_c;
 static bool_t   mSendDataAfterEncStart = FALSE;
 
 /* Service Data */
-static basConfig_t basServiceConfig = {service_battery, 0};
+static lasConfig_t lasServiceConfig         = {service_lamp, 0};
 static disConfig_t disServiceConfig         = {service_device_info};
 static otapClientConfig_t otapServiceConfig = {service_otap};
+
+static basConfig_t basServiceConfig = {service_battery, 0};
 
 static uint16_t otapWriteNotifHandles[] = {value_otap_control_point,
                                            value_otap_data};
@@ -194,11 +196,9 @@ static otapClientAppData_t     otapClientData =
 
 
 
-/************************************************************************************
-*************************************************************************************
+/* ***********************************************************************************
 * Private functions prototypes
-*************************************************************************************
-************************************************************************************/
+*********************************************************************************** */
 
 static void BleApp_Config();
 
@@ -238,9 +238,7 @@ static bool_t OtapClient_IsRemoteImageNewer (uint8_t* pRemoteImgId, uint8_t* pRe
 static otapStatus_t OtapClient_IsImageFileHeaderValid (bleOtaImageFileHeader_t* imgFileHeader);
 
 /************************************************************************************
-*************************************************************************************
 * Public functions
-*************************************************************************************
 ************************************************************************************/
 
 /*! *********************************************************************************
@@ -252,11 +250,12 @@ void BleApp_Init(void)
      tmrErrCode_t tmrerr = gTmrInvalidId_c;
     /* Initialize application support for drivers */
 
-
+    appTimerId = TMR_AllocateTimer();
     /* Initialize application specific peripher drivers here. */
     mMeasurementTimerId = TMR_AllocateTimer();
     /* Start 1 second measurements */
-    tmrerr = TMR_StartTimer(mMeasurementTimerId, gTmrIntervalTimer_c,TmrSeconds(1), MeasurementTimerCallback, NULL);
+    tmrerr = TMR_StartTimer(mMeasurementTimerId, gTmrIntervalTimer_c,TmrSeconds(3), MeasurementTimerCallback, NULL);
+
 }
 
 /*! *********************************************************************************
@@ -410,9 +409,9 @@ static void BleApp_Config()
     mAdvState.advOn = FALSE;
 
     /* Start services */
-    Dis_Start(&disServiceConfig);
-    
+    Dis_Start(&disServiceConfig);  
     OtapCS_Start(&otapServiceConfig);
+    Las_Start(&lasServiceConfig);
     
     basServiceConfig.batteryLevel = 50;
     Bas_Start(&basServiceConfig);
@@ -452,7 +451,6 @@ static void BleApp_AdvertisingCallback (gapAdvertisingEvent_t* pAdvertisingEvent
 
         case gAdvertisingCommandFailed_c:
         {
-
             panic(0,0,0,0);
         }
         break;
@@ -481,9 +479,11 @@ static void BleApp_ConnectionCallback (deviceId_t peerDeviceId, gapConnectionEve
             
 	    /* Subscribe client*/
             mPeerDeviceId = peerDeviceId;
-	    Bas_Subscribe(peerDeviceId);		
+	    Las_Subscribe(peerDeviceId);		
 	    OtapCS_Subscribe(peerDeviceId);
-				
+			
+            Bas_Subscribe(peerDeviceId);
+                    
             mSendDataAfterEncStart = FALSE;
             if (gBleSuccess_c == Gap_CheckIfBonded(peerDeviceId, &isBonded) &&
                 TRUE == isBonded) 
@@ -503,8 +503,10 @@ static void BleApp_ConnectionCallback (deviceId_t peerDeviceId, gapConnectionEve
         {
             /* Unsubscribe client */
             mPeerDeviceId = gInvalidDeviceId_c;
-            Bas_Unsubscribe();
+            Las_Unsubscribe();
             OtapCS_Unsubscribe();
+            
+            Bas_Unsubscribe();
             
             /* UI */
             
@@ -1890,9 +1892,18 @@ static otapStatus_t OtapClient_IsImageFileHeaderValid (bleOtaImageFileHeader_t* 
 
 static void MeasurementTimerCallback(void * pParam)
 {
+    // clockit
     measure_chip_temperature();
-    basServiceConfig.batteryLevel = 50;
-    Bas_RecordBatteryMeasurement(basServiceConfig.serviceHandle, basServiceConfig.batteryLevel);
+
+    // if active BLE conection 
+    if(mPeerDeviceId != gInvalidDeviceId_c)
+    {
+      Las_RecordMeasurementTV (lasServiceConfig.serviceHandle);
+    
+      basServiceConfig.batteryLevel = 50;
+      Bas_RecordBatteryMeasurement(basServiceConfig.serviceHandle, basServiceConfig.batteryLevel);
+    }
+
 }
 
 

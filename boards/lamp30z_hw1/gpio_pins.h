@@ -47,13 +47,10 @@
 /*! This should be defined according to board setting.*/
 enum _gpio_pins 
 {
-    //kGpioLED1        = GPIO_MAKE_PIN(GPIOC_IDX, 5),   /* FRDM-KW40Z4 Red LED 1 */
-    kGpioLED1        = GPIO_MAKE_PIN(GPIOC_IDX, 1),   /* lamp Blue LED 1 */
-    //kGpioLED2        = GPIO_MAKE_PIN(GPIOC_IDX, 4),   /* FRDM-KW40Z4 Red LED 2 */
-    kGpioLED2        = GPIO_MAKE_PIN(GPIOC_IDX, 0),   /* lamp Green LED 2 */
-    //kGpioLED3        = GPIO_MAKE_PIN(GPIOC_IDX, 1),   /* FRDM-KW40Z4 Red LED 3 */
-    kGpioLED3        = GPIO_MAKE_PIN(GPIOB_IDX, 18),   /* lamp Red LED 3 */
-    //kGpioLED4        = GPIO_MAKE_PIN(GPIOC_IDX, 0),   /* FRDM-KW40Z4 Red LED 4 */
+
+    kGpioLED1        = GPIO_MAKE_PIN(GPIOC_IDX, 1),   /* lamp Blue LED 1       */
+    kGpioLED2        = GPIO_MAKE_PIN(GPIOC_IDX, 0),   /* lamp Green LED 2      */
+    kGpioLED3        = GPIO_MAKE_PIN(GPIOB_IDX, 18),  /* lamp Red LED 3        */
     kGpioLED4        = GPIO_MAKE_PIN(GPIOB_IDX, 3),   /* lamp Cold White LED 4 */
     
     //kGpioSW1         = GPIO_MAKE_PIN(GPIOA_IDX, 18),  /* FRDM-KW40Z4 switchPin1 */

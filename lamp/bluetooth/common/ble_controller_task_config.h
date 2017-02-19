@@ -49,11 +49,11 @@
  */
 
 #ifndef gControllerTaskStackSize_c
-#define gControllerTaskStackSize_c 900
+  #define gControllerTaskStackSize_c 900
 #endif
 
 #ifndef gControllerTaskPriority_c
-#define gControllerTaskPriority_c 1
+  #define gControllerTaskPriority_c 1
 #endif
 
 /* Controller configuration specifics, change at your own risk.*/
@@ -63,7 +63,7 @@
  * Time range <= 10msec 
  */
 #ifndef mcAdvertisingPacketInterval_c     
-#define mcAdvertisingPacketInterval_c     0x08    /* 5msec */
+  #define mcAdvertisingPacketInterval_c     0x08    /* 5msec */
 #endif
       
 /* Advertising channels that are enabled for scanning operation.
@@ -73,7 +73,7 @@
  * 0x04 - Enables channel 39 for use.
  */
 #ifndef mcScanChannelMap_c 
-#define mcScanChannelMap_c        0x07
+  #define mcScanChannelMap_c        0x07
 #endif
       
 /* Advertising channels that are enabled for initiator scanning operation.
@@ -83,7 +83,7 @@
  * 0x04 - Enables channel 39 for use.
  */
 #ifndef mcInitiatorChannelMap_c 
-#define mcInitiatorChannelMap_c        0x07
+  #define mcInitiatorChannelMap_c        0x07
 #endif
 
 /* Offset to the first instant register. Units in 625uS time slots.
@@ -95,21 +95,21 @@
  * and default value (0x0006) will be set.
  */ 
 #ifndef mcOffsetToFirstInstant_c
-#define mcOffsetToFirstInstant_c        0xFFFF
+  #define mcOffsetToFirstInstant_c        0xFFFF
 #endif
 
 /* Default Tx Power on the advertising channel.
  * Power level (range 0-15) as defined in the table for Controller_SetTxPowerLevel
 */ 
 #ifndef mAdvertisingDefaultTxPower_c
-#define mAdvertisingDefaultTxPower_c    5
+  #define mAdvertisingDefaultTxPower_c    5
 #endif
 
 /* Default Tx Power on the connection channel.
  * Power level (range 0-15) as defined in the table for Controller_SetTxPowerLevel
 */ 
 #ifndef mConnectionDefaultTxPower_c
-#define mConnectionDefaultTxPower_c     5
+  #define mConnectionDefaultTxPower_c     5
 #endif
    
 /************************************************************************************

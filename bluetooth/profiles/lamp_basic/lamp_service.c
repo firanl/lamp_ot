@@ -35,9 +35,7 @@
  */
 
 /************************************************************************************
-*************************************************************************************
 * Include
-*************************************************************************************
 ************************************************************************************/
 #include "FunctionLib.h"
 #include "ble_general.h"
@@ -46,23 +44,22 @@
 #include "gatt_server_interface.h"
 #include "gap_interface.h"
 #include "lamp_interface.h"
+#include "temperature_sensor.h"
 /************************************************************************************
-*************************************************************************************
 * Private constants & macros
-*************************************************************************************
 ************************************************************************************/
 
+/* core temperature T, signed exponent -2 */
+/* core voltage reference V, signed exponent -3 */
+extern chip_TempVoltage_t g_chip_TV;
+
 /************************************************************************************
-*************************************************************************************
 * Private type definitions
-*************************************************************************************
 ************************************************************************************/
 
-/************************************************************************************
-*************************************************************************************
+/* ***********************************************************************************
 * Private memory declarations
-*************************************************************************************
-************************************************************************************/
+*********************************************************************************** */
 
 /*! Temperature Service - Subscribed Client*/
 static deviceId_t mLas_SubscribedClientId;
@@ -117,6 +114,8 @@ bleResult_t Las_Stop (lasConfig_t *pServiceConfig)
 bleResult_t Las_Subscribe(deviceId_t deviceId)
 {
     mLas_SubscribedClientId = deviceId;
+    
+    //if conection enable flag turn lamp on
 
     return gBleSuccess_c;
 }
@@ -125,8 +124,62 @@ bleResult_t Las_Unsubscribe()
 {
     mLas_SubscribedClientId = gInvalidDeviceId_c;
     
+    //if conection enable flag turn lamp off
+    
+    
     return gBleSuccess_c;
 }
+
+
+bleResult_t Las_RecordMeasurementTV (uint16_t serviceHandle)
+{
+    uint16_t  handle;
+    uint16_t  hCccd;
+    bool_t isNotificationActive;
+    bleResult_t result;
+    bleUuid_t uuidT = Uuid16(gBleSig_Temperature_d);
+    bleUuid_t* pUuidV = (bleUuid_t*)&uuid_char_core_voltage;
+
+    /* Get handle of CoreTemperature characteristic */
+    result = GattDb_FindCharValueHandleInService(serviceHandle,
+        gBleUuidType16_c, &uuidT, &handle);
+
+    if (result != gBleSuccess_c) return result;
+
+    /* Update characteristic value  */
+    result = GattDb_WriteAttribute(handle, sizeof(int16_t), (uint8_t*) &g_chip_TV.int16.gCoreTemperature);
+
+    if (result != gBleSuccess_c) return result;
+   
+    /* Get handle of CoreVoltage characteristic */
+    result = GattDb_FindCharValueHandleInService(serviceHandle,
+        gBleUuidType128_c, pUuidV, &handle);
+    
+    if (result != gBleSuccess_c) return result;
+    
+    /* Update characteristic value */
+    result = GattDb_WriteAttribute(handle, sizeof(int16_t), (uint8_t*)&g_chip_TV.int16.g_vReference);
+
+    if (result != gBleSuccess_c) return result;
+    
+    // if ctitical or warning values send notification
+    if(g_chip_TV.int16.gCoreTemperature > gCoreTemperatureNotify_d)
+    {
+        /* Get handle of CCCD */
+        if (GattDb_FindCccdHandleForCharValueHandle(serviceHandle, &hCccd) == gBleSuccess_c)
+        {
+          if (gBleSuccess_c == Gap_CheckNotificationStatus
+              (mLas_SubscribedClientId, hCccd, &isNotificationActive) &&
+              TRUE == isNotificationActive)
+          {
+              GattServer_SendNotification(mLas_SubscribedClientId, serviceHandle);
+          }
+        }
+    }
+
+    return gBleSuccess_c;
+}
+
 
 bleResult_t Las_RecordLampControl (uint16_t serviceHandle, uint8_t control_1B)
 {

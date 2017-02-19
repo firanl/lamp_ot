@@ -49,7 +49,7 @@
  * VALID RANGE: TRUE/FALSE
  */
 #ifndef gTMR_Enabled_d
-#define gTMR_Enabled_d    1
+  #define gTMR_Enabled_d    1
 #endif
 
 /*
@@ -58,7 +58,7 @@
  * VALID RANGE: TRUE/FALSE
  */
 #ifndef gTimestamp_Enabled_d 
-#define gTimestamp_Enabled_d 1
+  #define gTimestamp_Enabled_d 1
 #endif
 
 /*
@@ -67,20 +67,20 @@
  * VALID RANGE: TRUE/FALSE
 */
 #ifndef gTMR_PIT_Timestamp_Enabled_d 
-#define gTMR_PIT_Timestamp_Enabled_d  1
+  #define gTMR_PIT_Timestamp_Enabled_d  1
 #endif
 
 
 #if gTMR_PIT_Timestamp_Enabled_d
 /*
- * NAME: gTMR_PIT_FreqMultipleOfMHZ_d
- * DESCRIPTION: Set this define TRUE if the PIT frequency is an integer number of MHZ.
-                The function TMR_PITGetTimestamp will be optimised and will have no jitter.
+  * NAME: gTMR_PIT_FreqMultipleOfMHZ_d
+  * DESCRIPTION: Set this define TRUE if the PIT frequency is an integer number of MHZ.
+  *              The function TMR_PITGetTimestamp will be optimised and will have no jitter.
  * VALID RANGE: TRUE/FALSE
-*/
-#ifndef gTMR_PIT_FreqMultipleOfMHZ_d 
-#define gTMR_PIT_FreqMultipleOfMHZ_d 1
-#endif
+  */
+  #ifndef gTMR_PIT_FreqMultipleOfMHZ_d 
+    #define gTMR_PIT_FreqMultipleOfMHZ_d 1
+  #endif
 #endif
 
 /*
@@ -89,7 +89,7 @@
  * VALID RANGE: TRUE/FALSE
  */
 #ifndef gPrecision_Timers_Enabled_d 
-#define gPrecision_Timers_Enabled_d 0
+  #define gPrecision_Timers_Enabled_d 0
 #endif
 
 /*
@@ -98,7 +98,7 @@
  * VALID RANGE:
  */
 #ifndef gTmrTaskStackSize_c 
-#define gTmrTaskStackSize_c 600
+  #define gTmrTaskStackSize_c 600
 #endif
 
 /*
@@ -107,7 +107,7 @@
  * VALID RANGE:
  */
 #ifndef gTmrTaskPriority_c
-#define gTmrTaskPriority_c                 2
+  #define gTmrTaskPriority_c                 2
 #endif
 
 /*
@@ -116,7 +116,7 @@
  * VALID RANGE: 0..7
  */
 #ifndef gTMR_FTM_CNx
-#define gTMR_FTM_CNx    0
+  #define gTMR_FTM_CNx    0
 #endif
 
 /*
@@ -125,7 +125,7 @@
  * VALID RANGE: TRUE/FALSE
  */
 #ifndef gTMR_EnableLowPowerTimers_d
-#define gTMR_EnableLowPowerTimers_d    (1)
+  #define gTMR_EnableLowPowerTimers_d    (1)
 #endif
 
 /*
@@ -136,11 +136,11 @@
  */
 
 #ifndef gTMR_EnableHWLowPowerTimers_d
-#define gTMR_EnableHWLowPowerTimers_d    (0)
+  #define gTMR_EnableHWLowPowerTimers_d    (0)
 #endif
 
 #if ((gTMR_EnableHWLowPowerTimers_d == 1) && (gTMR_EnableLowPowerTimers_d == 1))
-#error "*** ERROR: gTMR_EnableLowPowerTimers_d needs to be set to 0 if hardware low-power timers are enabled"
+  #error "*** ERROR: gTMR_EnableLowPowerTimers_d needs to be set to 0 if hardware low-power timers are enabled"
 #endif
 
 /*
@@ -149,7 +149,7 @@
  * VALID RANGE: TRUE/FALSE
  */
 #ifndef gTMR_EnableMinutesSecondsTimers_d
-#define gTMR_EnableMinutesSecondsTimers_d   (1)
+  #define gTMR_EnableMinutesSecondsTimers_d   (1)
 #endif
 
 /*
@@ -158,7 +158,7 @@
  * VALID RANGE: user defined
  */
 #ifndef gTmrApplicationTimers_c
-#define gTmrApplicationTimers_c 4
+  #define gTmrApplicationTimers_c 4
 #endif
 
 /*
@@ -167,7 +167,7 @@
  * VALID RANGE: user defined
  */
 #ifndef gTmrStackTimers_c
-#define gTmrStackTimers_c   4
+  #define gTmrStackTimers_c   4
 #endif
 
 /*
@@ -176,7 +176,7 @@
  * VALID RANGE: sum of application and stack timers
  */
 #ifndef gTmrTotalTimers_c
-#define gTmrTotalTimers_c   ( gTmrApplicationTimers_c + gTmrStackTimers_c )
+  #define gTmrTotalTimers_c   ( gTmrApplicationTimers_c + gTmrStackTimers_c )
 #endif
 
 /*

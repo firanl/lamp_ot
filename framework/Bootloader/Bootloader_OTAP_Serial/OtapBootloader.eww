@@ -1,8 +1,18 @@
 <?xml version="1.0" encoding="iso-8859-1"?>
 
 <workspace>
-	<project>
-		<path>$WS_DIR$\OtapBootloader.ewp</path>
-	</project>
-<batchBuild/>
+  <project>
+    <path>$WS_DIR$\OtapBootloader.ewp</path>
+  </project>
+  <batchBuild>
+    <batchDefinition>
+      <name>test1</name>
+      <member>
+        <project>OtapBootloader</project>
+        <configuration>BootloaderOTAP_KW40Z4</configuration>
+      </member>
+    </batchDefinition>
+  </batchBuild>
 </workspace>
+
+

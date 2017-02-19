@@ -31,6 +31,8 @@
 * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#ifndef _FWKINIT_H_
+#define _FWKINIT_H_
 
 /*! *********************************************************************************
 *************************************************************************************
@@ -139,3 +141,5 @@ static void FwkTask(task_param_t argument)
 }
 
 #endif /* FWK_SMALL_RAM_CONFIG */
+
+#endif /* _FWKINIT_ */

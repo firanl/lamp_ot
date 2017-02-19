@@ -79,7 +79,13 @@ extern void Controller_InterruptHandler(void);
 OSA_TASK_DEFINE(CTRLR, gControllerTaskStackSize_c);
 
 /* Public Device Address */
-const uint8_t gBDAddress_c[6] = {BD_ADDR};
+#if useConstPublicDeviceAddress_d
+  const uint8_t gBDAddress_c[6] = {BD_ADDR};
+#else
+  uint8_t gBDAddress_c[6] = {BD_ADDR};
+#endif
+
+
 /* Time between the beginning of two consecutive advertising PDU's */
 const uint8_t gAdvertisingPacketInterval_c = mcAdvertisingPacketInterval_c;
 /* Advertising channels that are enabled for scanning operation. */

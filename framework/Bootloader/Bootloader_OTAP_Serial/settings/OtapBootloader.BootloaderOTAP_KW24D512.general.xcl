@@ -1,0 +1,15 @@
+"C:\Program Files (x86)\IAR Systems\Embedded Workbench 7.3\arm\bin\armproc.dll" 
+
+"C:\Program Files (x86)\IAR Systems\Embedded Workbench 7.3\arm\bin\armjlink2.dll" 
+
+"D:\Work\2017\Lampster\Lampster_V2.0.0\lamp_ster\framework\Bootloader\Bootloader_OTAP_Serial\BootloaderOTAP_KW24D512\Exe\BootloaderOTAP_KW24D512.out" 
+
+--plugin "C:\Program Files (x86)\IAR Systems\Embedded Workbench 7.3\arm\bin\armbat.dll" 
+
+ --attach 
+
+--device_macro "C:\Program Files (x86)\IAR Systems\Embedded Workbench 7.3\arm\config\debugger\Freescale\Kxx.dmac" 
+
+
+
+

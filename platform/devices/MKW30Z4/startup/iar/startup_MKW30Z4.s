@@ -128,7 +128,7 @@ __FlashConfig
       	DCD	0xFFFFFFFF
       	DCD	0xFFFFFFFF
       	DCD	0xFFFFFFFF
-      	DCD	0xFFFFFBFE    ;0xFFFFFFFE
+      	DCD	0xFFFFFBFE    ;default -> 0xFFFFFFFE  NMI_DIS=0 NMI interrupts are always blocked -> 0xFFFFFBFE 
 __FlashConfig_End
 
 __Vectors       EQU   __vector_table

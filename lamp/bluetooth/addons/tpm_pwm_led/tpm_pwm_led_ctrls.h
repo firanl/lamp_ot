@@ -29,8 +29,7 @@
 /******************************************************************************
 * User definitions
 *******************************************************************************/
-#define PWM_factor_MIN   0
-#define PWM_factor_50   50
+#define PWM_factor_MIN 0
 #define PWM_factor_MAX 100
 
 #define PWM_factor_Init 100
@@ -48,13 +47,6 @@
 #define TPM_PWM_RedOn()              TPM_PWM_Red(PWM_factor_MAX)
 #define TPM_PWM_GreenOn()            TPM_PWM_Green(PWM_factor_MAX)
 #define TPM_PWM_BlueOn()             TPM_PWM_Blue(PWM_factor_MAX)
-
-// Switch pwm outs to PWM_factor_50
-#define TPM_PWM_WarmWhite50()        TPM_PWM_WarmWhite(PWM_factor_50)
-#define TPM_PWM_ColdWhite50()        TPM_PWM_ColdWhite(PWM_factor_50)
-#define TPM_PWM_Red50()              TPM_PWM_Red(PWM_factor_50)
-#define TPM_PWM_Green50()            TPM_PWM_Green(PWM_factor_50)
-#define TPM_PWM_Blue50()             TPM_PWM_Blue(PWM_factor_50)
 
 
 
@@ -137,14 +129,7 @@ void TPM_PWM_Blue(uint8_t dutyCycleBlue);
 void TPM_PWM_Off(void);
 
 
-/*!**********************************************************************************
-* \brief        Set PWM duty cycle to PWM_factor_MAX for all channels.
-*
-* \param[in]    void  
-*
-* \return       void
-************************************************************************************/
-void TPM_PWM_On(void);
+
 
 
 

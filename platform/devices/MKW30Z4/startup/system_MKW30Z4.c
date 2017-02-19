@@ -89,6 +89,7 @@ void SystemInit (void) {
   /* SIM_COPC: COPT=0,COPCLKS=0,COPW=0 */
   SIM->COPC = (uint32_t)0x00u;
 #endif /* (DISABLE_WDOG) */
+  
 #ifdef CLOCK_SETUP
   if((RCM->SRS0 & RCM_SRS0_WAKEUP_MASK) != 0x00U)
   {
@@ -294,3 +295,5 @@ void SystemCoreClockUpdate (void) {
   SystemCoreClock = (MCGOUTClock / (0x01U + ((SIM->CLKDIV1 & SIM_CLKDIV1_OUTDIV1_MASK) >> SIM_CLKDIV1_OUTDIV1_SHIFT)));
 
 }
+
+

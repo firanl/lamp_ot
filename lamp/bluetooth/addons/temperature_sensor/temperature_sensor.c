@@ -92,10 +92,8 @@ const adc16_chn_config_t temperatureSensorBandgapVoltageChannel = {
 *******************************************************************************/
 
 /* core temperature, exponent -2 */
-int16_t gCoreTemperature;
 /* core voltage reference, exponent -3 */
-int16_t g_vReference;
-
+chip_TempVoltage_t g_chip_TV;
 
 /******************************************************************************
 * Private Function prototypes
@@ -146,8 +144,8 @@ void measure_chip_temperature (void){
   result = ADC16_DRV_ConfigConvChn(TEMPERATURE_SENSOR_ADC_INSTANCE, 0, &temperatureSensorBandgapVoltageChannel);
   
   if(result != kStatus_ADC16_Success) {
-    gCoreTemperature = kTemperatureSensorConversionStartError;
-    g_vReference     = kTemperatureSensorConversionStartError;
+    g_chip_TV.int16.gCoreTemperature = kTemperatureSensorConversionStartError;
+    g_chip_TV.int16.g_vReference     = kTemperatureSensorConversionStartError;
   }
   else {
         /* Wait for bandgap voltage measurement reading */
@@ -160,8 +158,8 @@ void measure_chip_temperature (void){
         result = ADC16_DRV_ConfigConvChn(TEMPERATURE_SENSOR_ADC_INSTANCE, 0, &temperatureSensorChipTemperatureChannel);
         
         if(result != kStatus_ADC16_Success) {
-          gCoreTemperature = kTemperatureSensorConversionStartError;
-          g_vReference     = kTemperatureSensorConversionStartError;
+          g_chip_TV.int16.gCoreTemperature = kTemperatureSensorConversionStartError;
+          g_chip_TV.int16.g_vReference     = kTemperatureSensorConversionStartError;
         }
         else { 
               /* Wait for temperature channel measurement reading */
@@ -171,16 +169,16 @@ void measure_chip_temperature (void){
               temperatureChannelAdcReading = ADC16_DRV_GetConvValueSigned (TEMPERATURE_SENSOR_ADC_INSTANCE, 0);
               
               /* Calculate Reference Voltage */
-              g_vReference = (int16_t)((TEMPERATURE_SENSOR_V_BANDGAP_mV * TEMPERATURE_SENSOR_ADC_RESOLUTION)/bandgapVoltageAdcReading);
+              g_chip_TV.int16.g_vReference = (int16_t)((TEMPERATURE_SENSOR_V_BANDGAP_mV * TEMPERATURE_SENSOR_ADC_RESOLUTION)/bandgapVoltageAdcReading);
               
               /* Calculate Temperature Sensor Voltage */
-              vTemperatureSensor = (int16_t)((g_vReference*temperatureChannelAdcReading)/TEMPERATURE_SENSOR_ADC_RESOLUTION);
+              vTemperatureSensor = (int16_t)((g_chip_TV.int16.g_vReference*temperatureChannelAdcReading)/TEMPERATURE_SENSOR_ADC_RESOLUTION);
               
               /* Obtain temperature measurement*/
-              gCoreTemperature = 2500 - (((vTemperatureSensor - TEMPERATURE_SENSOR_VTEMP25_mV)*1000*100)/TEMPERATURE_SENSOR_SLOPE_uV); 
+              g_chip_TV.int16.gCoreTemperature = 2500 - (((vTemperatureSensor - TEMPERATURE_SENSOR_VTEMP25_mV)*1000*100)/TEMPERATURE_SENSOR_SLOPE_uV); 
               
               /* If failure temperature is reached stop all PWM TPM outputs and try to BT notify */
-              if(gCoreTemperature > gCoreTemperatureFaliure_d)
+              if(g_chip_TV.int16.gCoreTemperature > gCoreTemperatureFaliure_d)
               {
                   //TPM_PWM_Off();
               }

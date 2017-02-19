@@ -143,7 +143,7 @@ gapSmpKeys_t gSmpKeys = {
 };
 
 /* Device Security Requirements */
-#define GAP_SERVICE_CNT 3
+#define GAP_SERVICE_CNT 4
 static const gapSecurityRequirements_t        masterSecurity = gGapDefaultSecurityRequirements_d;
 static const gapServiceSecurityRequirements_t serviceSecurity[GAP_SERVICE_CNT] = {
   {
@@ -153,7 +153,7 @@ static const gapServiceSecurityRequirements_t serviceSecurity[GAP_SERVICE_CNT] =
         .minimumEncryptionKeySize = gDefaultEncryptionKeySize_d
     },
     .serviceHandle = service_otap
-  },
+  }, 
   {
     .requirements = {
         .securityModeLevel = gSecurityMode_1_Level_1_c,

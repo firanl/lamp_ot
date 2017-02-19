@@ -66,7 +66,7 @@
 
 
 /* config hci_transport.h*/
-  #define APP_SERIAL_INTERFACE_TYPE      (gSerialMgrLpuart_c)
+  #define APP_SERIAL_INTERFACE_TYPE      (gSerialMgrNone_c)
   #define APP_SERIAL_INTERFACE_INSTANCE  (0)
 
 
@@ -101,13 +101,53 @@
 
 /* service_lamp db defaults */
 #define LA_LAMP_CONTROL      0xA0
-#define LA_LAMP_WHITE        0x00, 0x00
+#define LA_LAMP_WARM_WHITE   0x00
+#define LA_LAMP_COLD_WHITE   0x00
 #define LA_LAMP_RGB          0x00, 0x05, 0x00
 
 
 
+/* Lamp basic control tag */
+typedef union lamp_control_tag {
+	uint8_t raw;
+	struct {
+		uint8_t padding0   : 1; /*!< LSB   xxxx xxx1 - not used 0  */	
+		uint8_t padding1   : 1; /*!<       xxxx xx1x - not used 0  */
+		uint8_t padding2   : 1; /*!<       xxxx x1xx - not used 0  */
+		uint8_t mix        : 1; /*!<       xxxx 1xxx - White mix lock / unlock (long press btn functionality)  */
+						
+		uint8_t BTcon      : 1; /*!<       xxx1 xxxx - Lost connection enable switch on/off (byte 4 – On = 1 Off = 0)  */
+		uint8_t Color      : 1; /*!<       xx1x xxxx - Lamp Color Light On Off - (byte 5 – On = 1 Off = 0)  */
+		uint8_t White      : 1; /*!<       x1xx xxxx - Lamp White Light On Off - (byte 6 – On = 1 Off = 0)  */
+		uint8_t OnOff      : 1; /*!<  MSB  1xxx xxxx - Lamp On Off - (byte 7 – On = 1 Off = 0)              */	
+	} bit;
+} lamp_control_t;
 
-    
+typedef union lamp_white_tag {
+	uint16_t raw;
+	struct {
+		uint8_t coldW;   /*!<  LSB  cold white          */
+		uint8_t warmW;   /*!<  MSB  warm white          */
+	} uint8;
+} lamp_white_t;
+
+typedef union lamp_color_tag {
+	uint32_t raw;
+	struct {	
+		uint8_t b;	  /*!< 	LSB  blue          */
+		uint8_t g;        /*!<       green         */
+		uint8_t r;        /*!<       red           */
+		uint8_t padding;  /*!<  MSB	 - not used 0  */
+	} uint8;
+} lamp_color_t;
+
+typedef struct lamp_NVdata_tag {
+    lamp_control_t           lampControl;       // uint8_t
+    lamp_white_t             lampWhite;         // uint16_t
+    lamp_color_t             lampRGB;           // uint32_t
+} lamp_NVdata_t;
+
+
 
 #if defined(__cplusplus)
 extern "C" {

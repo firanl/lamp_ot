@@ -2,7 +2,7 @@
 
 /******************* Map of Kinetis FLASH ***********************************
 
-  +---------------+
+  +---------------+ - gRomSize_c
   |               |
   |               |
   |  Application  |
@@ -24,11 +24,16 @@ define symbol __region_RAM_end__     = 0x20001fff; // limit to  8K
 define symbol __size_cstack__ = 0x1000;
 define symbol __IntVectTable_start__ = __region_BOOT_ROM_start__;
 define symbol __IntVectTable_end__   = __region_BOOT_ROM_start__ + 0x3F;
-define exported symbol __BOOT_STACK_ADDRESS = __region_RAM_end__ - 7;	//0x20007FF8;
-define symbol __code_start__          = __IntVectTable_end__+1;
 
 define symbol __FlashConfig_start__   = 0x00000400;
 define symbol __FlashConfig_end__     = 0x0000040f;
+
+define symbol __code_start__          = __IntVectTable_end__+1;
+
+define exported symbol __BOOT_STACK_ADDRESS = __region_RAM_end__ - 7;	//0x20007FF8;
+
+
+
 
 define block CSTACK    with alignment = 8, size = __size_cstack__   { };
 

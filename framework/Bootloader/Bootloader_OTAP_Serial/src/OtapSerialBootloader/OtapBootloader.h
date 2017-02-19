@@ -96,6 +96,13 @@
 #define gFlashProtection_c 0xFFFFFFFF /* Flash is not write protected */
 // #define gFlashProtection_c 0xFFFFFFFE /* The first Flash region is write protected */
 
+/*
+   FTFA_FOPT Bit 2
+   NMI_DIS=1 NMI pin/interrupts reset default to enabled -> 0xFFFFFFFE 
+   NMI_DIS=0 NMI interrupts are always blocked -> 0xFFFFFBFE 
+*/
+#define gFlash_NMI_DIS_0_c  0xFFFFFBFE
+   
 
 /*
  * Name: gMcuFlashBlocks_c

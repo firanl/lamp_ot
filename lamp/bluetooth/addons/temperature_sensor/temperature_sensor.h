@@ -76,6 +76,17 @@ typedef enum temperatureSensorStatus{
   kTemperatureSensorConversionStartError = 0xFFFF,      /*!< Error starting the channel conversion */
 }temperature_sensor_status_t;
 
+typedef union lamp_TempVoltage_tag {
+	uint32_t raw;
+	struct {	
+          /* core temperature, exponent -2 */
+          int16_t gCoreTemperature;
+          /* core voltage reference, exponent -3 */
+          int16_t g_vReference;
+	} int16;
+} chip_TempVoltage_t;
+
+
 /******************************************************************************
 * Globals
 *******************************************************************************/
@@ -84,6 +95,12 @@ typedef enum temperatureSensorStatus{
 #ifndef gCoreTemperatureFaliure_d 
   #define gCoreTemperatureFaliure_d     7900
 #endif
+
+/* core temperature at witch the sistem should  BLE notify, exponent -2 */
+#ifndef gCoreTemperatureNotify_d 
+  #define gCoreTemperatureNotify_d     6900
+#endif
+
 
 /******************************************************************************
 * Configuration options

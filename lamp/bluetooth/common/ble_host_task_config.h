@@ -49,19 +49,19 @@
  */
 
 #ifndef gHost_TaskStackSize_c
-#define gHost_TaskStackSize_c 1300
+  #define gHost_TaskStackSize_c 1300
 #endif
 
 #ifndef gHost_TaskPriority_c
-#define gHost_TaskPriority_c 5
+  #define gHost_TaskPriority_c 5
 #endif
 
 #ifndef gL2ca_TaskStackSize_c
-#define gL2ca_TaskStackSize_c 800
+  #define gL2ca_TaskStackSize_c 800
 #endif
 
 #ifndef gL2ca_TaskPriority_c
-#define gL2ca_TaskPriority_c 4
+  #define gL2ca_TaskPriority_c 4
 #endif
 
 /************************************************************************************

@@ -41,7 +41,7 @@
 #include "Flash_Adapter.h"
 
 #if (gFsciIncluded_c && (gNvmEnableFSCIRequests_c || gNvmEnableFSCIMonitoring_c))
-#include "NV_FsciCommands.h"
+	#include "NV_FsciCommands.h"
 #endif
 
 #include "Messaging.h"
@@ -97,9 +97,9 @@
  *****************************************************************************
  *****************************************************************************/
 #if PGM_SIZE_BYTE == FTFx_PHRASE_SIZE
-typedef uint64_t NV_baseType;
+	typedef uint64_t NV_baseType;
 #else
-typedef uint32_t NV_baseType;
+	typedef uint32_t NV_baseType;
 #endif
 
 /*****************************************************************************
@@ -1054,32 +1054,32 @@ mutex_t mNVMMutex;
 
 #if gNvStorageIncluded_d
 
-#if (gNvUseFlexNVM_d == FALSE) || ((gNvUseFlexNVM_d == TRUE) && (DEBLOCK_SIZE == 0)) /* no FlexNVM */
+	#if (gNvUseFlexNVM_d == FALSE) || ((gNvUseFlexNVM_d == TRUE) && (DEBLOCK_SIZE == 0)) /* no FlexNVM */
 
-/*
- * Name: NV_STORAGE_END_ADDRESS
- * Description: NV_STORAGE_END_ADDRESS from linker command file is used by this code
- *              as Raw Sector Start Address. This should not be misleading because
- *              ENVM module writes meta information in address-ascending order
- *              and records in address-descending order.
- */
-extern uint32_t NV_STORAGE_END_ADDRESS[];
+		/*
+		 * Name: NV_STORAGE_END_ADDRESS
+		 * Description: NV_STORAGE_END_ADDRESS from linker command file is used by this code
+		 *              as Raw Sector Start Address. This should not be misleading because
+		 *              ENVM module writes meta information in address-ascending order
+		 *              and records in address-descending order.
+		 */
+		extern uint32_t NV_STORAGE_END_ADDRESS[];
 
-/*
- * Name: NV_STORAGE_SECTOR_SIZE
- * Description: external symbol from linker command file, it represents the size
- *              of a FLASH sector
- */
-extern uint32_t NV_STORAGE_SECTOR_SIZE[];
+		/*
+		 * Name: NV_STORAGE_SECTOR_SIZE
+		 * Description: external symbol from linker command file, it represents the size
+		 *              of a FLASH sector
+		 */
+		extern uint32_t NV_STORAGE_SECTOR_SIZE[];
 
-/*
- * Name:  NV_STORAGE_MAX_SECTORS
- * Description: external symbol from linker command file, it represents the sectors
- *              count used by the ENVM storage system; it has to be a multiple of 2
- */
-extern uint32_t  NV_STORAGE_MAX_SECTORS[];
+		/*
+		 * Name:  NV_STORAGE_MAX_SECTORS
+		 * Description: external symbol from linker command file, it represents the sectors
+		 *              count used by the ENVM storage system; it has to be a multiple of 2
+		 */
+		extern uint32_t  NV_STORAGE_MAX_SECTORS[];
 
-#endif /* no FlexNVM */
+	#endif /* no FlexNVM */
 
 
 #endif /* gNvStorageIncluded_d */
