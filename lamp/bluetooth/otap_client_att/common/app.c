@@ -681,6 +681,29 @@ static void BleApp_CccdWritten (deviceId_t deviceId, uint16_t handle, gattCccdFl
             Gap_Disconnect (deviceId);
         }
     }
+    /* lamp cccd */
+    else if (handle == cccd_lamp_Control)
+    {
+     
+    }
+    else if (handle == cccd_White)
+    {
+     
+    }
+    else if (handle == cccd_core_temperature)
+    {
+      measure_chip_temperature();
+      Las_RecordMeasurementTV (lasServiceConfig.serviceHandle);
+    }
+    else if (handle == cccd_core_voltage)
+    {
+      measure_chip_temperature();
+      Las_RecordMeasurementTV (lasServiceConfig.serviceHandle);
+    }
+    else if (handle == cccd_lamp_clock)
+    {
+     
+    } 
 }
 
 static void BleApp_AttributeWritten(deviceId_t  deviceId,
@@ -767,6 +790,58 @@ static void BleApp_AttributeWritten(deviceId_t  deviceId,
             break;
         };
     }
+    /* lamp data BleApp_AttributeWritten  with BT ACK */
+    else if (handle == value_lamp_Control)
+    {
+      if ( (length==1) )
+      {
+
+        // Report status to client
+      }
+    }     
+    else if (handle == value_lamp_White)
+    {
+      if ( (length==2) && (pValue[0] <= 100) && (pValue[1] <= 100) )
+      {
+
+        // Report status to client
+      }
+    }     
+    else if (handle == value_lamp_RGB)
+    {
+       if ( (length==3) && (pValue[0] <= 100) && (pValue[1] <= 100) && (pValue[2] <= 100))
+      {
+
+        // Report status to client
+      }
+    }   
+    else if (handle == value_lamp_clock)
+    {
+      if ( (length==7) )
+      {
+
+        // Report status to client
+
+      }
+    }
+    else if (handle == value_lamp_onHHMM)
+    {
+      if ( (length==2) && (pValue[0] <= 59) && (pValue[1] <= 59) )
+      {
+
+        // Report status to client
+
+      }
+    }
+    else if (handle == value_lamp_onHHMM)
+    {
+      if ( (length==2) && (pValue[0] <= 59) && (pValue[1] <= 59) )
+      {
+
+        // Report status to client
+
+      }
+    }     
     else
     {
         /*! A GATT Server is trying to GATT Write an unknown attribute value.
@@ -836,6 +911,56 @@ static void BleApp_AttributeWrittenWithoutResponse (deviceId_t deviceId,
             }
         }
     }
+    
+   /* lamp data BleApp_AttributeWrittenWithoutResponse  */
+    else if (handle == value_lamp_Control)
+    {
+      if ( (length==1) )
+      {
+
+
+      }
+    }     
+    else if (handle == value_lamp_White)
+    {
+      if ( (length==2) && (pValue[0] <= 100) && (pValue[1] <= 100) )
+      {
+
+
+      }
+    }     
+    else if (handle == value_lamp_RGB)
+    {
+       if ( (length==3) && (pValue[0] <= 100) && (pValue[1] <= 100) && (pValue[2] <= 100))
+      {
+
+
+      }
+    }
+    else if (handle == value_lamp_clock)
+    {
+      if ( (length==7) )
+      {
+
+
+      }
+    }
+    else if (handle == value_lamp_onHHMM)
+    {
+      if ( (length==2) && (pValue[0] <= 59) && (pValue[1] <= 59)  )
+      {
+
+
+      }
+    }
+    else if (handle == value_lamp_onHHMM)
+    {
+      if ( (length==2) && (pValue[0] <= 59) && (pValue[1] <= 59)  )
+      {
+
+
+      }
+    }   
 }
 
 static void BleApp_HandleValueConfirmation (deviceId_t deviceId)
