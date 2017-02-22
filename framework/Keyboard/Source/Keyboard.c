@@ -786,7 +786,7 @@ void KBD_SwitchPressedOnWakeUp
  ******************************************************************************/
 #if gKeyBoardSupported_d
 #if defined(__IAR_SYSTEMS_ICC__)
-#pragma location = ".isr_handler"
+	#pragma location = ".isr_handler"
 #endif
 void Switch_Press_ISR
 (
@@ -806,9 +806,9 @@ void
 
     if(kbi_irq)
     {
-#if gTMR_Enabled_d
-        TMR_StartIntervalTimer(mKeyScanTimerID, gKeyScanInterval_c, (pfTmrCallBack_t)KeyScan, (void*)mKeyScanTimerID);       
-#endif
+	#if gTMR_Enabled_d
+		TMR_StartIntervalTimer(mKeyScanTimerID, gKeyScanInterval_c, (pfTmrCallBack_t)KeyScan, (void*)mKeyScanTimerID);       
+	#endif
     }
 }
 #endif /* gKeyBoardSupported_d */

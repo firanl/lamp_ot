@@ -61,7 +61,7 @@
 extern uint32_t FREESCALE_PROD_DATA_BASE_ADDR[];
 
 /* Hardware parameters */
-hardwareParameters_t gHardwareParameters;
+//hardwareParameters_t gHardwareParameters;
 
 FLASH_SSD_CONFIG gFlashConfig =
 {

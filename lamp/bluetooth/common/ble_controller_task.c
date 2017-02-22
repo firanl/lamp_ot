@@ -79,13 +79,18 @@ extern void Controller_InterruptHandler(void);
 OSA_TASK_DEFINE(CTRLR, gControllerTaskStackSize_c);
 
 /* Public Device Address */
-#if useConstPublicDeviceAddress_d
-  const uint8_t gBDAddress_c[6] = {BD_ADDR};
+#if initConstPublicDeviceAddress_d
+  #if defined(__IAR_SYSTEMS_ICC__)
+    #pragma location = "gBDAddress_ROM"
+    const uint8_t gBDAddress_c[6] 
+  #else
+    const uint8_t gBDAddress_c[6]  
+  #endif
+   = {BD_ADDR}; //  = {BD_ADDR_FF};
 #else
-  uint8_t gBDAddress_c[6] = {BD_ADDR};
+    uint8_t gBDAddress_c[6] = {BD_ADDR};
 #endif
-
-
+    
 /* Time between the beginning of two consecutive advertising PDU's */
 const uint8_t gAdvertisingPacketInterval_c = mcAdvertisingPacketInterval_c;
 /* Advertising channels that are enabled for scanning operation. */

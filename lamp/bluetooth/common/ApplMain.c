@@ -51,8 +51,8 @@
 #include "Panic.h"
 
 #if gFsciIncluded_c    
-#include "FsciInterface.h"
-#include "FsciCommands.h"
+  #include "FsciInterface.h"
+  #include "FsciCommands.h"
 #endif
 
 /* KSDK */
@@ -68,8 +68,6 @@
 #include "l2ca_cb_interface.h"
 #include "l2ca_interface.h"
 
-/* TPM PWM */
-#include "tpm_pwm_led_ctrl.h"
 
 #ifdef cPWR_UsePowerDownMode
   #if (cPWR_UsePowerDownMode)
@@ -316,11 +314,7 @@ void main_task(uint32_t param)
         
        
         LED_Init();
-        #if (!gLEDSupported_d)
-          TPM_PWM_Init();    
-          TPM_PWM_On();
-        #endif
-          
+
         SecLib_Init();
         
         RNG_Init();   

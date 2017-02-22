@@ -424,14 +424,6 @@ otaResult_t OTA_InitExternalMemory(void)
         {
             return gOtaExternalFlashError_c;
         }
-
-        /* Update the offset to the internal storage if necessary */
-        NV_ReadHWParameters(&gHardwareParameters);
-        if( gHardwareParameters.gInternalStorageAddr != gEepromParams_StartOffset_c )
-        {
-            gHardwareParameters.gInternalStorageAddr = gEepromParams_StartOffset_c;
-            NV_WriteHWParameters(&gHardwareParameters);
-        }
         
         mEepromInitStatus = TRUE;
     }

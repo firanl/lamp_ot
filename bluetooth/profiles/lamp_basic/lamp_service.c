@@ -45,6 +45,9 @@
 #include "gap_interface.h"
 #include "lamp_interface.h"
 #include "temperature_sensor.h"
+#include "board.h"
+/* TPM PWM */
+#include "tpm_pwm_led_ctrl.h"
 /************************************************************************************
 * Private constants & macros
 ************************************************************************************/
@@ -52,6 +55,9 @@
 /* core temperature T, signed exponent -2 */
 /* core voltage reference V, signed exponent -3 */
 extern chip_TempVoltage_t g_chip_TV;
+
+/* lamp control light data */
+extern lamp_NVdata_t lamp_NVdata;
 
 /************************************************************************************
 * Private type definitions
@@ -61,29 +67,25 @@ extern chip_TempVoltage_t g_chip_TV;
 * Private memory declarations
 *********************************************************************************** */
 
-/*! Temperature Service - Subscribed Client*/
+/*! Lamp basic Service - Subscribed Client*/
 static deviceId_t mLas_SubscribedClientId;
 
+static deviceId_t mLas_serviceHandle;
+
+
 /************************************************************************************
-*************************************************************************************
 * Private functions prototypes
-*************************************************************************************
 ************************************************************************************/
 // Short BTN press changes
-static void Hls_LampControlNotification
-(
-    uint16_t handle
-);
-
+static void Hls_LampControlNotification(uint16_t handle );
 // Long BTN press canges
-static void Hls_LampWhiteNotification 
-(
-    uint16_t handle
-);
+static void Hls_LampWhiteNotification(uint16_t handle);
+static bleResult_t  Las_RecordLampControl (uint16_t serviceHandle, uint8_t notify);
+static bleResult_t  Las_RecordLampWhite   (uint16_t serviceHandle, uint8_t notify);
+static bleResult_t  Las_RecordLampRGB     (uint16_t serviceHandle);
+
 /************************************************************************************
-*************************************************************************************
 * Public functions
-*************************************************************************************
 ************************************************************************************/
 bleResult_t Las_Start (lasConfig_t *pServiceConfig)
 {    
@@ -91,17 +93,44 @@ bleResult_t Las_Start (lasConfig_t *pServiceConfig)
       
     mLas_SubscribedClientId = gInvalidDeviceId_c;
     
-    result = Las_RecordLampControl (pServiceConfig->serviceHandle, 
-                                             pServiceConfig->lampControl);
+    #if gLED_TPM_PWM_d
+
+      /* switch to pre-reset light */
+        if(lamp_NVdata.lampControl.bit.OnOff)
+        {
+          /* the lamp is on */
+          
+          if(lamp_NVdata.lampControl.bit.White)
+          {
+            /* white light is on */
+            TPM_PWM_WarmWhite(lamp_NVdata.lampWhite.uint8.warmW);
+            TPM_PWM_ColdWhite(lamp_NVdata.lampWhite.uint8.coldW);
+          }
+          
+          if(lamp_NVdata.lampControl.bit.Color)
+          {
+             /* color RGB light is on */
+             TPM_PWM_Red  (lamp_NVdata.lampRGB.uint8.r);
+             TPM_PWM_Green(lamp_NVdata.lampRGB.uint8.g);
+             TPM_PWM_Blue (lamp_NVdata.lampRGB.uint8.b);
+          }        
+        }
+        else  
+        {
+          TPM_PWM_Off();
+        }
+    #endif
+      
+    result = Las_RecordLampControl (pServiceConfig->serviceHandle, FALSE);
     if(result != gBleSuccess_c) return result;
-    
-    result = Las_RecordLampWhite (pServiceConfig->serviceHandle, 
-                                             pServiceConfig->lampWhite);
+
+    result = Las_RecordLampWhite (pServiceConfig->serviceHandle, FALSE);
     if(result != gBleSuccess_c) return result; 
-    
-    result = Las_RecordLampRGB (pServiceConfig->serviceHandle, 
-                                             pServiceConfig->lampRGB);
+
+    result = Las_RecordLampRGB (pServiceConfig->serviceHandle);
     if(result != gBleSuccess_c) return result;   
+    
+    mLas_serviceHandle = pServiceConfig->serviceHandle;
     
     return result;
 }
@@ -111,21 +140,44 @@ bleResult_t Las_Stop (lasConfig_t *pServiceConfig)
     return Las_Unsubscribe();
 }
 
+
 bleResult_t Las_Subscribe(deviceId_t deviceId)
 {
+   uint8_t control = 0;
+   
     mLas_SubscribedClientId = deviceId;
+   
     
-    //if conection enable flag turn lamp on
+    /* if conection enable flag turn lamp on */
+    if(lamp_NVdata.lampControl.bit.BTcon)
+    {
+      /* and lamp was set before */
+      if(lamp_NVdata.lampControl.bit.White || lamp_NVdata.lampControl.bit.Color)
+      {
+        control = lamp_NVdata.lampControl.raw8 | 0x80;
+        Las_SetLampControl (mLas_serviceHandle, control, TRUE);
+      }
+    }   
 
     return gBleSuccess_c;
 }
 
 bleResult_t Las_Unsubscribe()
 {
+   uint8_t control = 0;
+
     mLas_SubscribedClientId = gInvalidDeviceId_c;
     
     //if conection enable flag turn lamp off
-    
+    if(lamp_NVdata.lampControl.bit.BTcon)
+    {
+      /* and lamp was set before */
+      if(lamp_NVdata.lampControl.bit.White || lamp_NVdata.lampControl.bit.Color)
+      {
+        control = lamp_NVdata.lampControl.raw8 & 0x7F;
+        Las_SetLampControl (mLas_serviceHandle, control, FALSE);   
+      }
+    }
     
     return gBleSuccess_c;
 }
@@ -181,88 +233,203 @@ bleResult_t Las_RecordMeasurementTV (uint16_t serviceHandle)
 }
 
 
-bleResult_t Las_RecordLampControl (uint16_t serviceHandle, uint8_t control_1B)
+
+
+bleResult_t Las_SetLampControl (uint16_t serviceHandle, uint8_t control, uint8_t notify)
+{
+  bleResult_t result = gBleSuccess_c;
+  
+  if (control != lamp_NVdata.lampControl.raw8)
+  {
+    /* turn lamp off - stat fade off */
+        /* turn off white */
+        /* turn off RGB */
+    
+    /* turn lamp on - stat fade on */
+        /* turn on white */
+        /* turn on RGB */
+    
+    /* change from white to RGB */
+    
+    /* update DB */
+    lamp_NVdata.lampControl.raw8 = control;
+    result = Las_RecordLampControl(serviceHandle, notify);
+  }
+  
+  return result;
+
+}
+
+  
+bleResult_t Las_SetLampWhite (uint16_t serviceHandle, uint8_t warmW, uint8_t coldW, uint8_t notify)
+{
+  bleResult_t result = gBleSuccess_c;
+  uint8_t upd_db = 0;
+  
+  if (warmW != lamp_NVdata.lampWhite.uint8.warmW)
+  {
+    upd_db = 1;
+    lamp_NVdata.lampWhite.uint8.warmW = warmW;
+    if (lamp_NVdata.lampControl.bit.OnOff && lamp_NVdata.lampControl.bit.White)
+    {
+      TPM_PWM_WarmWhite(lamp_NVdata.lampWhite.uint8.warmW);
+    }
+  }
+  
+  if (coldW != lamp_NVdata.lampWhite.uint8.coldW)
+  {
+    upd_db = 1;
+    lamp_NVdata.lampWhite.uint8.coldW = coldW;
+    if (lamp_NVdata.lampControl.bit.OnOff && lamp_NVdata.lampControl.bit.White)
+    {
+      TPM_PWM_ColdWhite(lamp_NVdata.lampWhite.uint8.coldW); 
+    }
+  }  
+  
+  if(upd_db)
+  {
+    /* update DB */
+    result = Las_RecordLampWhite(serviceHandle, notify);  
+  }
+  
+  return result;
+}
+
+
+bleResult_t Las_SetLampRGB (uint16_t serviceHandle, uint8_t red, uint8_t green, uint8_t blue)
+{
+  bleResult_t result = gBleSuccess_c;
+  uint8_t upd_db = 0;
+  
+  if (red != lamp_NVdata.lampRGB.uint8.r)
+  {
+    upd_db = 1;
+    lamp_NVdata.lampRGB.uint8.r = red;
+    if (lamp_NVdata.lampControl.bit.OnOff && lamp_NVdata.lampControl.bit.Color)
+    {
+      TPM_PWM_Red  (lamp_NVdata.lampRGB.uint8.r);
+    }
+  }  
+  
+  if (green != lamp_NVdata.lampRGB.uint8.g)
+  {
+    upd_db = 1;
+    lamp_NVdata.lampRGB.uint8.g = green;
+    if (lamp_NVdata.lampControl.bit.OnOff && lamp_NVdata.lampControl.bit.Color)
+    {
+      TPM_PWM_Green(lamp_NVdata.lampRGB.uint8.g);
+    }
+  }  
+
+  if (blue != lamp_NVdata.lampRGB.uint8.b)
+  {
+    upd_db = 1;
+    lamp_NVdata.lampRGB.uint8.g = blue;
+    if (lamp_NVdata.lampControl.bit.OnOff && lamp_NVdata.lampControl.bit.Color)
+    {
+      TPM_PWM_Blue (lamp_NVdata.lampRGB.uint8.b);
+    }
+  }    
+  
+  if(upd_db)
+  {
+    /* update DB */
+    result = Las_RecordLampRGB(serviceHandle);  
+  } 
+  
+    return result;
+}
+
+
+             
+             
+
+/************************************************************************************
+* Private functions
+************************************************************************************/
+
+static bleResult_t Las_RecordLampControl (uint16_t serviceHandle, uint8_t notify)
 {
     uint16_t  handle;
     bleResult_t result;
     bleUuid_t* pUuid = (bleUuid_t*)&uuid_char_lamp_Control;
 
-    /* Get handle of Temperature characteristic */
-    result = GattDb_FindCharValueHandleInService(serviceHandle,
-        gBleUuidType128_c, pUuid, &handle);
-
-    if (result != gBleSuccess_c)
-        return result;
     
-    /* Update characteristic value */
-    result = GattDb_WriteAttribute(handle, sizeof(uint8_t), (uint8_t*)&control_1B);
+    if(mLas_SubscribedClientId != gInvalidDeviceId_c)
+    {
+      /* Get handle of Temperature characteristic */
+      result = GattDb_FindCharValueHandleInService(serviceHandle,
+          gBleUuidType128_c, pUuid, &handle);
 
-    if (result != gBleSuccess_c)
-        return result;
+      if (result != gBleSuccess_c)
+          return result;
+      
+      /* Update characteristic value */
+      result = GattDb_WriteAttribute(handle, sizeof(uint8_t), (uint8_t*)&lamp_NVdata.lampControl.raw8);
 
-    Hls_LampControlNotification(handle);
+      if (result != gBleSuccess_c)
+          return result;
+
+      if (notify) Hls_LampControlNotification(handle);
+    }
 
     return gBleSuccess_c;
 }
 
-bleResult_t Las_RecordLampWhite (uint16_t serviceHandle, uint16_t white_2B)
+static bleResult_t Las_RecordLampWhite (uint16_t serviceHandle, uint8_t notify)
 {
     uint16_t  handle;
     bleResult_t result;
     bleUuid_t* pUuid = (bleUuid_t*)&uuid_char_lamp_White;
 
-    /* Get handle of Temperature characteristic */
-    result = GattDb_FindCharValueHandleInService(serviceHandle,
-        gBleUuidType128_c, pUuid, &handle);
+    if(mLas_SubscribedClientId != gInvalidDeviceId_c)
+    {
+      /* Get handle of Temperature characteristic */
+      result = GattDb_FindCharValueHandleInService(serviceHandle,
+          gBleUuidType128_c, pUuid, &handle);
 
-    if (result != gBleSuccess_c)
-        return result;
-    
-    /* Update characteristic value */
-    result = GattDb_WriteAttribute(handle, sizeof(uint16_t), (uint8_t*)&white_2B);
+      if (result != gBleSuccess_c)
+          return result;
+      
+      /* Update characteristic value */
+      result = GattDb_WriteAttribute(handle, sizeof(uint16_t), (uint8_t*)&lamp_NVdata.lampWhite.raw16);
 
-    if (result != gBleSuccess_c)
-        return result;
+      if (result != gBleSuccess_c)
+          return result;
 
-    Hls_LampControlNotification(handle);
+      if (notify) Hls_LampWhiteNotification(handle);
+    }
 
     return gBleSuccess_c;
 }
 
-bleResult_t Las_RecordLampRGB (uint16_t serviceHandle, uint32_t rgb_3B)
+static bleResult_t Las_RecordLampRGB (uint16_t serviceHandle)
 {
     uint16_t  handle;
     bleResult_t result;
     bleUuid_t* pUuid = (bleUuid_t*)&uuid_char_lamp_RGB;
 
-    /* Get handle of Temperature characteristic */
-    result = GattDb_FindCharValueHandleInService(serviceHandle,
-        gBleUuidType128_c, pUuid, &handle);
+    if(mLas_SubscribedClientId != gInvalidDeviceId_c)
+    {
+      /* Get handle of Temperature characteristic */
+      result = GattDb_FindCharValueHandleInService(serviceHandle,
+          gBleUuidType128_c, pUuid, &handle);
 
-    if (result != gBleSuccess_c)
-        return result;
-    
-    /* Update characteristic value */
-    result = GattDb_WriteAttribute(handle, 3, (uint8_t*)&rgb_3B);
+      if (result != gBleSuccess_c)
+          return result;
+      
+      /* Update characteristic value */
+      result = GattDb_WriteAttribute(handle, 3, (uint8_t*)&lamp_NVdata.lampRGB.raw32);
 
-    if (result != gBleSuccess_c)
-        return result;
-
-    Hls_LampControlNotification(handle);
+      if (result != gBleSuccess_c)
+          return result;
+    }
 
     return gBleSuccess_c;
 }
 
-/************************************************************************************
-*************************************************************************************
-* Private functions
-*************************************************************************************
-************************************************************************************/
 // Short BTN press changes
-static void Hls_LampControlNotification
-(
-  uint16_t handle
-)
+static void Hls_LampControlNotification( uint16_t handle )
 {
     uint16_t  hCccd;
     bool_t isNotificationActive;
@@ -280,10 +447,7 @@ static void Hls_LampControlNotification
 }
 
 // Long BTN press canges
-static void Hls_LampWhiteNotification 
-(
-  uint16_t handle
-)
+static void Hls_LampWhiteNotification( uint16_t handle )
 {
     uint16_t  hCccd;
     bool_t isNotificationActive;
@@ -300,7 +464,7 @@ static void Hls_LampWhiteNotification
     }
 }
 
-//BOARD_chip_temperature();
+
 
 /*! *********************************************************************************
  * @}

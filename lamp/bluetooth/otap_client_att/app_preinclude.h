@@ -54,6 +54,9 @@
 /* LED output normal or inverted */
 #define mLEDInvertedOut_c       FALSE
 
+/* LED PWM */
+#define gLED_TPM_PWM_d          TRUE
+
 /* Specifies the type of EEPROM available on the target board */
 #define gEepromType_d           gEepromDevice_AT45DB021E_c
 
@@ -116,13 +119,17 @@
  * 	BLE Stack Configuration
  ********************************************************************************** */
 
- /*  Public Device Address fariable type in ble_controller_task.c
-*           TRUE enables  const uint8_t gBDAddress_c[6] = {BD_ADDR};
-*           FALSE enables uint8_t gBDAddress_c[6] = {BD_ADDR};
+ /*  Public Device Address variable type in ble_controller_task.c
+*           TRUE  init in ROM  const uint8_t gBDAddress_c[6] = {BD_ADDR};
+*           FALSE init in RAM
 */       
-#define useConstPublicDeviceAddress_d TRUE
+#define initConstPublicDeviceAddress_d FALSE
+
+#define BD_ADDR_BYTES 6      
            
 #define BD_ADDR             0x13,0x00,0x00,0x9F,0x04,0x00
+#define BD_ADDR_FF          0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+
 
 
 #endif /* _APP_PREINCLUDE_H_ */

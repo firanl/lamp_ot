@@ -92,7 +92,7 @@ const FlashConfig_t gFlashConfig __attribute__ ((section(".cfmconfig"))) =
 
 /* Variables used by the Bootloader */
 volatile bootInfo_t *gpBootInfo;
-volatile uint32_t gBootStorageStartAddress;
+
 
 
 /*! *********************************************************************************
@@ -100,18 +100,6 @@ volatile uint32_t gBootStorageStartAddress;
 * Public Functions
 *************************************************************************************
 ********************************************************************************** */
-
-/*! *********************************************************************************
-* \brief   This function determines the start address of the internal sorage.
-*          If value is 0xFFFFFFFF then external storage should be used!
-*
-* \return the start address of the internal storage
-*
-********************************************************************************** */
-uint32_t Boot_GetInternalStorageStartAddr(void)
-{
-    return *((uint32_t*)(gBootProductInfoAddress_c + gInternalStorageStartAddressOffset_c));
-}
 
 
 /*! *********************************************************************************
@@ -147,48 +135,6 @@ static void JumpToApplication(volatile uint32_t userStartup)
 }
 
 
-/*! *********************************************************************************
-* \brief   Initialize the external storage
-*
-* \return status
-*
-********************************************************************************** */
-uint8_t Boot_InitExternalStorage(void)
-{
-    if (gBootInvalidAddress_c == gBootStorageStartAddress)
-        return EEPROM_Init();
-
-    return 0;
-}
-
-
-/*! *********************************************************************************
-* \brief   Read data from the external stoage
-*
-* \param[in]  NoOfBytes  number of byter to read
-* \param[in]  Addr       read memory address
-* \param[out] outbuf     location where read data is stored
-*
-* \return error code. 0 if success
-*
-********************************************************************************** */
-uint8_t Boot_ReadExternalStorage(uint16_t NoOfBytes, uint32_t Addr, uint8_t *outbuf)
-{
-    if (gBootInvalidAddress_c == gBootStorageStartAddress)
-    {
-        return EEPROM_ReadData(NoOfBytes, Addr, outbuf);
-    }
-    else
-    {
-        Addr += gBootStorageStartAddress;
-        while(NoOfBytes--)
-        {
-            *outbuf++ = *((uint8_t*)Addr++);
-        }
-
-        return 0;
-    }
-}
 
 
 /*! *********************************************************************************
@@ -205,29 +151,28 @@ void Boot_LoadImage (void)
     uint32_t flashAddr      = 0;
     uint8_t  bitMask        = gBitMaskInit_c;
     uint8_t *pBitmap        = bitmapBuffer;
-#if defined(MCU_MK21DX256)
-    vuint8_t* pFlexRamAddress;
-    uint8_t  EEEDataSetSize;
-    uint16_t size;
-#endif
 
-    /* Check if we have a valid internal storage start address. */
-    gBootStorageStartAddress = Boot_GetInternalStorageStartAddr();
+
 
     /* Init the flash module */
     FlashInitialization();
 
-    /* Init the external storage */
-    Boot_InitExternalStorage();
+    /* Init the external storage - if fails reset - true return point */
+    if(EEPROM_Init() != ee_ok) 
+         gHandleBootError_d();
 
-    /* Read image size */
-    if (Boot_ReadExternalStorage(gBootData_ImageLength_Size_c,gBootData_ImageLength_Offset_c, (uint8_t*)(&remaingImgSize)))
+    /* Read image size - if fails reset - true return point  */
+    if (EEPROM_ReadData(gBootData_ImageLength_Size_c,gBootData_ImageLength_Offset_c, (uint8_t*)(&remaingImgSize)) != ee_ok) 
         gHandleBootError_d();
 
-    /* Read sector bitmap */
-    if (Boot_ReadExternalStorage(gBootData_SectorsBitmap_Size_c, gBootData_SectorsBitmap_Offset_c, bitmapBuffer))
+    /* Read sector bitmap - if fails reset - true return point */
+    if (EEPROM_ReadData(gBootData_SectorsBitmap_Size_c, gBootData_SectorsBitmap_Offset_c, bitmapBuffer)  != ee_ok ) 
         gHandleBootError_d();
 
+    
+    /* TODO: first sector to erase should contain bootInfo_t flags - setting them to FALSE, FALSE */
+    /* implement field - how many times the device was flashed */
+    
     /* Start writing the image. Do not alter the last sector which contains HW specific data! */
     while (flashAddr < (gMcuFlashSize_c - gFlashErasePage_c))
     {
@@ -241,27 +186,34 @@ void Boot_LoadImage (void)
         {
             /* Erase Flash sector */
             if (FLASH_OK != FLASH_EraseSector(flashAddr))
-                gHandleBootError_d();
+              if (FLASH_OK != FLASH_EraseSector(flashAddr))
+                if (FLASH_OK != FLASH_EraseSector(flashAddr))
+                  gHandleBootError_d();
 
             if (len)
             {
-                /* Read a new image block */
-                if (Boot_ReadExternalStorage(len, flashAddr + gBootData_Image_Offset_c, buffer))
-                    gHandleBootError_d();
+                /* Read a new image block - if fails reset - false return point */
+                if (EEPROM_ReadData(len, flashAddr + gBootData_Image_Offset_c, buffer)  != ee_ok )
+                    if (EEPROM_ReadData(len, flashAddr + gBootData_Image_Offset_c, buffer)  != ee_ok ) 
+                       if (EEPROM_ReadData(len, flashAddr + gBootData_Image_Offset_c, buffer)  != ee_ok ) 
+                          gHandleBootError_d();
 
 
                 if( (flashAddr <= gBootImageFlagsAddress_c) && (flashAddr + len > gBootImageFlagsAddress_c) )
                 {
                     uint32_t i, offset = gBootImageFlagsAddress_c - flashAddr;
-                    /* Program the Flash before boot flags */
+                    
+                    /* Program the Flash before boot flags  - if fails reset - false return point*/
                     if(FLASH_OK != FLASH_Program(flashAddr, (uint32_t)buffer, offset))
-                        gHandleBootError_d();
+                       if(FLASH_OK != FLASH_Program(flashAddr, (uint32_t)buffer, offset))
+                          if(FLASH_OK != FLASH_Program(flashAddr, (uint32_t)buffer, offset))
+                            gHandleBootError_d();
 
                     /* Keep the boot flags set  until the all image is downloaded */
                     for( i=0; i<gEepromParams_WriteAlignment_c; i++ )
                     {
                         flags.newBootImageAvailable[i] = gBootValueForFALSE_c;
-                        flags.bootProcessCompleted[i] = gBootValueForTRUE_c;
+                        flags.bootProcessCompleted[i] = gBootValueForTRUE_c;  
                     }
                     i = offset + 2 * gEepromParams_WriteAlignment_c;
                     flags.bootVersion[0] = buffer[i++];
@@ -270,13 +222,17 @@ void Boot_LoadImage (void)
 
                     /* Program the Flash after the boot flags*/
                     if(FLASH_OK != FLASH_Program(flashAddr + offset, (uint32_t)(&buffer[offset]), len - offset))
-                        gHandleBootError_d();
+                      if(FLASH_OK != FLASH_Program(flashAddr + offset, (uint32_t)(&buffer[offset]), len - offset))
+                        if(FLASH_OK != FLASH_Program(flashAddr + offset, (uint32_t)(&buffer[offset]), len - offset))
+                          gHandleBootError_d();
                 }
                 else
                 {
                     /* Program the image block to Flash */
                     if(FLASH_OK != FLASH_Program(flashAddr, (uint32_t)buffer, len))
-                        gHandleBootError_d();
+                      if(FLASH_OK != FLASH_Program(flashAddr, (uint32_t)buffer, len))
+                        if(FLASH_OK != FLASH_Program(flashAddr, (uint32_t)buffer, len))
+                          gHandleBootError_d();
                 }
             }
         }
@@ -298,109 +254,13 @@ void Boot_LoadImage (void)
             remaingImgSize -= len;
     } /* while */
 
-#if defined(MCU_MK21DX256)
-
-    while((FTFL_FSTAT & FTFL_FSTAT_CCIF_MASK) != FTFL_FSTAT_CCIF_MASK)
-    {
-        /* wait till CCIF bit is set */
-    }
-
-    /* clear RDCOLERR & ACCERR & FPVIOL flag in flash status register */
-    FTFL_FSTAT = (FTFL_FSTAT_RDCOLERR_MASK | FTFL_FSTAT_ACCERR_MASK |
-                  FTFL_FSTAT_FPVIOL_MASK);
-
-    /* Write Command Code to FCCOB0 */
-    FTFL_FCCOB0 = FLASH_READ_RESOURCE;
-    /* Write address to FCCOB1/2/3 */
-    FTFL_FCCOB1 = ((uint8_t)(FLASH_DFLASH_IFR_READRESOURCE_ADDRESS >> 16));
-    FTFL_FCCOB2 = ((uint8_t)((FLASH_DFLASH_IFR_READRESOURCE_ADDRESS >> 8) & 0xFF));
-    FTFL_FCCOB3 = ((uint8_t)(FLASH_DFLASH_IFR_READRESOURCE_ADDRESS & 0xFF));
-
-    /* Write Resource Select Code of 0 to FCCOB8 to select IFR. Without this, */
-    /* an access error may occur if the register contains data from a previous command. */
-    FTFL_FCCOB8 = 0;
-
-    /* clear CCIF bit */
-    FTFL_FSTAT |= FTFL_FSTAT_CCIF_MASK;
-
-    /* check CCIF bit */
-    while((FTFL_FSTAT & FTFL_FSTAT_CCIF_MASK) != FTFL_FSTAT_CCIF_MASK)
-    {
-        /* wait till CCIF bit is set */
-    }
-
-    /* read the FlexRAM window size */
-    EEEDataSetSize = FTFL_FCCOB6;
-    EEEDataSetSize &= 0x0F;
-
-    if((EEEDataSetSize == 2) || (EEEDataSetSize == 3)) /* FlexRAM size is 4KB or 2KB */
-    {
-        /* Enable EEE */
-        FLASH_SetEEEEnable(FLASH_FLEXRAM_FNC_CTRL_CODE);
-
-        pBitmap = &bitmapBuffer[0] + (uint32_t)((gMcuFlashSize_c/gFlashErasePage_c)/8);
-
-        if(EEEDataSetSize == 2) /* 4KB */
-        {
-            if(*pBitmap & 0x01)
-            {
-                size = gBootFlexRam_4K_Size_c/2;
-                pFlexRamAddress = (vuint8_t*)((uint32_t)gBootFlexRAMBaseAddress_c);
-                while(size--)
-                {
-                    /* wait for EEPROM system to be ready */
-                    while(!(FTFL_FCNFG & FTFL_FCNFG_EEERDY_MASK));
-                    *pFlexRamAddress = 0xFF;
-                    pFlexRamAddress ++;
-                }
-            }
-            if(*pBitmap & 0x02)
-            {
-                size = gBootFlexRam_4K_Size_c/2;
-                pFlexRamAddress = (vuint8_t*)((uint32_t)(gBootFlexRAMBaseAddress_c + size));
-                while(size--)
-                {
-                    /* wait for EEPROM system to be ready */
-                    while(!(FTFL_FCNFG & FTFL_FCNFG_EEERDY_MASK));
-                    *pFlexRamAddress = 0xFF;
-                    pFlexRamAddress ++;
-                }
-            }
-        }
-        else if (EEEDataSetSize == 3) /* 2K */
-        {
-            if(*pBitmap & 0x01)
-            {
-                size = gBootFlexRam_2K_Size_c/2;
-                pFlexRamAddress = (vuint8_t*)((uint32_t)gBootFlexRAMBaseAddress_c);
-                while(size--)
-                {
-                    /* wait for EEPROM system to be ready */
-                    while(!(FTFL_FCNFG & FTFL_FCNFG_EEERDY_MASK));
-                    *pFlexRamAddress = 0xFF;
-                    pFlexRamAddress ++;
-                }
-            }
-            if(*pBitmap & 0x02)
-            {
-                size = gBootFlexRam_2K_Size_c/2;
-                pFlexRamAddress = (vuint8_t*)((uint32_t)(gBootFlexRAMBaseAddress_c + size));
-                while(size--)
-                {
-                    /* wait for EEPROM system to be ready */
-                    while(!(FTFL_FCNFG & FTFL_FCNFG_EEERDY_MASK));
-                    *pFlexRamAddress = 0xFF;
-                    pFlexRamAddress ++;
-                }
-            }
-        }
-    }
-#endif
 
 
     /* Set the bBootProcessCompleted Flag */
     if( FLASH_OK != FLASH_Program((uint32_t)gBootImageFlagsAddress_c, (uint32_t)&flags, sizeof(flags)) )
-        gHandleBootError_d();
+       if( FLASH_OK != FLASH_Program((uint32_t)gBootImageFlagsAddress_c, (uint32_t)&flags, sizeof(flags)) )
+          if( FLASH_OK != FLASH_Program((uint32_t)gBootImageFlagsAddress_c, (uint32_t)&flags, sizeof(flags)) )
+            gHandleBootError_d();
 
     /* Reseting MCU */
     Boot_ResetMCU();
@@ -434,11 +294,7 @@ int main(int argc, char **argv)
     SCB_VTOR = (uint32_t)__region_BOOT_ROM_start__;
 
     /* Disable watchdog */
-#if defined(MCU_MK21DN512) || defined(MCU_MK21DX256) || defined(MCU_MK64FN1M)
-    WDOG_UNLOCK = 0xC520;
-    WDOG_UNLOCK = 0xD928;
-    WDOG_STCTRLH &= ~WDOG_STCTRLH_WDOGEN_MASK;
-#elif defined(MCU_MKL46Z256) || defined(MCU_MKW40Z160)
+#if defined(MCU_MKW40Z160)
     SIM_COPC = SIM_COPC_COPT(0);
 #endif
 #if gSerialBootloaderEnable_c
@@ -454,26 +310,22 @@ int main(int argc, char **argv)
         CheckForUartLoader();
     }
 #endif
-    /* Check if there is no boot image available in the external EEPROM and if eventually
-    the booting of the previous one has been completed. If both conditions are met, start
-    running the application in the internal Flash. Else, start the process of booting from
-    external EEPROM */
+
     gpBootInfo = (bootInfo_t*)gBootImageFlagsAddress_c;
-    /*
-    if( (gpBootInfo->newBootImageAvailable == gBootValueForTRUE_c) &&
-    (gpBootInfo->bootProcessCompleted ==  gBootValueForFALSE_c) )
-    */
-    if ((gpBootInfo->newBootImageAvailable[0] != gBootValueForTRUE_c) &&
-        (gpBootInfo->bootProcessCompleted[0] ==  gBootValueForTRUE_c))
-    {
-        /* Set the start address of the interrupt vector*/
-        SCB_VTOR = gUserFlashStart_d;
-        JumpToApplication(gUserFlashStart_d);
+
+    /* TODO implement a visual way if device is stil in bootloader */
+    
+    /* if new image available and bootProcessCompleted or not */
+    if ( (gpBootInfo->newBootImageAvailable[0] == gBootValueForTRUE_c) )
+    { 
+        /* Write the new image */
+        Boot_LoadImage();
     }
     else
     {
-        /* Write the new image */
-        Boot_LoadImage();
+        /* Set the start address of the interrupt vector*/
+        SCB_VTOR = gUserFlashStart_d;
+        JumpToApplication(gUserFlashStart_d);       
     }
 
     return 0;

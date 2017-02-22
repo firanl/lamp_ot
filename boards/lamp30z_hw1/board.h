@@ -103,13 +103,20 @@
 #define LA_LAMP_CONTROL      0xA0
 #define LA_LAMP_WARM_WHITE   0x00
 #define LA_LAMP_COLD_WHITE   0x00
-#define LA_LAMP_RGB          0x00, 0x05, 0x00
+#define LA_LAMP_R            0x00
+#define LA_LAMP_G            0x00     
+#define LA_LAMP_B            0x00     
 
-
+typedef union prog_cycles_tag {
+      uint32_t cnt;
+      struct {
+          uint8_t prog_cycles[4];
+      } uint8;
+  } prog_cycles_t;
 
 /* Lamp basic control tag */
 typedef union lamp_control_tag {
-	uint8_t raw;
+	uint8_t raw8;
 	struct {
 		uint8_t padding0   : 1; /*!< LSB   xxxx xxx1 - not used 0  */	
 		uint8_t padding1   : 1; /*!<       xxxx xx1x - not used 0  */
@@ -124,7 +131,7 @@ typedef union lamp_control_tag {
 } lamp_control_t;
 
 typedef union lamp_white_tag {
-	uint16_t raw;
+	uint16_t raw16;
 	struct {
 		uint8_t coldW;   /*!<  LSB  cold white          */
 		uint8_t warmW;   /*!<  MSB  warm white          */
@@ -132,7 +139,7 @@ typedef union lamp_white_tag {
 } lamp_white_t;
 
 typedef union lamp_color_tag {
-	uint32_t raw;
+	uint32_t raw32;
 	struct {	
 		uint8_t b;	  /*!< 	LSB  blue          */
 		uint8_t g;        /*!<       green         */

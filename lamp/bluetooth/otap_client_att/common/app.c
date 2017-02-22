@@ -67,6 +67,8 @@
 /* core temperature measurement, voltage reference measurement */
 #include "temperature_sensor.h"
 
+/* TPM PWM */
+#include "tpm_pwm_led_ctrl.h"
 
 #include "board.h"
 #include "ApplMain.h"
@@ -79,6 +81,9 @@
 /* core temperature T, signed exponent -2 */
 /* core voltage reference V, signed exponent -3 */
 extern chip_TempVoltage_t g_chip_TV;
+
+/* lamp control light data */
+extern lamp_NVdata_t lamp_NVdata;
 
 /************************************************************************************
 * Extern functions
@@ -154,7 +159,7 @@ static deviceId_t  mPeerDeviceId = gInvalidDeviceId_c;
 static bool_t   mSendDataAfterEncStart = FALSE;
 
 /* Service Data */
-static lasConfig_t lasServiceConfig         = {service_lamp, 0};
+static lasConfig_t lasServiceConfig         = {service_lamp};
 static disConfig_t disServiceConfig         = {service_device_info};
 static otapClientConfig_t otapServiceConfig = {service_otap};
 
@@ -207,7 +212,7 @@ static void BleApp_AdvertisingCallback (gapAdvertisingEvent_t* pAdvertisingEvent
 static void BleApp_ConnectionCallback (deviceId_t peerDeviceId, gapConnectionEvent_t* pConnectionEvent);
 static void BleApp_GattServerCallback (deviceId_t deviceId, gattServerEvent_t* pServerEvent);
 
-
+static void BleApp_SendAttWriteResponse (deviceId_t deviceId, uint16_t handle, bleResult_t result);
 
 static void BleApp_CccdWritten (deviceId_t deviceId, uint16_t handle, gattCccdFlags_t cccd);
 static void BleApp_AttributeWritten (deviceId_t deviceId, uint16_t handle, uint16_t length, uint8_t* pValue);
@@ -249,6 +254,15 @@ void BleApp_Init(void)
 {
      tmrErrCode_t tmrerr = gTmrInvalidId_c;
     /* Initialize application support for drivers */
+     
+    #if gLED_TPM_PWM_d
+      LED_UnInit();
+      
+      /* init PEM TPM driver */
+      TPM_PWM_Init();   
+    #endif
+      
+
 
     appTimerId = TMR_AllocateTimer();
     /* Initialize application specific peripher drivers here. */
@@ -413,10 +427,9 @@ static void BleApp_Config()
     OtapCS_Start(&otapServiceConfig);
     Las_Start(&lasServiceConfig);
     
-    basServiceConfig.batteryLevel = 50;
+    basServiceConfig.batteryLevel = 90;
     Bas_Start(&basServiceConfig);
     
- 
 
     
     // start advertising
@@ -795,24 +808,27 @@ static void BleApp_AttributeWritten(deviceId_t  deviceId,
     {
       if ( (length==1) )
       {
-
+        bleResult = Las_SetLampControl(lasServiceConfig.serviceHandle, pValue[0], FALSE);
         // Report status to client
+        BleApp_SendAttWriteResponse (deviceId, handle, bleResult);
       }
     }     
     else if (handle == value_lamp_White)
     {
-      if ( (length==2) && (pValue[0] <= 100) && (pValue[1] <= 100) )
+      if ( (length==2) && (pValue[0] <= PWM_factor_MAX) && (pValue[1] <= PWM_factor_MAX) )
       {
-
+         bleResult = Las_SetLampWhite (lasServiceConfig.serviceHandle, pValue[0], pValue[1], FALSE);
         // Report status to client
+        BleApp_SendAttWriteResponse (deviceId, handle, bleResult);
       }
     }     
     else if (handle == value_lamp_RGB)
     {
-       if ( (length==3) && (pValue[0] <= 100) && (pValue[1] <= 100) && (pValue[2] <= 100))
+       if ( (length==3) && (pValue[0] <= PWM_factor_MAX) && (pValue[1] <= PWM_factor_MAX) && (pValue[2] <= PWM_factor_MAX))
       {
-
+        bleResult = Las_SetLampRGB (lasServiceConfig.serviceHandle, pValue[0], pValue[1], pValue[3]);
         // Report status to client
+        BleApp_SendAttWriteResponse (deviceId, handle, bleResult);
       }
     }   
     else if (handle == value_lamp_clock)
@@ -821,7 +837,7 @@ static void BleApp_AttributeWritten(deviceId_t  deviceId,
       {
 
         // Report status to client
-
+        BleApp_SendAttWriteResponse (deviceId, handle, bleResult);
       }
     }
     else if (handle == value_lamp_onHHMM)
@@ -830,7 +846,7 @@ static void BleApp_AttributeWritten(deviceId_t  deviceId,
       {
 
         // Report status to client
-
+        BleApp_SendAttWriteResponse (deviceId, handle, bleResult);
       }
     }
     else if (handle == value_lamp_onHHMM)
@@ -839,7 +855,7 @@ static void BleApp_AttributeWritten(deviceId_t  deviceId,
       {
 
         // Report status to client
-
+        BleApp_SendAttWriteResponse (deviceId, handle, bleResult);
       }
     }     
     else
@@ -917,24 +933,21 @@ static void BleApp_AttributeWrittenWithoutResponse (deviceId_t deviceId,
     {
       if ( (length==1) )
       {
-
-
+        Las_SetLampControl(lasServiceConfig.serviceHandle, pValue[0], FALSE);
       }
     }     
     else if (handle == value_lamp_White)
     {
-      if ( (length==2) && (pValue[0] <= 100) && (pValue[1] <= 100) )
+      if ( (length==2) && (pValue[0] <= PWM_factor_MAX) && (pValue[1] <= PWM_factor_MAX) )
       {
-
-
+        bleResult = Las_SetLampWhite (lasServiceConfig.serviceHandle, pValue[0], pValue[1], FALSE);
       }
     }     
     else if (handle == value_lamp_RGB)
     {
-       if ( (length==3) && (pValue[0] <= 100) && (pValue[1] <= 100) && (pValue[2] <= 100))
+       if ( (length==3) && (pValue[0] <= PWM_factor_MAX) && (pValue[1] <= PWM_factor_MAX) && (pValue[2] <= PWM_factor_MAX))
       {
-
-
+        bleResult = Las_SetLampRGB (lasServiceConfig.serviceHandle, pValue[0], pValue[1], pValue[3]);
       }
     }
     else if (handle == value_lamp_clock)
@@ -2025,12 +2038,28 @@ static void MeasurementTimerCallback(void * pParam)
     {
       Las_RecordMeasurementTV (lasServiceConfig.serviceHandle);
     
-      basServiceConfig.batteryLevel = 50;
+      basServiceConfig.batteryLevel = 90;
       Bas_RecordBatteryMeasurement(basServiceConfig.serviceHandle, basServiceConfig.batteryLevel);
     }
 
 }
 
+/*! *********************************************************************************
+* \brief        Sends GATT response to the client
+********************************************************************************** */
+static void BleApp_SendAttWriteResponse (deviceId_t deviceId, uint16_t handle, bleResult_t result)
+{
+  attErrorCode_t attErrorCode;
+  
+  // Determine response to send (OK or Error)
+  if(result == gBleSuccess_c)
+    attErrorCode = gAttErrCodeNoError_c;
+  else{
+    attErrorCode = (attErrorCode_t)(result & 0x00FF);
+  }
+  // Send response to client  
+  GattServer_SendAttributeWrittenStatus(deviceId, handle, attErrorCode);
+}
 
 /*! *********************************************************************************
 * @}

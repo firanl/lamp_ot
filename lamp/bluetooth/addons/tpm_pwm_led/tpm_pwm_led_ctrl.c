@@ -52,7 +52,7 @@
 ************************************************************************************/
   /* Initialize TPM module for PWM generation */
   tpm_general_config_t driverInfo_0 = {      //TPM 0 configuration structure 
-        .isDBGMode = TRUE,
+        .isDBGMode = FALSE,
         .isGlobalTimeBase = FALSE,
         .isTriggerMode = FALSE,
         .isStopCountOnOveflow = FALSE,
@@ -61,7 +61,7 @@
   };
 
   tpm_general_config_t driverInfo_1 = {      //TPM 1 configuration structure
-        .isDBGMode = TRUE,
+        .isDBGMode = FALSE,
         .isGlobalTimeBase = FALSE,
         .isTriggerMode = FALSE,
         .isStopCountOnOveflow = FALSE,

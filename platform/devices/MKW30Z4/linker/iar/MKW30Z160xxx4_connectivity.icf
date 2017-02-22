@@ -117,6 +117,13 @@ define symbol m_fsl_prodInfo_start     = __region_ROM_end__ - m_sector_size + 1;
 define symbol m_fsl_prodInfo_end       = __region_ROM_end__;
 define exported symbol FREESCALE_PROD_DATA_BASE_ADDR = m_fsl_prodInfo_start;
 
+/*** hardwareParameters end of flash offsets */  
+define symbol m_hp_bluetooth_address_offset = 50;  
+
+define symbol m_hp_bluetooth_address_start =  m_fsl_prodInfo_start + m_hp_bluetooth_address_offset;
+
+
+
 
 /*** NVM Configuration ***/
 if( gUseNVMLink_d )
@@ -212,12 +219,12 @@ do not initialize  { section .noinit };
 
 
 /*** Memory placements ***/
-place at address mem: m_interrupts_start    { readonly section .intvec };
-place at address mem: m_fsl_prodInfo_start  { readonly section .FREESCALE_PROD_DATA };
-place in TEXT_region                        { readonly };
-place in DATA_region                        { readwrite, zi };
-place in HEAP_region                        { block HEAP };
-place in CSTACK_region                      { block CSTACK };
+place at address mem: m_interrupts_start                      { readonly section .intvec };
+place at address mem: m_hp_bluetooth_address_start            { section gBDAddress_ROM };
+place in TEXT_region                                          { readonly };
+place in DATA_region                                          { readwrite, zi };
+place in HEAP_region                                          { block HEAP };
+place in CSTACK_region                                        { block CSTACK };
 
 
 if (gUseBootloaderLink_d) 

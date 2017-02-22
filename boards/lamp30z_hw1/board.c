@@ -35,7 +35,7 @@
 #include "board.h"
 #include "fsl_clock_manager.h"
 #include "fsl_smc_hal.h"
-#include "fsl_debug_console.h"
+//#include "fsl_debug_console.h"
 #include "pin_mux.h"
 #include "fsl_adc16_driver.h"
 #include "fsl_pmc_hal.h"
@@ -59,7 +59,17 @@
 /************************************************************************************
 * Private type definitions and macros
 ************************************************************************************/
-extern uint8_t gBDAddress_c[];
+extern uint32_t FREESCALE_PROD_DATA_BASE_ADDR[];
+
+
+#if (initConstPublicDeviceAddress_d)
+  extern const uint8_t gBDAddress_c[];
+#else
+  extern uint8_t gBDAddress_c[];
+#endif
+
+/* lamp control light data */
+lamp_NVdata_t lamp_NVdata;
 
 /************************************************************************************
 * Private memory declarations
@@ -76,13 +86,6 @@ gpio_input_pin_user_config_t switchPins[] = {
         .config.pullSelect = kPortPullUp,
         .config.isPassiveFilterEnabled = false,
         .config.interrupt = kPortIntFallingEdge,
-    },
-    {
-        .pinName = kGpioSW2,
-        .config.isPullEnable = true,
-        .config.pullSelect = kPortPullUp,
-        .config.isPassiveFilterEnabled = false,
-        .config.interrupt = kPortIntFallingEdge
     },
     {
         .pinName = GPIO_PINS_OUT_OF_RANGE,
@@ -129,10 +132,9 @@ static void BOARD_InitOsc0(void);
 static void BOARD_ClockInit(void);
 static void CLOCK_SetBootConfig(clock_manager_user_config_t const* config);
 static void initHardwareParameters(void);
-static void clone_SIM_UIDL_private_static_MAC(void);
-static void clone_RSIM_private_static_MAC(void);
-static void clone_RSIM_r_private_static_MAC(void);
-static uint8_t test_MAC(void);
+
+static void clone_RSIM_private_static_MAC(uint8_t bluetooth_address[]);
+
 /************************************************************************************
 * Public functions prototypes
 ************************************************************************************/
@@ -167,7 +169,7 @@ void hardware_init(void) {
   /* init core temperature value and voltage reference */
   measure_chip_temperature();
   
-  //clone_RSIM_private_static_MAC();
+
 
   
   initHardwareParameters();
@@ -182,63 +184,65 @@ void hardware_init(void) {
 * Private functions
 *********************************************************************************** */
 
+
+/* init lamp NV data - lamp status, bluetooth adress, device info data */
 static void initHardwareParameters(void)
-{
-  NV_ReadHWParameters(&gHardwareParameters);
-      
+{ 
+  /* init lamp data */
+  lamp_NVdata.lampControl.raw8 = LA_LAMP_CONTROL;
+  lamp_NVdata.lampWhite.uint8.warmW = LA_LAMP_WARM_WHITE;
+  lamp_NVdata.lampWhite.uint8.coldW = LA_LAMP_COLD_WHITE;
+  lamp_NVdata.lampRGB.uint8.r = LA_LAMP_R;
+  lamp_NVdata.lampRGB.uint8.g = LA_LAMP_G;
+  lamp_NVdata.lampRGB.uint8.b = LA_LAMP_B;
+  
+  /* init MAC ADRESS */  
+  clone_RSIM_private_static_MAC(gBDAddress_c);
+
+   
 }
 
-static void clone_RSIM_private_static_MAC(void)
-{
-    uint32_t *ptr;
 
-    ptr = (uint32_t *)(RSIM_BASE + 0x0C); // RSIM_MAC_LSB
-    gBDAddress_c[0] = (uint8_t) *ptr;
-    gBDAddress_c[1] = (uint8_t) ( *ptr >> 8); 
-    gBDAddress_c[2] = (uint8_t) ( *ptr >> 16); 
-    gBDAddress_c[3] = (uint8_t) ( *ptr >> 24);  
-    ptr = (uint32_t *)(RSIM_BASE + 0x08); // RSIM_MAC_MSB
-    gBDAddress_c[4] = (uint8_t) *ptr;
-    gBDAddress_c[5] = 0xC0;   // MSB is 11xx xxxx
-}
-
-static void clone_RSIM_r_private_static_MAC(void)
+static void clone_RSIM_private_static_MAC(uint8_t bluetooth_address[] )
 {
     uint32_t *ptr;
 
     ptr = (uint32_t *)(RSIM_BASE + 0x0C); // RSIM_MAC_LSB
-    gBDAddress_c[4] = (uint8_t) *ptr;
-    gBDAddress_c[3] = (uint8_t) ( *ptr >> 8); 
-    gBDAddress_c[2] = (uint8_t) ( *ptr >> 16); 
-    gBDAddress_c[1] = (uint8_t) ( *ptr >> 24);  
+    bluetooth_address[0] = (uint8_t) *ptr;
+    bluetooth_address[1] = (uint8_t) ( *ptr >> 8); 
+    bluetooth_address[2] = (uint8_t) ( *ptr >> 16); 
+    bluetooth_address[3] = (uint8_t) ( *ptr >> 24);  
     ptr = (uint32_t *)(RSIM_BASE + 0x08); // RSIM_MAC_MSB
-    gBDAddress_c[0] = (uint8_t) *ptr;
-    gBDAddress_c[5] = 0xC0;   // MSB is 11xx xxxx
+    bluetooth_address[4] = (uint8_t) *ptr;
+    bluetooth_address[5] = 0xC0;   // MSB is 11xx xxxx
 }
 
-static void clone_SIM_UIDL_private_static_MAC(void)
+
+
+static void clone_SIM_UIDL_private_static_MAC(uint8_t bluetooth_address[])
 {
     uint32_t *ptr;
   
     ptr = (uint32_t *)(SIM_BASE  + 0x1060); // Unique Identification Register Low (SIM_UIDL)
-    gBDAddress_c[0] = (uint8_t) *ptr;
-    gBDAddress_c[1] = (uint8_t) ( *ptr >> 8); 
-    gBDAddress_c[2] = (uint8_t) ( *ptr >> 16); 
-    gBDAddress_c[3] = (uint8_t) ( *ptr >> 24);  
+    bluetooth_address[0] = (uint8_t) *ptr;
+    bluetooth_address[1] = (uint8_t) ( *ptr >> 8); 
+    bluetooth_address[2] = (uint8_t) ( *ptr >> 16); 
+    bluetooth_address[3] = (uint8_t) ( *ptr >> 24);  
     ptr = (uint32_t *) (SIM_BASE + 0x105C); // Unique Identification Register Mid Low (SIM_UIDML)
-    gBDAddress_c[4] = (uint8_t) *ptr;
-    gBDAddress_c[5] = 0xC0;   // MSB is 11xx xxxx
+    bluetooth_address[4] = (uint8_t) *ptr;
+    bluetooth_address[5] = 0xC0;   // MSB is 11xx xxxx
 }
 
-static uint8_t test_MAC(void)
+
+static uint8_t test_MAC(uint8_t bluetooth_address[])
 {
     int8_t i=6, j=0;
       
     /* check if bluetooth_address is valid */
     while(i--)
     {
-        if(gBDAddress_c[i] == 0xFF) j++;
-        else if(gBDAddress_c[i] == 0x00) j--;
+       if(bluetooth_address[i] == 0xFF) j++;
+        else if(bluetooth_address[i] == 0x00) j--;
     }
            
     if( (j==6) || (j==(-6)) )

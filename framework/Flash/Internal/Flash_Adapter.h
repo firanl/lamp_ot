@@ -104,7 +104,9 @@
 * Public type definitions
 ********************************************************************************** */
 
-typedef PACKED_STRUCT hardwareParameters_tag
+
+
+ typedef PACKED_STRUCT hardwareParameters_tag
 {
     uint8_t  reserved[42];             /* for backward compatibillity */
     uint8_t  ieee_802_15_4_address[8]; /* IEEE 802.15.4 MAC address   - not used  */
@@ -121,7 +123,7 @@ typedef PACKED_STRUCT hardwareParameters_tag
 ********************************************************************************** */
 extern FLASH_SSD_CONFIG gFlashConfig;
 extern pFLASHCOMMANDSEQUENCE gFlashLaunchCommand;
-extern hardwareParameters_t gHardwareParameters;
+
 
 /*! *********************************************************************************
 * Public prototypes

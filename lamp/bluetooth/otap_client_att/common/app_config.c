@@ -169,7 +169,15 @@ static const gapServiceSecurityRequirements_t serviceSecurity[GAP_SERVICE_CNT] =
         .minimumEncryptionKeySize = gDefaultEncryptionKeySize_d
     },
     .serviceHandle = service_device_info
-  }
+  },
+  {
+    .requirements = {
+        .securityModeLevel = gSecurityMode_1_Level_1_c,
+        .authorization = FALSE,
+        .minimumEncryptionKeySize = gDefaultEncryptionKeySize_d
+    },
+    .serviceHandle = service_lamp
+  }  
 };
 
 gapDeviceSecurityRequirements_t deviceSecurityRequirements = {

@@ -43,29 +43,11 @@
 #include "EmbeddedTypes.h"
 #include "Eeprom_Boot.h"
 
-#if defined(MCU_MK21DN512) || defined(MCU_MK21DX256)
-  #include "MK21D5.h"
-#elif defined(MCU_MKL46Z256)
-  #include "MKL46Z4.h"
-#elif defined(MCU_MKW40Z160)
+
+
+#if (MCU_MKW40Z160)
   #include "MKW40Z4.h"
-#elif defined(MCU_MK64FN1M)
-  #include "MK64F12.h"
-#else
-  #error MCU not supported
-#endif
-
-
-#if defined(MCU_MK21DN512)
-  #include "MK21D512_cfg.h"
-#elif defined(MCU_MK21DX256)
-  #include "MK21D256_cfg.h"
-#elif defined(MCU_MKL46Z256)
-  #include "MKL46Z256_cfg.h"
-#elif defined(MCU_MKW40Z160)
   #include "MKW40Z160_cfg.h"
-#elif defined(MCU_MK64FN1M)
-  #include "MK64F12_cfg.h"
 #else
   #error MCU not supported
 #endif
@@ -85,7 +67,7 @@
  * Description: The value for FPROT register. By default the Flash is not Protected
  */
 #ifndef gSerialBootloaderEnable_c
-#define gSerialBootloaderEnable_c FALSE
+  #define gSerialBootloaderEnable_c FALSE
 #endif
 
 
@@ -183,11 +165,7 @@ indicates which Flash sectors are write protected and should not be updated */
 #define gBootData_Image_Offset_c             gEepromAlignAddr_d(gBootData_SectorsBitmap_Offset_c + \
                                                                 gBootData_SectorsBitmap_Size_c)
 
-#if defined(MCU_MK21DX256)
-#define gBootFlexRAMBaseAddress_c    0x14000000
-#define gBootFlexRam_4K_Size_c       0x1000
-#define gBootFlexRam_2K_Size_c       0x800
-#endif
+
 
 
 /*! *********************************************************************************

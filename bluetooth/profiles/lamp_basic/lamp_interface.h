@@ -62,9 +62,7 @@
 typedef struct lasConfig_tag
 {
     uint16_t    serviceHandle;
-    uint8_t     lampControl;   
-    uint16_t     lampWhite;  
-    uint32_t     lampRGB;  
+    
 } lasConfig_t;
 
 
@@ -117,19 +115,17 @@ bleResult_t Las_Subscribe(deviceId_t clientDeviceId);
 ************************************************************************************/
 bleResult_t Las_Unsubscribe();
 
-/*!**********************************************************************************
-* \brief        Records Lamp control settings on a specified service handle.
-*
-* \param[in]    serviceHandle   Service handle.
-* \param[in]    value           Lamp control bits.
-*
-* \return       gBleSuccess_c or error.
-************************************************************************************/
-bleResult_t Las_RecordLampControl (uint16_t serviceHandle, uint8_t control_1B);
-bleResult_t Las_RecordLampWhite   (uint16_t serviceHandle, uint16_t white_2B);
-bleResult_t Las_RecordLampRGB     (uint16_t serviceHandle, uint32_t rgb_3B);
+
 
 bleResult_t Las_RecordMeasurementTV (uint16_t serviceHandle);
+
+bleResult_t Las_SetLampControl (uint16_t serviceHandle, uint8_t control, uint8_t notify);
+
+bleResult_t Las_SetLampWhite (uint16_t serviceHandle, uint8_t warmW, uint8_t coldW, uint8_t notify);
+
+bleResult_t Las_SetLampRGB (uint16_t serviceHandle, uint8_t red, uint8_t green, uint8_t blue);
+
+
 
 #ifdef __cplusplus
 }

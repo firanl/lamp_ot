@@ -38,7 +38,7 @@ PRIMARY_SERVICE_UUID128(service_lamp, uuid_service_lamp)
         CCCD(cccd_White)
 
     CHARACTERISTIC_UUID128(char_lamp_RGB, uuid_char_lamp_RGB, (gGattCharPropRead_c | gGattCharPropWrite_c | gGattCharPropWriteWithoutRsp_c) )
-        VALUE_UUID128(value_lamp_RGB, uuid_char_lamp_RGB, (gPermissionFlagReadable_c | gPermissionFlagWritable_c), 3, LA_LAMP_RGB)
+        VALUE_UUID128(value_lamp_RGB, uuid_char_lamp_RGB, (gPermissionFlagReadable_c | gPermissionFlagWritable_c), 3, LA_LAMP_R,  LA_LAMP_G, LA_LAMP_B)
  
     CHARACTERISTIC(char_core_temperature, gBleSig_Temperature_d, (gGattCharPropRead_c | gGattCharPropNotify_c))
         VALUE(value_core_temperature, gBleSig_Temperature_d, (gPermissionFlagReadable_c), 2, 0xD1, 0x07)
