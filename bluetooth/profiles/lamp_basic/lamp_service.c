@@ -99,12 +99,16 @@ bleResult_t Las_Start (lasConfig_t *pServiceConfig)
         if(lamp_NVdata.lampControl.bit.OnOff)
         {
           /* the lamp is on */
-          
           if(lamp_NVdata.lampControl.bit.White)
           {
             /* white light is on */
             TPM_PWM_WarmWhite(lamp_NVdata.lampWhite.uint8.warmW);
             TPM_PWM_ColdWhite(lamp_NVdata.lampWhite.uint8.coldW);
+          }
+          else
+          {
+            TPM_PWM_WarmWhiteOff();
+            TPM_PWM_ColdWhiteOff();
           }
           
           if(lamp_NVdata.lampControl.bit.Color)
@@ -113,7 +117,14 @@ bleResult_t Las_Start (lasConfig_t *pServiceConfig)
              TPM_PWM_Red  (lamp_NVdata.lampRGB.uint8.r);
              TPM_PWM_Green(lamp_NVdata.lampRGB.uint8.g);
              TPM_PWM_Blue (lamp_NVdata.lampRGB.uint8.b);
-          }        
+          } 
+          else
+          {
+             TPM_PWM_RedOff  ();
+             TPM_PWM_GreenOff();
+             TPM_PWM_BlueOff ();
+          }
+          
         }
         else  
         {
@@ -143,7 +154,7 @@ bleResult_t Las_Stop (lasConfig_t *pServiceConfig)
 
 bleResult_t Las_Subscribe(deviceId_t deviceId)
 {
-   uint8_t control = 0;
+   uint8_t control;
    
     mLas_SubscribedClientId = deviceId;
    
@@ -164,7 +175,7 @@ bleResult_t Las_Subscribe(deviceId_t deviceId)
 
 bleResult_t Las_Unsubscribe()
 {
-   uint8_t control = 0;
+   uint8_t control;
 
     mLas_SubscribedClientId = gInvalidDeviceId_c;
     
@@ -238,26 +249,103 @@ bleResult_t Las_RecordMeasurementTV (uint16_t serviceHandle)
 bleResult_t Las_SetLampControl (uint16_t serviceHandle, uint8_t control, uint8_t notify)
 {
   bleResult_t result = gBleSuccess_c;
+  lamp_control_t lamp_ctrl;
+
+  lamp_ctrl.raw8 = control;
   
-  if (control != lamp_NVdata.lampControl.raw8)
-  {
-    /* turn lamp off - stat fade off */
-        /* turn off white */
-        /* turn off RGB */
+  /* see some differences from old control */   
+  if (lamp_ctrl.raw8 != lamp_NVdata.lampControl.raw8)
+  { 
+    lamp_NVdata.lampControl.bit.BTcon = lamp_ctrl.bit.BTcon;
+    lamp_NVdata.lampControl.bit.mix = lamp_ctrl.bit.mix; 
     
-    /* turn lamp on - stat fade on */
-        /* turn on white */
-        /* turn on RGB */
+    /* the on off state is changed */
+    if(lamp_ctrl.bit.OnOff != lamp_NVdata.lampControl.bit.OnOff)
+    {
+      lamp_NVdata.lampControl.bit.White = lamp_ctrl.bit.White; 
+      lamp_NVdata.lampControl.bit.Color = lamp_ctrl.bit.Color; 
+      
+      /* turn lamp on - stat fade on */
+      if(lamp_ctrl.bit.OnOff)
+      {      
+        ///===== fade on
+          if(lamp_NVdata.lampControl.bit.White)
+          {
+            /* white light is on */
+            TPM_PWM_WarmWhite(lamp_NVdata.lampWhite.uint8.warmW);
+            TPM_PWM_ColdWhite(lamp_NVdata.lampWhite.uint8.coldW);
+          }
+          else
+          {
+            TPM_PWM_WarmWhiteOff();
+            TPM_PWM_ColdWhiteOff();
+          }
+          
+          if(lamp_NVdata.lampControl.bit.Color)
+          {
+             /* color RGB light is on */
+             TPM_PWM_Red  (lamp_NVdata.lampRGB.uint8.r);
+             TPM_PWM_Green(lamp_NVdata.lampRGB.uint8.g);
+             TPM_PWM_Blue (lamp_NVdata.lampRGB.uint8.b);
+          } 
+          else
+          {
+             TPM_PWM_RedOff  ();
+             TPM_PWM_GreenOff();
+             TPM_PWM_BlueOff ();
+          }
+        ///=====      
+      }
+      /* turn lamp off - stat fade off */
+      else
+      {
+      ///===== fade off
+        TPM_PWM_Off();
+      ///=====
+      }
+      
+      lamp_NVdata.lampControl.bit.OnOff = lamp_ctrl.bit.OnOff; 
+    }
+    /* the White or RGB state is changed */
+    else
+    {
+      lamp_NVdata.lampControl.bit.White = lamp_ctrl.bit.White; 
+      lamp_NVdata.lampControl.bit.Color = lamp_ctrl.bit.Color; 
+      
+      if(lamp_NVdata.lampControl.bit.White)
+      {
+        /* white light is on */
+        TPM_PWM_WarmWhite(lamp_NVdata.lampWhite.uint8.warmW);
+        TPM_PWM_ColdWhite(lamp_NVdata.lampWhite.uint8.coldW);
+      }
+      else
+      {
+        TPM_PWM_WarmWhiteOff();
+        TPM_PWM_ColdWhiteOff();
+      }
+      
+      if(lamp_NVdata.lampControl.bit.Color)
+      {
+         /* color RGB light is on */
+         TPM_PWM_Red  (lamp_NVdata.lampRGB.uint8.r);
+         TPM_PWM_Green(lamp_NVdata.lampRGB.uint8.g);
+         TPM_PWM_Blue (lamp_NVdata.lampRGB.uint8.b);
+      } 
+      else
+      {
+         TPM_PWM_RedOff  ();
+         TPM_PWM_GreenOff();
+         TPM_PWM_BlueOff ();
+      }
     
-    /* change from white to RGB */
+    }
     
     /* update DB */
-    lamp_NVdata.lampControl.raw8 = control;
     result = Las_RecordLampControl(serviceHandle, notify);
   }
   
+  
   return result;
-
 }
 
   
@@ -324,7 +412,7 @@ bleResult_t Las_SetLampRGB (uint16_t serviceHandle, uint8_t red, uint8_t green, 
   if (blue != lamp_NVdata.lampRGB.uint8.b)
   {
     upd_db = 1;
-    lamp_NVdata.lampRGB.uint8.g = blue;
+    lamp_NVdata.lampRGB.uint8.b = blue;
     if (lamp_NVdata.lampControl.bit.OnOff && lamp_NVdata.lampControl.bit.Color)
     {
       TPM_PWM_Blue (lamp_NVdata.lampRGB.uint8.b);

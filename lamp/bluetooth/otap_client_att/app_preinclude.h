@@ -43,12 +43,12 @@
  ********************************************************************************** */
 
 /* GPIO KeyBoard support */
-#define gKeyBoardSupported_d    TRUE
+#define gKeyBoardSupported_d    FALSE
 /* Defines the number of available keys for the keyboard module */
 #define gKBD_KeysCount_c        1
 
 /* GPIO Led support */
-#define gLEDSupported_d         TRUE
+#define gLEDSupported_d         FALSE
 /* Specifies the number of physical LEDs on the target board */
 #define gLEDsOnTargetBoardCnt_c  4
 /* LED output normal or inverted */

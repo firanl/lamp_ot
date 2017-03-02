@@ -131,7 +131,7 @@ void TPM_PWM_Init(void)
     //PORT_HAL_SetMuxMode(PORTA, 1u,kPortMuxAlt5); /* TPM1_CH1 cold white old versions */
   #endif  
     
-  PORT_HAL_SetMuxMode(PORTB, 3u, kPortMuxAlt5); /* TPM1_CH1  cold white */
+  PORT_HAL_SetMuxMode(PORTB, 3u, kPortMuxAlt5); /* TPM1_CH1  cold white, not present in old version */
   PORT_HAL_SetMuxMode(PORTB,18u, kPortMuxAlt5); /* TPM0_CH0 */
   PORT_HAL_SetMuxMode(PORTC, 0u, kPortMuxAlt5); /* TPM0_CH1 */
   PORT_HAL_SetMuxMode(PORTC, 1u, kPortMuxAlt5); /* TPM0_CH2 */

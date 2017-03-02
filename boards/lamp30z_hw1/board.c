@@ -197,7 +197,9 @@ static void initHardwareParameters(void)
   lamp_NVdata.lampRGB.uint8.b = LA_LAMP_B;
   
   /* init MAC ADRESS */  
-  clone_RSIM_private_static_MAC(gBDAddress_c);
+  #if (!initConstPublicDeviceAddress_d)
+    clone_RSIM_private_static_MAC(gBDAddress_c);
+  #endif
 
    
 }

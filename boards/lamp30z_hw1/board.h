@@ -39,8 +39,7 @@
 * Public macros
 *************************************************************************************/
 
-/* The board name */
-#define BOARD_NAME                      "FRDM-KW40Z"
+
 
 
 /* Config clock */
@@ -100,12 +99,46 @@
 
 
 /* service_lamp db defaults */
+   
+
+#define LA_LAMP_GapDeviceName      "FSL_BLE_OTAP_CLIENT"
+
+#define DI_ManufacturerNameString  "Freescale"
+#define DI_ModelNumberString       "OTAP Demo"
+#define DI_SerialNumberString      "BLESN01"
+#define DI_HardwareRevisionString  "FRDM-KW40Z"
+#define DI_FirmwareRevisionString  "1.1.1"
+#define DI_SoftwareRevisionString  "1.1.4"
+#define DI_SystemId                "\x00\x00\x00\xFE\xFF\x9F\x04\x00"
+#define DI_IeeeRcdl                0x00, 0x00, 0x00, 0x00
+#define DI_PnpId                   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+
+  
 #define LA_LAMP_CONTROL      0xA0
 #define LA_LAMP_WARM_WHITE   0x00
 #define LA_LAMP_COLD_WHITE   0x00
 #define LA_LAMP_R            0x00
 #define LA_LAMP_G            0x00     
-#define LA_LAMP_B            0x00     
+#define LA_LAMP_B            0x00  
+/* temperature value - default 20.01 */
+#define LA_LAMP_TEMP         0xD1, 0x07
+/* core voltage - default 3.303 */
+#define LA_LAMP_VCC          0xE4, 0x0C
+// Year 1582 9999 defaulf 2017
+#define LA_DATE_TIME_Y       0xE1, 0x07  
+// Month 0 	12 values: 0 Month is not known; default 1 January
+#define LA_DATE_TIME_M       0x01  
+// Day 1 	31
+#define LA_DATE_TIME_D       0x07
+// Hours 0 	23
+#define LA_DATE_TIME_H       0x09
+// default 35
+#define LA_DATE_TIME_MI      0x23
+// default 
+#define LA_DATE_TIME_S       0x01
+ 
+  
+   
 
 typedef union prog_cycles_tag {
       uint32_t cnt;
@@ -114,6 +147,7 @@ typedef union prog_cycles_tag {
       } uint8;
   } prog_cycles_t;
 
+ 
 /* Lamp basic control tag */
 typedef union lamp_control_tag {
 	uint8_t raw8;

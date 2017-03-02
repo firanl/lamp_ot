@@ -41,18 +41,12 @@
 * Include
 *********************************************************************************** */
 
+
 /* ***********************************************************************************
 * Public constants & macros
 *********************************************************************************** */
 
-/*! Temperature Service - Invalid Value */
-#define gTms_InvalidTemperatureValue_c     0x1000
 
-/*! Temperature Service - Maximum Value ( -273.15 C)*/
-#define gTms_MinimumTemperatureValue_c     0x954D
-
-/*! Temperature Service - Minimum Value ( -273.15 C)*/
-#define gTms_MaximumTemperatureValue_c     0x8FFF
 
 /* ***********************************************************************************
 * Public type definitions

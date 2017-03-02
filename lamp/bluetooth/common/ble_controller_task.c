@@ -79,7 +79,7 @@ extern void Controller_InterruptHandler(void);
 OSA_TASK_DEFINE(CTRLR, gControllerTaskStackSize_c);
 
 /* Public Device Address */
-#if initConstPublicDeviceAddress_d
+#if (initConstPublicDeviceAddress_d)
   #if defined(__IAR_SYSTEMS_ICC__)
     #pragma location = "gBDAddress_ROM"
     const uint8_t gBDAddress_c[6] 

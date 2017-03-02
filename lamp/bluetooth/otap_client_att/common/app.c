@@ -146,8 +146,10 @@ static bleDeviceAddress_t   maBleDeviceAddress;
 static advState_t  mAdvState;
 
 /* Timers */
-static tmrTimerID_t appTimerId;
-static tmrTimerID_t mMeasurementTimerId;
+static tmrTimerID_t tmrMeasurementTimerId;
+static tmrTimerID_t tmrOn_HH_MM;
+static tmrTimerID_t tmrOff_HH_MM;
+
 
 static deviceId_t  mPeerDeviceId = gInvalidDeviceId_c;
 #if gBondingSupported_d
@@ -165,8 +167,15 @@ static otapClientConfig_t otapServiceConfig = {service_otap};
 
 static basConfig_t basServiceConfig = {service_battery, 0};
 
-static uint16_t otapWriteNotifHandles[] = {value_otap_control_point,
-                                           value_otap_data};
+
+static uint16_t WriteNotifHandles[] =     {value_otap_control_point,
+                                           value_otap_data,
+                                           value_lamp_Control,
+                                           value_lamp_White, 
+                                           value_lamp_RGB,
+                                           value_lamp_clock,
+                                           value_lamp_onHHMM,
+                                           value_lamp_offHHMM};
 
 /* Application Data */
 
@@ -218,6 +227,7 @@ static void BleApp_CccdWritten (deviceId_t deviceId, uint16_t handle, gattCccdFl
 static void BleApp_AttributeWritten (deviceId_t deviceId, uint16_t handle, uint16_t length, uint8_t* pValue);
 static void BleApp_AttributeWrittenWithoutResponse (deviceId_t deviceId, uint16_t handle, uint16_t length, uint8_t* pValue);
 static void BleApp_HandleValueConfirmation (deviceId_t deviceId);
+/* Timers callbacks */
 static void MeasurementTimerCallback (void *);
 
 static void BleApp_Advertise (void);
@@ -256,19 +266,18 @@ void BleApp_Init(void)
     /* Initialize application support for drivers */
      
     #if gLED_TPM_PWM_d
-      LED_UnInit();
+      //LED_UnInit();
       
       /* init PEM TPM driver */
       TPM_PWM_Init();   
     #endif
       
 
-
-    appTimerId = TMR_AllocateTimer();
     /* Initialize application specific peripher drivers here. */
-    mMeasurementTimerId = TMR_AllocateTimer();
+    tmrMeasurementTimerId = TMR_AllocateTimer();
+
     /* Start 1 second measurements */
-    tmrerr = TMR_StartTimer(mMeasurementTimerId, gTmrIntervalTimer_c,TmrSeconds(3), MeasurementTimerCallback, NULL);
+    tmrerr = TMR_StartTimer(tmrMeasurementTimerId, gTmrIntervalTimer_c,TmrSeconds(5), MeasurementTimerCallback, NULL);
 
 }
 
@@ -384,14 +393,14 @@ void BleApp_GenericCallback (gapGenericEvent_t* pGenericEvent)
 static void BleApp_Config()
 {  
     tmrErrCode_t tmrerr = gTmrInvalidId_c;
+    uint8_t      handleCount = sizeof(WriteNotifHandles)/sizeof(WriteNotifHandles[0]);
   
     /* Read public address from controller */
     Gap_ReadPublicDeviceAddress();
 
     /* Register for callbacks*/
     App_RegisterGattServerCallback (BleApp_GattServerCallback);
-    GattServer_RegisterHandlesForWriteNotifications (sizeof(otapWriteNotifHandles)/sizeof(otapWriteNotifHandles[0]),
-                                                     otapWriteNotifHandles);
+    GattServer_RegisterHandlesForWriteNotifications (handleCount, WriteNotifHandles);       
     
     /* Register security requirements */
 #if gUseServiceSecurity_d
@@ -423,14 +432,13 @@ static void BleApp_Config()
     mAdvState.advOn = FALSE;
 
     /* Start services */
-    Dis_Start(&disServiceConfig);  
-    OtapCS_Start(&otapServiceConfig);
-    Las_Start(&lasServiceConfig);
-    
     basServiceConfig.batteryLevel = 90;
     Bas_Start(&basServiceConfig);
     
-
+    Dis_Start(&disServiceConfig);  
+    OtapCS_Start(&otapServiceConfig);
+    Las_Start(&lasServiceConfig);
+   
     
     // start advertising
     BleApp_Start();
@@ -454,7 +462,6 @@ static void BleApp_AdvertisingCallback (gapAdvertisingEvent_t* pAdvertisingEvent
         case gAdvertisingStateChanged_c:
         {
             mAdvState.advOn = !mAdvState.advOn;
-
             if(mAdvState.advOn)
             {
 
@@ -726,6 +733,7 @@ static void BleApp_AttributeWritten(deviceId_t  deviceId,
 {
     bleResult_t bleResult;
     otapCommand_t otapCommand;
+
     
     /* Only the OTAP Control Point attribute is expected to be written using the
      * ATT Write Command. */
@@ -754,6 +762,7 @@ static void BleApp_AttributeWritten(deviceId_t  deviceId,
             bleResult = GattServer_SendAttributeWrittenStatus (deviceId,
                                                                value_otap_control_point,
                                                                gAttErrCodeNoError_c);
+
             if (gBleSuccess_c == bleResult)
             {
                 OtapClient_HandleNewImageInfoResponse (deviceId,
@@ -770,6 +779,7 @@ static void BleApp_AttributeWritten(deviceId_t  deviceId,
             bleResult = GattServer_SendAttributeWrittenStatus (deviceId,
                                                                value_otap_control_point,
                                                                gAttErrCodeNoError_c);
+
             if (gBleSuccess_c == bleResult)
             {
                 OtapClient_HandleErrorNotification (deviceId,
@@ -826,7 +836,7 @@ static void BleApp_AttributeWritten(deviceId_t  deviceId,
     {
        if ( (length==3) && (pValue[0] <= PWM_factor_MAX) && (pValue[1] <= PWM_factor_MAX) && (pValue[2] <= PWM_factor_MAX))
       {
-        bleResult = Las_SetLampRGB (lasServiceConfig.serviceHandle, pValue[0], pValue[1], pValue[3]);
+        bleResult = Las_SetLampRGB (lasServiceConfig.serviceHandle, pValue[0], pValue[1], pValue[2]);
         // Report status to client
         BleApp_SendAttWriteResponse (deviceId, handle, bleResult);
       }
@@ -874,6 +884,7 @@ static void BleApp_AttributeWrittenWithoutResponse (deviceId_t deviceId,
     otapCommand_t otapCommand;
     otapStatus_t otapStatus = gOtapStatusSuccess_c;
     bleResult_t bleResult;
+    
     
     /* Only the OTAP Data attribute is expected to be written using the
      * ATT Write Without Response Command. */
@@ -947,7 +958,7 @@ static void BleApp_AttributeWrittenWithoutResponse (deviceId_t deviceId,
     {
        if ( (length==3) && (pValue[0] <= PWM_factor_MAX) && (pValue[1] <= PWM_factor_MAX) && (pValue[2] <= PWM_factor_MAX))
       {
-        bleResult = Las_SetLampRGB (lasServiceConfig.serviceHandle, pValue[0], pValue[1], pValue[3]);
+        bleResult = Las_SetLampRGB (lasServiceConfig.serviceHandle, pValue[0], pValue[1], pValue[2]);
       }
     }
     else if (handle == value_lamp_clock)

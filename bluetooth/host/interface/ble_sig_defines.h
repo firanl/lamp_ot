@@ -104,10 +104,13 @@
   /*! GAP Device Name Characteristic UUID */
   #define gBleSig_GapDeviceName_d                 0x2A00
   /*! GAP Appearance Characteristic UUID */
+  /* https://www.bluetooth.com/specifications/gatt/viewer?attributeXmlFile=org.bluetooth.characteristic.gap.appearance.xml */
   #define gBleSig_GapAppearance_d                 0x2A01
   /*! GAP Peripheral Preferred Connection Parameters Characteristic UUID */
+  /* https://www.bluetooth.com/specifications/gatt/viewer?attributeXmlFile=org.bluetooth.characteristic.gap.peripheral_preferred_connection_parameters.xml */
   #define gBleSig_GapPpcp_d                       0x2A04
   /*! GATT Service Changed Characteristic UUID */
+  /* https://www.bluetooth.com/specifications/gatt/viewer?attributeXmlFile=org.bluetooth.characteristic.gatt.service_changed.xml */
   #define gBleSig_GattServiceChanged_d            0x2A05
   /*! Alert Level Characteristic UUID */
   #define gBleSig_AlertLevel_d                    0x2A06
@@ -211,6 +214,30 @@
   #define gBleSig_CpControlPoint_d                0x2A66
   /*! Temperature Characteristic UUID */
   #define gBleSig_Temperature_d                   0x2A6E
+
+
+  /*! GAP Appearance Characteristic Value Fields */
+  #define gBleSig_GapAppearance_Bytes_d         2
+
+
+  /*! GAP Peripheral Preferred Connection Parameters Characteristic Value Fields */
+    #define gBleSig_GapPpcp_Bytes_d         8
+    /* Minimum Connection Interval  uint16 	6 	3200   connInterval_min = Minimum Connection Interval * 1.25 ms */
+    #define gBleSig_GapPpcp_mci_d   0x0A, 0x00
+    /* Maximum Connection Interval uint16 	6 	3200 */
+    #define gBleSig_GapPpcp_Mci_d   0x10, 0x00
+    /* Slave Latency   uint16 	0 	1000  */
+    #define gBleSig_GapPpcp_SL_d    0x64, 0x00
+    /* Connection Supervision Timeout Multiplier  uint16 	10 	3200 */
+    #define gBleSig_GapPpcp_cstm_d    0xE2, 0x04
+
+  /*! GATT Service Changed Characteristic Value Fields  */
+    #define gBleSig_GattServiceChanged_Bytes_d  4
+    /* Start of Affected Attribute Handle Range uint16 	1 	65535  */
+    #define gBleSig_GattServiceChanged_SAAHR_d  0x00, 0x00
+    /* End of Affected Attribute Handle Range  uint16 	1 	65535 */
+    #define gBleSig_GattServiceChanged_EAAHR_d  0x00, 0x00
+
 
 /* DESCRIPTOR(.., gBleSig_CharPresFormatDescriptor_d, .., 7, Format, Exponent, Unit, Namespace, Description) 
 * https://www.bluetooth.com/specifications/gatt/viewer?attributeXmlFile=org.bluetooth.descriptor.gatt.characteristic_presentation_format.xml 

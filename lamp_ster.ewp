@@ -751,6 +751,8 @@
           <state>gUseBootloaderLink_d=1</state>
           <state>gUseInternalStorageLink_d=0</state>
           <state>__ram_vector_table__=1</state>
+          <state>__stack_size__=568</state>
+          <state>__heap_size__=0</state>
         </option>
         <option>
           <name>IlinkMapFile</name>
@@ -1335,6 +1337,7 @@
           <state>$PROJ_DIR$/platform/CMSIS/Include</state>
           <state>$PROJ_DIR$/boards/lamp30z_hw1</state>
           <state>$PROJ_DIR$/lamp/bluetooth/addons/tpm_pwm_led</state>
+          <state>$PROJ_DIR$/lamp/bluetooth/addons/temperature_sensor</state>
           <state>$PROJ_DIR$/platform/devices</state>
           <state>$PROJ_DIR$/platform/devices/MKW30Z4/include</state>
           <state>$PROJ_DIR$/platform/devices/MKW30Z4/startup</state>
@@ -1376,6 +1379,7 @@
           <state>$PROJ_DIR$/bluetooth/profiles/battery</state>
           <state>$PROJ_DIR$/bluetooth/profiles/device_info</state>
           <state>$PROJ_DIR$/bluetooth/profiles/otap</state>
+          <state>$PROJ_DIR$/bluetooth/profiles/lamp_basic</state>
           <state>$PROJ_DIR$/framework/XCVR/MKW30Z4</state>
           <state>$PROJ_DIR$/lamp/bluetooth/otap_client_att/common</state>
           <state>$PROJ_DIR$/framework/DCDC/Interface</state>
@@ -1769,6 +1773,8 @@
           <state>gUseBootloaderLink_d=0</state>
           <state>gUseInternalStorageLink_d=0</state>
           <state>__ram_vector_table__=1</state>
+          <state>__stack_size__=568</state>
+          <state>__heap_size__=0</state>
         </option>
         <option>
           <name>IlinkMapFile</name>

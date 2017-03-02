@@ -1,5 +1,5 @@
 [Stack]
-FillEnabled=0
+FillEnabled=1
 OverflowWarningsEnabled=1
 WarningThreshold=90
 SpWarningsEnabled=1
@@ -21,7 +21,7 @@ TraceBufferSize=0x00010000
 TraceStallIfFIFOFull=0x00000000
 TracePortSize=0x00000000
 [DebugChecksum]
-Checksum=166965564
+Checksum=-898239347
 [CodeCoverage]
 Enabled=_ 0
 [Exceptions]
@@ -54,12 +54,7 @@ ShowTiming=1
 [Disassemble mode]
 mode=0
 [Breakpoints2]
-Bp0=_ 0 "EMUL_CODE" "{$PROJ_DIR$\lamp\bluetooth\otap_client_att\common\app.c}.1367.9" 0 0 1 "" 0 "" 0
-Bp1=_ 0 "EMUL_CODE" "{$PROJ_DIR$\lamp\bluetooth\otap_client_att\common\app.c}.1701.5" 0 0 1 "" 0 "" 0
-Bp2=_ 0 "EMUL_CODE" "{$PROJ_DIR$\lamp\bluetooth\otap_client_att\common\app.c}.1795.9" 0 0 1 "" 0 "" 0
-Bp3=_ 0 "EMUL_CODE" "{$PROJ_DIR$\lamp\bluetooth\otap_client_att\common\app.c}.1964.5" 0 0 1 "" 0 "" 0
-Bp4=_ 0 "EMUL_CODE" "{$PROJ_DIR$\lamp\bluetooth\otap_client_att\common\app.c}.162.1" 0 0 1 "" 0 "" 0
-Count=5
+Count=0
 [Aliases]
 Count=0
 SuppressDialog=0
