@@ -1770,7 +1770,7 @@
         <option>
           <name>IlinkConfigDefines</name>
           <state>gUseNVMLink_d=1</state>
-          <state>gUseBootloaderLink_d=0</state>
+          <state>gUseBootloaderLink_d=1</state>
           <state>gUseInternalStorageLink_d=0</state>
           <state>__ram_vector_table__=1</state>
           <state>__stack_size__=568</state>

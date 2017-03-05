@@ -93,45 +93,48 @@ bleResult_t Las_Start (lasConfig_t *pServiceConfig)
       
     mLas_SubscribedClientId = gInvalidDeviceId_c;
     
-    #if gLED_TPM_PWM_d
-
-      /* switch to pre-reset light */
-        if(lamp_NVdata.lampControl.bit.OnOff)
-        {
-          /* the lamp is on */
-          if(lamp_NVdata.lampControl.bit.White)
-          {
-            /* white light is on */
-            TPM_PWM_WarmWhite(lamp_NVdata.lampWhite.uint8.warmW);
-            TPM_PWM_ColdWhite(lamp_NVdata.lampWhite.uint8.coldW);
-          }
-          else
-          {
-            TPM_PWM_WarmWhiteOff();
-            TPM_PWM_ColdWhiteOff();
-          }
-          
-          if(lamp_NVdata.lampControl.bit.Color)
-          {
-             /* color RGB light is on */
-             TPM_PWM_Red  (lamp_NVdata.lampRGB.uint8.r);
-             TPM_PWM_Green(lamp_NVdata.lampRGB.uint8.g);
-             TPM_PWM_Blue (lamp_NVdata.lampRGB.uint8.b);
-          } 
-          else
-          {
-             TPM_PWM_RedOff  ();
-             TPM_PWM_GreenOff();
-             TPM_PWM_BlueOff ();
-          }
-          
-        }
-        else  
-        {
-          TPM_PWM_Off();
-        }
-    #endif
+//
+    /* switch to pre-reset light */
+    if(lamp_NVdata.lampControl.bit.OnOff)
+    {
+      /* the lamp is on */
+      if(lamp_NVdata.lampControl.bit.White)
+      {
+        /* white light is on */
+        TPM_PWM_WarmWhite(lamp_NVdata.lampWhite.uint8.warmW);
+        TPM_PWM_ColdWhite(lamp_NVdata.lampWhite.uint8.coldW);
+      }
+      else
+      {
+        TPM_PWM_WarmWhiteOff();
+        TPM_PWM_ColdWhiteOff();
+      }
       
+      if(lamp_NVdata.lampControl.bit.Color)
+      {
+         /* color RGB light is on */
+         TPM_PWM_Red  (lamp_NVdata.lampRGB.uint8.r);
+         TPM_PWM_Green(lamp_NVdata.lampRGB.uint8.g);
+         TPM_PWM_Blue (lamp_NVdata.lampRGB.uint8.b);
+      } 
+      else
+      {
+         TPM_PWM_RedOff  ();
+         TPM_PWM_GreenOff();
+         TPM_PWM_BlueOff ();
+      }
+      
+    }
+    else  
+    {
+      TPM_PWM_Off();
+    }
+//
+    //TODO entry change 
+    //Las_SetLampWhite (uint16_t serviceHandle, uint8_t warmW, uint8_t coldW, uint8_t notify)
+    //Las_SetLampRGB (uint16_t serviceHandle, uint8_t red, uint8_t green, uint8_t blue)
+    //Las_SetLampControl (mLas_serviceHandle, control, TRUE);
+    
     result = Las_RecordLampControl (pServiceConfig->serviceHandle, FALSE);
     if(result != gBleSuccess_c) return result;
 

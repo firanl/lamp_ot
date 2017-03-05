@@ -40,6 +40,7 @@
 #include "gap_interface.h"
 #include "ble_constants.h"
 #include "gatt_db_handles.h"
+#include "board.h"
 
 /************************************************************************************
 * Private macros
@@ -53,7 +54,6 @@
 
 /* Scanning and Advertising Data */
 static const uint8_t adData0[1] =  { (gapAdTypeFlags_t)(gLeGeneralDiscoverableMode_c | gBrEdrNotSupported_c) };
-static const uint8_t adData1[] = { 0xE0, 0x1C, 0x4B, 0x5E, 0x1E, 0xEB, 0xA1, 0x5C, 0xEE, 0xF4, 0x5E, 0xBA, 0x50, 0x55, 0xFF, 0x01};
 static const gapAdStructure_t advScanStruct[3] = {
   {
     .length = NumberOfElements(adData0) + 1,
@@ -61,14 +61,14 @@ static const gapAdStructure_t advScanStruct[3] = {
     .aData = (void *)adData0
   },
   {
-    .length = NumberOfElements(adData1) + 1,
+    .length = NumberOfElements(LA_LAMP_GapAd_uuid_service) + 1,
     .adType = gAdComplete128bitServiceList_c,
-    .aData = (void *)adData1
+    .aData = (void *)LA_LAMP_GapAd_uuid_service
   },
   {
-    .length = 8 + 1,
+    .length = sizeof(LA_LAMP_GapAdShortenedLocalName),
     .adType = gAdShortenedLocalName_c,
-    .aData = "FSL_OTAC"
+    .aData = LA_LAMP_GapAdShortenedLocalName 
   }
 };
 
@@ -105,7 +105,7 @@ gapAdvertisingParameters_t gAdvParameters =
 /* SMP Data */
 gapPairingParameters_t gPairingParameters = {
     TRUE,
-    gSecurityMode_1_Level_1_c,
+    gSecurityMode_1_Level_2_c,
     mcEncryptionKeySize_c,
     gIoDisplayOnly_c,
     TRUE,
@@ -148,7 +148,7 @@ static const gapSecurityRequirements_t        masterSecurity = gGapDefaultSecuri
 static const gapServiceSecurityRequirements_t serviceSecurity[GAP_SERVICE_CNT] = {
   {
     .requirements = {
-        .securityModeLevel = gSecurityMode_1_Level_1_c,
+        .securityModeLevel = gSecurityMode_1_Level_3_c,
         .authorization = FALSE,
         .minimumEncryptionKeySize = gDefaultEncryptionKeySize_d
     },
@@ -156,7 +156,7 @@ static const gapServiceSecurityRequirements_t serviceSecurity[GAP_SERVICE_CNT] =
   }, 
   {
     .requirements = {
-        .securityModeLevel = gSecurityMode_1_Level_1_c,
+        .securityModeLevel = gSecurityMode_1_Level_3_c,
         .authorization = FALSE,
         .minimumEncryptionKeySize = gDefaultEncryptionKeySize_d
     },
@@ -164,7 +164,7 @@ static const gapServiceSecurityRequirements_t serviceSecurity[GAP_SERVICE_CNT] =
   },
   {
     .requirements = {
-        .securityModeLevel = gSecurityMode_1_Level_1_c,
+        .securityModeLevel = gSecurityMode_1_Level_3_c,
         .authorization = FALSE,
         .minimumEncryptionKeySize = gDefaultEncryptionKeySize_d
     },
@@ -172,7 +172,7 @@ static const gapServiceSecurityRequirements_t serviceSecurity[GAP_SERVICE_CNT] =
   },
   {
     .requirements = {
-        .securityModeLevel = gSecurityMode_1_Level_1_c,
+        .securityModeLevel = gSecurityMode_1_Level_3_c,
         .authorization = FALSE,
         .minimumEncryptionKeySize = gDefaultEncryptionKeySize_d
     },

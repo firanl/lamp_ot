@@ -53,9 +53,9 @@
 *************************************************************************************
 ********************************************************************************** */
 #if gTmrTaskStackSize_c > gSerialTaskStackSize_c
-#define gFwkCommonStackSize_c gTmrTaskStackSize_c
+  #define gFwkCommonStackSize_c gTmrTaskStackSize_c
 #else
-#define gFwkCommonStackSize_c gSerialTaskStackSize_c
+  #define gFwkCommonStackSize_c gSerialTaskStackSize_c
 #endif
 
 

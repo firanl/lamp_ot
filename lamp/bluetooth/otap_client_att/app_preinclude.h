@@ -39,98 +39,206 @@
 #define _APP_PREINCLUDE_H_
 
 /*! *********************************************************************************
- * 	Drivers Configuration
- ********************************************************************************** */
-
-/* GPIO KeyBoard support */
-#define gKeyBoardSupported_d    FALSE
-/* Defines the number of available keys for the keyboard module */
-#define gKBD_KeysCount_c        1
-
-/* GPIO Led support */
-#define gLEDSupported_d         FALSE
-/* Specifies the number of physical LEDs on the target board */
-#define gLEDsOnTargetBoardCnt_c  4
-/* LED output normal or inverted */
-#define mLEDInvertedOut_c       FALSE
-
-/* LED PWM */
-#define gLED_TPM_PWM_d          TRUE
-
-/* Specifies the type of EEPROM available on the target board */
-#define gEepromType_d           gEepromDevice_AT45DB021E_c
-
-/*! *********************************************************************************
  * 	Framework Configuration
  ********************************************************************************** */
-/* Defines a smaller FWK configuration */
-#define FWK_SMALL_RAM_CONFIG
+   
+  /*! *********************************************************************************
+   * 	Common
+   ********************************************************************************** */  
+  /* FwkInit.c */
+  /* Defines a smaller FWK configuration */
+  /* Range  default not defined */
+  //#define FWK_SMALL_RAM_CONFIG   
+   
+  /*! *********************************************************************************
+   * 	DCDC
+   ********************************************************************************** */   
+   
+  /*! *********************************************************************************
+   * 	Flash
+   ********************************************************************************** */
+    /* Eeprom.h */
+      /* Specifies the type of EEPROM available on the target board */
+      /* Range 0,1,2,3,4 default gEepromDevice_None_c */
+      #define gEepromType_d           gEepromDevice_AT45DB021E_c
+   
+      #define gUseNVMLink_d 1
+      #define mAppUseNvm_d  1
 
-/* Defines Num of Serial Manager interfaces */
-#define gSerialManagerMaxInterfaces_c   0
+  /*! *********************************************************************************
+   * 	FSCI
+   ********************************************************************************** */   
+   
+   /*! *********************************************************************************
+   * 	FunctionLib
+   ********************************************************************************** */  
+   /* FunctionLib.h */
+     /* Range   default 0 */
+     #define gUseToolchainMemFunc_d 0
 
-/* Defines Size for Serial Manager Task */
-#define gSerialTaskStackSize_c  500
+  /*! *********************************************************************************
+   * 	GPIOIrq
+   ********************************************************************************** */  
+   
+  /*! *********************************************************************************
+   * 	Keyboard - Drivers Configuration
+   ********************************************************************************** */
 
-/* Defines Size for Timer Task*/
-#define gTmrTaskStackSize_c  384
+    /* GPIO KeyBoard support */
+    #define gKeyBoardSupported_d    0
+    /* Defines the number of available keys for the keyboard module */
+    #define gKBD_KeysCount_c        1
 
-/* Defines pools by block size and number of blocks. Must be aligned to 4 bytes.*/
-#define PoolsDetails_c \
-         _block_size_  32  _number_of_blocks_    8 _eol_  \
-         _block_size_  64  _number_of_blocks_    5 _eol_  \
-         _block_size_ 128  _number_of_blocks_    3 _eol_
+  /*! *********************************************************************************
+   * 	Led - Drivers Configuration
+   ********************************************************************************** */
 
-/* Defines number of timers needed by the application */
-#define gTmrApplicationTimers_c         4
+    /* GPIO Led support */
+    #define gLEDSupported_d         0
+    /* Specifies the number of physical LEDs on the target board */
+    #define gLEDsOnTargetBoardCnt_c  4
+    /* LED output normal or inverted */
+    #define mLEDInvertedOut_c       0
 
-/* Defines number of timers needed by the protocol stack */
-#define gTmrStackTimers_c               5
 
-/* Set this define TRUE if the PIT frequency is an integer number of MHZ */
-#define gTMR_PIT_FreqMultipleOfMHZ_d    0
 
-/* Enables / Disables the precision timers platform component */
-#define gTimestamp_Enabled_d            0
 
-/* Enable/Disable Low Power Timer */
-#define gTMR_EnableLowPowerTimers_d       1
-           
+  /*! *********************************************************************************
+   * 	SerialManager
+   ********************************************************************************** */
+    /* SerialManager.h */
+      /* Defines Num of Serial Manager interfaces */
+      /* Range   default 1 */  
+      #define gSerialManagerMaxInterfaces_c   0
 
-/* Enable/Disable PowerDown functionality in PwrLib */
-#define cPWR_UsePowerDownMode           FALSE
+      /* Defines Size for Serial Manager Task bytes */
+      /* Range   default 1024 */  
+      #define gSerialTaskStackSize_c  500
 
-/* Enable/Disable BLE Link Layer DSM */
-#define cPWR_BLE_LL_Enable              FALSE
 
-/* Default Deep Sleep Mode*/
-#define cPWR_DeepSleepMode              3
+  /*! *********************************************************************************
+   * 	TimersManager
+   ********************************************************************************** */               
+    /* TMR_Adapter.h */
+      /* TPM instance 0,1,2 used to drive timer clock */
+      #define gStackTimerInstance_c           2  
+      /* Range   default 0 */       
+      #define gStackTimerChannel_c            0       
+             
+    /* TimersManager.h */  
+      /* Defines Size for Timer Task, align 8, default 600 */
+      #define gTmrTaskStackSize_c  384
+               
+      /* Defines number of timers needed by the application, default 4 */
+      #define gTmrApplicationTimers_c         4
 
-/*! *********************************************************************************
- * 	RTOS Configuration
- ********************************************************************************** */
-/* Defines number of OS events used */
-#define osNumberOfEvents        4
+      /* Defines number of timers needed by the protocol stack, default 4 */
+      /* Range   default 4 */
+      #define gTmrStackTimers_c               5
 
-/* Defines number of OS semaphores used */
-#define osNumberOfSemaphores    1
+      /* Set this define TRUE if the PIT frequency is an integer number of MHZ */
+      /* Range TRUE, FALSE default TRUE */
+      #define gTMR_PIT_FreqMultipleOfMHZ_d    0
+
+      /* Enables / Disables the precision timers platform component  */
+      /* Range TRUE, FALSE default TRUE */
+      #define gTimestamp_Enabled_d             0
+
+      /* Enable/Disable Low Power Timer  */
+      /* Range TRUE, FALSE default TRUE */
+      #define gTMR_EnableLowPowerTimers_d       0
+         
+   
+   /*! *********************************************************************************
+   * 	 LowPower
+   ********************************************************************************** */   
+    /* PWR_Interface.h */
+       /* Range TRUE, FALSE default FALSE */
+       #define gAllowDeviceToSleep_c          0
+                 
+    /* PWR_Configuration.h */
+      /* Enable/Disable PowerDown functionality in PwrLib */
+      /* Range TRUE, FALSE default TRUE */
+      #define cPWR_UsePowerDownMode           0
+
+      /* Enable/Disable BLE Link Layer DSM */
+      /* Range TRUE, FALSE default TRUE */
+      #define cPWR_BLE_LL_Enable              0
+
+      /* Default Deep Sleep Mode */
+      /* Range 1,2,3,4,5,6 default 4 */
+      #define cPWR_DeepSleepMode              3
+
+  /*! *********************************************************************************
+   * 	MemManager
+   ********************************************************************************** */  
+    /* MemManager.h */
+      /* Defines pools by block size and number of blocks. Must be aligned to 4 bytes.*/
+      #define PoolsDetails_c \
+               _block_size_  32  _number_of_blocks_    8 _eol_  \
+               _block_size_  64  _number_of_blocks_    5 _eol_  \
+               _block_size_ 128  _number_of_blocks_    3 _eol_
+
+
+  /*! *********************************************************************************
+   * 	OSAbstraction - RTOS Configuration
+   ********************************************************************************** */
+    /* fsl_osa_ext_config.h */
+      /* Defines number of OS main thread stack size in bytes */
+      /* Range   default 1024  */           
+      #define gMainThreadStackSize_c 1024
+                 
+      /* Defines number of OS semaphores used */
+      /* Range   default 0 */
+      #define osNumberOfSemaphores    1
+                 
+      /* Defines number of OS events used */
+      /* Range   default 1 */ 
+      #define osNumberOfEvents        4
+
+
+
           
 /*! *********************************************************************************
- * 	BLE Stack Configuration
+ * 	bluetooth - BLE Stack Configuration
  ********************************************************************************** */
 
- /*  Public Device Address variable type in ble_controller_task.c
-*           TRUE  init in ROM  const uint8_t gBDAddress_c[6] = {BD_ADDR};
-*           FALSE init in RAM
-*/       
-#define initConstPublicDeviceAddress_d FALSE
+  /*! *********************************************************************************
+   * 	controller
+   ********************************************************************************** */
+  /*! *********************************************************************************
+   * 	hci_transport
+   ********************************************************************************** */
+    /* hci_transport.h*/
+      #define APP_SERIAL_INTERFACE_TYPE      (gSerialMgrNone_c)
+      #define APP_SERIAL_INTERFACE_INSTANCE  (0)                 
+                 
+  /*! *********************************************************************************
+   * 	host
+   ********************************************************************************** */
+  /*! *********************************************************************************
+   * 	profiles
+   ********************************************************************************** */
+                 
+  /*! *********************************************************************************
+   * 	app
+   ********************************************************************************** */
+    /* ble_controller_task.c */                   
+      /*  Public Device Address variable type in ble_controller_task.c
+      *           TRUE  init in ROM  const uint8_t gBDAddress_c[6] = {BD_ADDR};
+      *           FALSE init in RAM
+      */       
+      #define initConstPublicDeviceAddress_d FALSE
+              
+      #define BD_ADDR             0x13,0x00,0x00,0x9F,0x04,0x00
+      #define BD_ADDR_FF          0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
 
-#define BD_ADDR_BYTES 6      
-           
-#define BD_ADDR             0x13,0x00,0x00,0x9F,0x04,0x00
-#define BD_ADDR_FF          0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
 
-
+/*! *********************************************************************************
+ * 	RAM Stack Size
+ ********************************************************************************** */
+ 
+#define Stack_Size (gMainThreadStackSize_c + gTmrTaskStackSize_c + gSerialTaskStackSize_c)
 
 #endif /* _APP_PREINCLUDE_H_ */
 

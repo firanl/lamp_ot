@@ -63,12 +63,6 @@
   #endif
 
 
-
-/* config hci_transport.h*/
-  #define APP_SERIAL_INTERFACE_TYPE      (gSerialMgrNone_c)
-  #define APP_SERIAL_INTERFACE_INSTANCE  (0)
-
-
 /* RTC Setup */
   /* RTC pinout setup
   ALT0 kPortPinDisabled,  ALT1 kPortMuxAsGpio
@@ -100,8 +94,13 @@
 
 /* service_lamp db defaults */
    
+#define LA_LAMP_GapAdShortenedLocalName  "FSL_OTAC"
+#define LA_LAMP_GapAd_uuid_service       uuid_service_otap 
+   //uuid_service_lamp
+   
+   
+#define LA_LAMP_GapDeviceName            "FSL_BLE_OTAP_CLIENT"
 
-#define LA_LAMP_GapDeviceName      "FSL_BLE_OTAP_CLIENT"
 
 #define DI_ManufacturerNameString  "Freescale"
 #define DI_ModelNumberString       "OTAP Demo"
@@ -114,12 +113,12 @@
 #define DI_PnpId                   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 
   
-#define LA_LAMP_CONTROL      0xA0
+#define LA_LAMP_CONTROL      0xB0
 #define LA_LAMP_WARM_WHITE   0x00
 #define LA_LAMP_COLD_WHITE   0x00
 #define LA_LAMP_R            0x00
 #define LA_LAMP_G            0x00     
-#define LA_LAMP_B            0x00  
+#define LA_LAMP_B            0x10  
 /* temperature value - default 20.01 */
 #define LA_LAMP_TEMP         0xD1, 0x07
 /* core voltage - default 3.303 */

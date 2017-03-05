@@ -265,12 +265,8 @@ void BleApp_Init(void)
      tmrErrCode_t tmrerr = gTmrInvalidId_c;
     /* Initialize application support for drivers */
      
-    #if gLED_TPM_PWM_d
-      //LED_UnInit();
-      
-      /* init PEM TPM driver */
-      TPM_PWM_Init();   
-    #endif
+    /* init PEM TPM driver */
+    TPM_PWM_Init();            
       
 
     /* Initialize application specific peripher drivers here. */

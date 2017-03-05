@@ -273,12 +273,12 @@ static uint8_t numberOfActiveTimers = 0;
 static uint8_t numberOfLowPowerActiveTimers = 0;
 
 #if 0
-/*
- * NAME: PE_LDD_DeviceDataList
- * DESCRIPTION: Array of initialized device structures of LDD components.
- * VALUES:
- */
-LDD_TDeviceData *PE_LDD_DeviceDataList[] = {NULL};
+  /*
+   * NAME: PE_LDD_DeviceDataList
+   * DESCRIPTION: Array of initialized device structures of LDD components.
+   * VALUES:
+   */
+  LDD_TDeviceData *PE_LDD_DeviceDataList[] = {NULL};
 #endif
 
 #define IncrementActiveTimerNumber(type)  (((type) & gTmrLowPowerTimer_c) \
@@ -298,8 +298,8 @@ static bool_t timerHardwareIsRunning = FALSE;
 
 
 #if defined(FWK_SMALL_RAM_CONFIG)
-extern event_t  gFwkCommonEvent;
-#define mTimerThreadEventId gFwkCommonEvent
+  extern event_t  gFwkCommonEvent;
+  #define mTimerThreadEventId gFwkCommonEvent
 
 #else
 /*

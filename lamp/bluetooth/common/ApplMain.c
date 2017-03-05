@@ -325,9 +325,9 @@ void main_task(uint32_t param)
         RNG_GetRandomNo((uint32_t*)(&(pseudoRNGSeed[16])));
         RNG_SetPseudoRandomNoSeed(pseudoRNGSeed);
         
-        #if (gKeyBoardSupported_d)
-          KBD_Init(App_KeyboardCallBack);
-        #endif
+
+        KBD_Init(App_KeyboardCallBack);
+
 
 #if gUseNVMLink_d       
         /* Initialize NV module */
