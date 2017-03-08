@@ -45,7 +45,9 @@
 #include "FunctionLib.h"
 #include "fsl_os_abstraction.h"
 #include "panic.h"
-#include "PWR_Interface.h"
+#if cPWR_UsePowerDownMode
+  #include "PWR_Interface.h"
+#endif
 #include "OtaSupport.h"
 
 /* BLE Host Stack */
@@ -69,6 +71,9 @@
 
 /* TPM PWM */
 #include "tpm_pwm_led_ctrl.h"
+
+/* TSI Capacitive touch sensor */
+#include "tsi_sensor.h"
 
 #include "board.h"
 #include "ApplMain.h"
@@ -146,9 +151,8 @@ static bleDeviceAddress_t   maBleDeviceAddress;
 static advState_t  mAdvState;
 
 /* Timers */
-static tmrTimerID_t tmrMeasurementTimerId;
-static tmrTimerID_t tmrOn_HH_MM;
-static tmrTimerID_t tmrOff_HH_MM;
+  /* Temperature voltage timer  */
+  static tmrTimerID_t tmrMeasurementTimerId;
 
 
 static deviceId_t  mPeerDeviceId = gInvalidDeviceId_c;
@@ -174,8 +178,8 @@ static uint16_t WriteNotifHandles[] =     {value_otap_control_point,
                                            value_lamp_White, 
                                            value_lamp_RGB,
                                            value_lamp_clock,
-                                           value_lamp_onHHMM,
-                                           value_lamp_offHHMM};
+                                           value_lamp_on_sec,
+                                           value_lamp_off_sec};
 
 /* Application Data */
 
@@ -209,7 +213,6 @@ static otapClientAppData_t     otapClientData =
 };
 
 
-
 /* ***********************************************************************************
 * Private functions prototypes
 *********************************************************************************** */
@@ -218,19 +221,22 @@ static void BleApp_Config();
 
 /* Gatt and Att callbacks */
 static void BleApp_AdvertisingCallback (gapAdvertisingEvent_t* pAdvertisingEvent);
-static void BleApp_ConnectionCallback (deviceId_t peerDeviceId, gapConnectionEvent_t* pConnectionEvent);
-static void BleApp_GattServerCallback (deviceId_t deviceId, gattServerEvent_t* pServerEvent);
+static void BleApp_ConnectionCallback  (deviceId_t peerDeviceId, gapConnectionEvent_t* pConnectionEvent);
+static void BleApp_GattServerCallback  (deviceId_t deviceId, gattServerEvent_t* pServerEvent);
+
 
 static void BleApp_SendAttWriteResponse (deviceId_t deviceId, uint16_t handle, bleResult_t result);
-
 static void BleApp_CccdWritten (deviceId_t deviceId, uint16_t handle, gattCccdFlags_t cccd);
 static void BleApp_AttributeWritten (deviceId_t deviceId, uint16_t handle, uint16_t length, uint8_t* pValue);
 static void BleApp_AttributeWrittenWithoutResponse (deviceId_t deviceId, uint16_t handle, uint16_t length, uint8_t* pValue);
 static void BleApp_HandleValueConfirmation (deviceId_t deviceId);
+
+
 /* Timers callbacks */
-static void MeasurementTimerCallback (void *);
+static void MeasurementTimerCallback (void* pParam);
 
 static void BleApp_Advertise (void);
+
 
 /* OTAP Client functions */
 /* Commands received from the OTAP Server */
@@ -263,17 +269,20 @@ static otapStatus_t OtapClient_IsImageFileHeaderValid (bleOtaImageFileHeader_t* 
 void BleApp_Init(void)
 {
      tmrErrCode_t tmrerr = gTmrInvalidId_c;
-    /* Initialize application support for drivers */
      
-    /* init PEM TPM driver */
-    TPM_PWM_Init();            
+    /* Initialize application support for drivers */          
       
+    /* Initialize TSI sensor */
+    TSI_Init();
+  
+    /* Init timers */    
+    tmrMeasurementTimerId = TMR_AllocateTimer(); /* T+V */
+      
+   /* start timers */  
+    /* Start 5 second measurements voltage and temperature */
+    tmrerr = TMR_StartTimer(tmrMeasurementTimerId, gTmrIntervalTimer_c, TmrSeconds(5), MeasurementTimerCallback, NULL);
+    
 
-    /* Initialize application specific peripher drivers here. */
-    tmrMeasurementTimerId = TMR_AllocateTimer();
-
-    /* Start 1 second measurements */
-    tmrerr = TMR_StartTimer(tmrMeasurementTimerId, gTmrIntervalTimer_c,TmrSeconds(5), MeasurementTimerCallback, NULL);
 
 }
 
@@ -329,6 +338,17 @@ void BleApp_HandleKeys(key_event_t events)
     
 }
 
+
+/*! *********************************************************************************
+* \brief        Handles TSI events.
+*
+* \param[in]    pElectrodeFlags    Electrode flags.
+********************************************************************************** */
+void BleApp_HandleTouch(uint8_t events)
+{
+  
+}
+
 /*! *********************************************************************************
 * \brief        Handles BLE generic callback.
 *
@@ -365,7 +385,6 @@ void BleApp_GenericCallback (gapGenericEvent_t* pGenericEvent)
 
         case gInternalError_c:
         {
-            //Led2On();
             panic(0,0,0,0);
         }
         break;
@@ -376,10 +395,10 @@ void BleApp_GenericCallback (gapGenericEvent_t* pGenericEvent)
 }
 
 /************************************************************************************
-*************************************************************************************
 * Private functions
-*************************************************************************************
 ************************************************************************************/
+
+
 
 /*! *********************************************************************************
 * \brief        Configures BLE Stack after initialization. Usually used for
@@ -711,11 +730,6 @@ static void BleApp_CccdWritten (deviceId_t deviceId, uint16_t handle, gattCccdFl
       measure_chip_temperature();
       Las_RecordMeasurementTV (lasServiceConfig.serviceHandle);
     }
-    else if (handle == cccd_core_voltage)
-    {
-      measure_chip_temperature();
-      Las_RecordMeasurementTV (lasServiceConfig.serviceHandle);
-    }
     else if (handle == cccd_lamp_clock)
     {
      
@@ -846,20 +860,20 @@ static void BleApp_AttributeWritten(deviceId_t  deviceId,
         BleApp_SendAttWriteResponse (deviceId, handle, bleResult);
       }
     }
-    else if (handle == value_lamp_onHHMM)
+    else if (handle == value_lamp_on_sec)
     {
-      if ( (length==2) && (pValue[0] <= 59) && (pValue[1] <= 59) )
+      if ( (length==4) )
       {
-
+         Las_SetOnTimer(lasServiceConfig.serviceHandle, pValue);
         // Report status to client
         BleApp_SendAttWriteResponse (deviceId, handle, bleResult);
       }
     }
-    else if (handle == value_lamp_onHHMM)
+    else if (handle == value_lamp_off_sec)
     {
-      if ( (length==2) && (pValue[0] <= 59) && (pValue[1] <= 59) )
+      if ( (length==4) )
       {
-
+         Las_SetOffTimer(lasServiceConfig.serviceHandle, pValue);
         // Report status to client
         BleApp_SendAttWriteResponse (deviceId, handle, bleResult);
       }
@@ -935,14 +949,7 @@ static void BleApp_AttributeWrittenWithoutResponse (deviceId_t deviceId,
         }
     }
     
-   /* lamp data BleApp_AttributeWrittenWithoutResponse  */
-    else if (handle == value_lamp_Control)
-    {
-      if ( (length==1) )
-      {
-        Las_SetLampControl(lasServiceConfig.serviceHandle, pValue[0], FALSE);
-      }
-    }     
+   /* lamp data BleApp_AttributeWrittenWithoutResponse  */     
     else if (handle == value_lamp_White)
     {
       if ( (length==2) && (pValue[0] <= PWM_factor_MAX) && (pValue[1] <= PWM_factor_MAX) )
@@ -957,30 +964,7 @@ static void BleApp_AttributeWrittenWithoutResponse (deviceId_t deviceId,
         bleResult = Las_SetLampRGB (lasServiceConfig.serviceHandle, pValue[0], pValue[1], pValue[2]);
       }
     }
-    else if (handle == value_lamp_clock)
-    {
-      if ( (length==7) )
-      {
 
-
-      }
-    }
-    else if (handle == value_lamp_onHHMM)
-    {
-      if ( (length==2) && (pValue[0] <= 59) && (pValue[1] <= 59)  )
-      {
-
-
-      }
-    }
-    else if (handle == value_lamp_onHHMM)
-    {
-      if ( (length==2) && (pValue[0] <= 59) && (pValue[1] <= 59)  )
-      {
-
-
-      }
-    }   
 }
 
 static void BleApp_HandleValueConfirmation (deviceId_t deviceId)
@@ -2035,9 +2019,21 @@ static otapStatus_t OtapClient_IsImageFileHeaderValid (bleOtaImageFileHeader_t* 
     return gOtapStatusSuccess_c;
 }
 
+
+
+
+
+
+
+
+
+/*! *********************************************************************************
+* \brief        Measurement Timer for Temperature and voltage on core.
+*
+* \param[in]    pParam        Callback parameters.
+********************************************************************************** */
 static void MeasurementTimerCallback(void * pParam)
 {
-    // clockit
     measure_chip_temperature();
 
     // if active BLE conection 
@@ -2050,6 +2046,7 @@ static void MeasurementTimerCallback(void * pParam)
     }
 
 }
+
 
 /*! *********************************************************************************
 * \brief        Sends GATT response to the client

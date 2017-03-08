@@ -310,10 +310,7 @@ void main_task(uint32_t param)
             
         /* Framework init */
         MEM_Init();
-        TMR_Init();
-        
-       
-        LED_Init();
+        TMR_Init();     
 
         SecLib_Init();
         
@@ -326,7 +323,7 @@ void main_task(uint32_t param)
         RNG_SetPseudoRandomNoSeed(pseudoRNGSeed);
         
 
-        KBD_Init(App_KeyboardCallBack);
+        KBD_Init(App_KeyboardCallBack);        
 
 
 #if gUseNVMLink_d       
@@ -339,22 +336,7 @@ void main_task(uint32_t param)
         
         pfBLE_SignalFromISR = BLE_SignalFromISRCallback;        
         
-#if (cPWR_UsePowerDownMode)
-        AppIdle_TaskInit();
-        PWR_Init();
-        PWR_DisallowDeviceToSleep();
-#else    
-        #if (gLEDSupported_d)
-          TurnOnLeds();
-          TurnOffLeds();
-          
-          //Led1Flashing(); 
-          //Led2Flashing();
-          Led3Flashing();
-          //Led4Flashing();  
-        #endif 
-#endif    
-       
+
        
         
         /* Initialize peripheral drivers specific to the application */

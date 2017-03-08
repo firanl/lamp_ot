@@ -48,7 +48,7 @@
   /* FwkInit.c */
   /* Defines a smaller FWK configuration */
   /* Range  default not defined */
-  //#define FWK_SMALL_RAM_CONFIG   
+  #define FWK_SMALL_RAM_CONFIG   
    
   /*! *********************************************************************************
    * 	DCDC
@@ -130,7 +130,7 @@
       #define gTmrTaskStackSize_c  384
                
       /* Defines number of timers needed by the application, default 4 */
-      #define gTmrApplicationTimers_c         4
+      #define gTmrApplicationTimers_c         5
 
       /* Defines number of timers needed by the protocol stack, default 4 */
       /* Range   default 4 */
@@ -216,12 +216,26 @@
   /*! *********************************************************************************
    * 	host
    ********************************************************************************** */
+    /* ble_general.h */
+      /* Range  0x0006 0xFFFF  default 40 <> 50ms */ 
+      #define gcConnectionIntervalMinDefault_c            (40)
+      /* Range  0x0000 0xFFFF  default 160 <> 200ms */ 
+      #define gcConnectionIntervalMaxDefault_c            (160)
+      #define gcConnectionSlaveLatencyDefault_c           (0)
+      /*! Time = N * 10 ms */
+      /* Range    default 2000 <> 20sec */                  
+      #define gcConnectionSupervisionTimeoutDefault_c     (2000)
+      /*! Time = N * 0.625 ms */                 
+      #define gcConnectionEventMinDefault_c               (0) 
+      /*! Time = N * 0.625 ms */                 
+      #define gcConnectionEventMaxDefault_c               (0)                 
+                 
   /*! *********************************************************************************
    * 	profiles
    ********************************************************************************** */
                  
   /*! *********************************************************************************
-   * 	app
+   * 	app common
    ********************************************************************************** */
     /* ble_controller_task.c */                   
       /*  Public Device Address variable type in ble_controller_task.c
@@ -233,12 +247,43 @@
       #define BD_ADDR             0x13,0x00,0x00,0x9F,0x04,0x00
       #define BD_ADDR_FF          0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
 
-
+    /* ble_controller_task_config.h */
+      /* Range   default 900 */
+      #define gControllerTaskStackSize_c 900
+      /* Range   default 1 */           
+      #define gControllerTaskPriority_c 1  
+                 
+    /* ble_host_task_config.h */  
+      /* Range   default 1300 */
+      #define gHost_TaskStackSize_c 1300  
+      /* Range   default 5 */
+      #define gHost_TaskPriority_c     5
+      /* Range   default 800 */
+      #define gL2ca_TaskStackSize_c  800
+      /* Range   default 4 */
+      #define gL2ca_TaskPriority_c     4
+      /* Range time <= 10msec  default  0x08 <-> 5msec */               
+      #define mcAdvertisingPacketInterval_c     0x08                     
+      /* Range  0x01 - 0x07  default  0x07 */      
+      #define mcScanChannelMap_c                0x07 
+      /* Range  0x01 - 0x07  default  0x07 */                    
+      #define mcInitiatorChannelMap_c           0x07 
+      #define mcOffsetToFirstInstant_c          0xFFFF  
+      /* Default Tx Power on the advertising channel.  */
+      /* Range  0-15  default  5  */ 
+      #define mAdvertisingDefaultTxPower_c      5  
+      /* Default Tx Power on the connection channel.  */
+      /* Range  0-15  default  5  */                  
+      #define mConnectionDefaultTxPower_c       5                 
+                 
 /*! *********************************************************************************
  * 	RAM Stack Size
  ********************************************************************************** */
- 
-#define Stack_Size (gMainThreadStackSize_c + gTmrTaskStackSize_c + gSerialTaskStackSize_c)
+
+#define FW_Stack ( gMainThreadStackSize_c + gTmrTaskStackSize_c + gSerialTaskStackSize_c)
+#define BT_Stack ( gControllerTaskStackSize_c + gHost_TaskStackSize_c + gL2ca_TaskStackSize_c)
+#define Stack_Size ( FW_Stack + BT_Stack)
+
 
 #endif /* _APP_PREINCLUDE_H_ */
 

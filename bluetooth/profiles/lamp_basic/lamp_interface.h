@@ -5,7 +5,9 @@
 /*!
  * Copyright (c) 2016, FiranL.
  * All rights reserved.
+ *
  * \file lamp_interface.h
+ *
  * This file is the interface file for the Temperature Service
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -119,6 +121,9 @@ bleResult_t Las_SetLampWhite (uint16_t serviceHandle, uint8_t warmW, uint8_t col
 
 bleResult_t Las_SetLampRGB (uint16_t serviceHandle, uint8_t red, uint8_t green, uint8_t blue);
 
+bleResult_t Las_SetOnTimer  (uint16_t serviceHandle, uint8_t* pSeconds);
+
+bleResult_t Las_SetOffTimer (uint16_t serviceHandle, uint8_t* pSeconds);
 
 
 #ifdef __cplusplus

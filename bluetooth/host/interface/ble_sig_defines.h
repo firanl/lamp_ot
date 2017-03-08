@@ -116,7 +116,8 @@
   #define gBleSig_AlertLevel_d                    0x2A06
   /*! TX Power Characteristic UUID */
   #define gBleSig_TxPower_d                       0x2A07
-  /*! Date Time 	org.bluetooth.characteristic.date_time  */
+  /*! Date Time   */
+  /* https://www.bluetooth.com/ko-kr/specifications/gatt/viewer?attributeXmlFile=org.bluetooth.characteristic.date_time.xml */
   #define gBleSig_Date_Time_d                    0x2A08
   /*! Glucose Measurement Characteristic UUID */
   #define gBleSig_GlucoseMeasurement_d            0x2A18

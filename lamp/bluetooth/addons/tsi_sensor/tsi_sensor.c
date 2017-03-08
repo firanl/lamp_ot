@@ -51,7 +51,9 @@
 #include "tsi_sensor.h"
 
 // KSDK header files
+#include "fsl_port_hal.h"
 #include "fsl_tsi_driver.h"
+#include "TimersManager.h"
 
 
 /******************************************************************************
@@ -60,35 +62,45 @@
 tsi_state_t tsiSensorState;
 tsi_sensor_callback_t userCallbackFunction;
 
-/* List of TSI electrodes to scan */
-tsi_sensor_electrode_data_t tsiSensorElectrodeList[] = {
-  {
-    .channel = 10,
-  },
-  {
-    .channel = 11,
-  },
-};
-
-tsi_sensor_electrode_flags_t tsiSensorActiveElectrodeFlag = {0x0000};
+/* The TPM instance/channel used for board */
+#define BOARD_TSI_INSTANCE        0
+  /*!< Electrode channel */
+  #define BOARD_TSI_BTN_CHANNEL               15u
+  static uint16_t BOARD_TSI_BTN_treshold;
+  
+  /* Touch Sensing sensor timer  */
+  static tmrTimerID_t tmrTsiId;  
 
 /******************************************************************************
 * Globals
 *******************************************************************************/
+uint8_t tsiSensorActiveElectrodeFlag;
+
 
 /******************************************************************************
 * Private Function prototypes
 ******************************************************************************/
+static void TsiTimerCallback(void* pParam);
 static void tsiIrqCallback(uint32_t instance, void* usrData);
+
+/************************************************************************************
+* Extern functions
+************************************************************************************/
+
+extern void TSI_DRV_IRQHandler(uint32_t instance);
+extern void BleApp_HandleTouch(uint8_t event);
 
 /******************************************************************************
 * Public Functions
 ******************************************************************************/
 
-tsi_sensor_status_t tsi_sensor_init (tsi_sensor_callback_t pCallbackFunc){
+void TSI_Init ()
+{
   tsi_status_t result;
+  tmrErrCode_t tmrerr = gTmrInvalidId_c;
   
   /* Set up the HW configuration for normal mode of TSI */
+  /* FSL_FEATURE_TSI_VERSION == 4 */
   static const tsi_config_t tsi_HwConfig =
   {
     .ps = kTsiElecOscPrescaler_2div,
@@ -109,74 +121,80 @@ tsi_sensor_status_t tsi_sensor_init (tsi_sensor_callback_t pCallbackFunc){
     .usrData = (void*)0x00,
   };
   
-  /* Initialize TSI module */
-  result = TSI_DRV_Init(0, &tsiSensorState, &tsiSensorConfig);
+  //configure_tsi_pins
+  /* TSI0_CH15 */
+  PORT_HAL_SetMuxMode(PORTC, 3u, kPortPinDisabled);  
   
-  if(result != kStatus_TSI_Success)
-    return kTsiInitError;
+  /* Initialize TSI module */
+  result = TSI_DRV_Init(BOARD_TSI_INSTANCE, &tsiSensorState, &tsiSensorConfig);
   
   /* Configure all electrode channels */
-  uint8_t electrodeCount = (sizeof(tsiSensorElectrodeList)/sizeof(tsi_sensor_electrode_data_t));
-  uint8_t electrodeIndex;
-  
-  for(electrodeIndex=0; electrodeIndex<electrodeCount; electrodeIndex++)
-  {
-    result = TSI_DRV_EnableElectrode(0, tsiSensorElectrodeList[electrodeIndex].channel, true);
-    if(result != kStatus_TSI_Success)
-    return kTsiInitError;
-  }
-  
-  /* Store user callback function */
-  userCallbackFunction = pCallbackFunc;
-  
+  result = TSI_DRV_EnableElectrode(BOARD_TSI_INSTANCE, BOARD_TSI_BTN_CHANNEL, true);
+
   /* Start measurements */
-  return tsi_sensor_start_single_measurement();
+  result = TSI_DRV_MeasureBlocking(BOARD_TSI_INSTANCE);
+  
+  /* Calibrate all electrode channels */
+  result = TSI_DRV_GetCounter(BOARD_TSI_INSTANCE, BOARD_TSI_BTN_CHANNEL, &BOARD_TSI_BTN_treshold);
+  BOARD_TSI_BTN_treshold += TSI_SENSOR_THRESHOLD_ADDER;
+  
+  
+  tsiSensorActiveElectrodeFlag = 0;
+  
+  tmrTsiId = TMR_AllocateTimer(); /* TSI */
+  
+  /* Start TSI timer for capacitive touch BTN */     
+  tmrerr = TMR_StartTimer(tmrTsiId, gTmrIntervalTimer_c, gTsiUpdateTime_c, TsiTimerCallback, NULL);  
+  
 }
 
-tsi_sensor_status_t tsi_sensor_start_single_measurement (void){
+void TSI_MeasureOnce(void)
+{
   tsi_status_t result;
   
   /* Start measurements */
-  result = TSI_DRV_Measure(0);
+  result = TSI_DRV_Measure(BOARD_TSI_INSTANCE);
   
-  if(result != kStatus_TSI_Success)
-  {
-    return kTsiStartError;
-  }
-  
-  return kTsiOk;
 }
 
 /******************************************************************************
 * Private Functions
 ******************************************************************************/
-void tsiIrqCallback(uint32_t instance, void* usrData){
-  static bool_t isTsiSensorCalibrated = FALSE;
+static void tsiIrqCallback(uint32_t instance, void* usrData)
+{
   uint16_t tsiChannelReading;
-  uint8_t electrodeCount = (sizeof(tsiSensorElectrodeList)/sizeof(tsi_sensor_electrode_data_t));
-  uint8_t electrodeIndex;
-    
-  if(isTsiSensorCalibrated == FALSE){
-    /* Calibrate all electrode channels */
-    for(electrodeIndex=0; electrodeIndex<electrodeCount; electrodeIndex++)
-    {
-      TSI_DRV_GetCounter(0, tsiSensorElectrodeList[electrodeIndex].channel, &tsiSensorElectrodeList[electrodeIndex].threshold);
-      tsiSensorElectrodeList[electrodeIndex].threshold += TSI_SENSOR_THRESHOLD_ADDER;
-    }
-    /* Clear sensor calibration flag */
-    isTsiSensorCalibrated = TRUE;
+
+  //Read current measurement
+  TSI_DRV_GetCounter(BOARD_TSI_INSTANCE, BOARD_TSI_BTN_CHANNEL, &tsiChannelReading); 
+  
+  //Compare measurement with thresshold Check if some electrode was pressed. Executes callback if true
+  if(tsiChannelReading > BOARD_TSI_BTN_treshold) 
+  {
+    tsiSensorActiveElectrodeFlag=1; 
+    BleApp_HandleTouch(1);
   }
-  else{
-    for(electrodeIndex=0; electrodeIndex<electrodeCount; electrodeIndex++)
-    {
-      TSI_DRV_GetCounter(0, tsiSensorElectrodeList[electrodeIndex].channel, &tsiChannelReading); //Read current measurement
-      if(tsiChannelReading > tsiSensorElectrodeList[electrodeIndex].threshold) //Compare measurement with thresshold
-        tsiSensorActiveElectrodeFlag.overallFlagStatus |= (1<<electrodeIndex); //Set proper flag
-    }
-    //Check if some electrode was pressed. Executes callback if true
-    if(tsiSensorActiveElectrodeFlag.overallFlagStatus != 0)
-      userCallbackFunction(&tsiSensorActiveElectrodeFlag);
-  }
+  
+}
+
+/*! *********************************************************************************
+* \brief        Handles TSI sensor timer callback
+*
+* \param[in]    pParam        Callback parameters.
+********************************************************************************** */
+static void TsiTimerCallback(void* pParam)
+{
+  /* Start a new TSI single measurement */
+  TSI_MeasureOnce();
+}
+
+/*!
+ * @brief Implementation of TSI0 handler named in startup code.
+ *
+ * Passes instance to generic TSI IRQ handler.
+ */
+void TSI0_IRQHandler(void)
+{
+    TSI_DRV_IRQHandler(0);
 }
 
 /* End of file */

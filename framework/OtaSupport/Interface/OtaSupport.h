@@ -45,17 +45,17 @@
 ************************************************************************************/
 
 #ifndef gEnableOTAServer_d
-#define gEnableOTAServer_d                 (0)
+  #define gEnableOTAServer_d                 (0)
 #endif
 
 #ifndef gUpgradeImageOnCurrentDevice_d
-#define gUpgradeImageOnCurrentDevice_d     (0)
+  #define gUpgradeImageOnCurrentDevice_d     (0)
 #endif
 
 #define gOtaVersion_c                      (0x01)
 
 #ifndef gOtaVerifyWrite_d
-#define gOtaVerifyWrite_d                  (1)
+  #define gOtaVerifyWrite_d                  (1)
 #endif
 
 #define gBootValueForTRUE_c                (0x00)

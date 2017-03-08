@@ -1,17 +1,4 @@
 /*!
-*@defgroup input_report Input Report
-*
-* Input Report implements functions to acquire users input when a button is pressed (GPIO) or a capacitive sensor is touched (TSI).
-*
-* Input Report functions are divided in two sub-modules. Keyboard module is part of the Connectivity Software stack and implements 
-* functions to handle GPIO inputs. TSI Sensor module includes functions to acquire user input when pressing capacitive touch sensors.
-*
-* Keyboard module is explained in the Connectivity Software stack documentation. Please refer to the Connectivity Framwork Reference Manual 
-* (CONNFWRKRM) for more information on this module.
-*
-* @{
-*******************************************************************************/
-/*!
 * @file tsi_sensor.h
 *
 * @author  
@@ -71,35 +58,14 @@
 /******************************************************************************
 * User definitions
 *******************************************************************************/
-#define TSI_SENSOR_THRESHOLD_ADDER      10       /*!< Threshold value to detect a touch event */
+/*!< Threshold value to detect a touch event */
+#define TSI_SENSOR_THRESHOLD_ADDER       10 
+/*!< TSI update time in mS */
+#define gTsiUpdateTime_c                150     
 
 /******************************************************************************
 * Type definitions
 ******************************************************************************/
-/*!
- * TSI Electrode flags array
- */
-typedef union tsiSensorElectrodeFlags{
-  uint16_t overallFlagStatus;   /*!< Status of all TSI flags */
-  struct {
-    uint16_t electrode1 : 1;
-    uint16_t electrode2 : 1;
-    uint16_t electrode3 : 1;
-    uint16_t electrode4 : 1;
-    uint16_t electrode5 : 1;
-    uint16_t electrode6 : 1;
-    uint16_t electrode7 : 1;
-    uint16_t electrode8 : 1;
-    uint16_t electrode9 : 1;
-    uint16_t electrode10 : 1;
-    uint16_t electrode11 : 1;
-    uint16_t electrode12 : 1;
-    uint16_t electrode13 : 1;
-    uint16_t electrode14 : 1;
-    uint16_t electrode15 : 1;
-    uint16_t electrode16 : 1;  
-  }activeFlag;                 /*!< Status of each TSI flag */
-}tsi_sensor_electrode_flags_t;
 
 /*!
  * TSI Sensor return status for functions
@@ -110,23 +76,16 @@ typedef enum tsiSensorStatus{
   kTsiStartError,       /*!< Error starting the measurements */
 }tsi_sensor_status_t;
 
-/*!
- * TSI electrode data structure
- */
-typedef struct tsiSensorElectrodeData{
-  uint8_t       channel;        /*!< Electrode channel */
-  uint16_t      threshold;      /*!< Electrode threshold */
-}tsi_sensor_electrode_data_t;
 
 /*!
  * TSI Sensor callback function type
  */
-typedef void (*tsi_sensor_callback_t) (tsi_sensor_electrode_flags_t* pElectrodeFlags);
+typedef void (*tsi_sensor_callback_t) (uint8_t* pElectrodeFlags);
 
 /******************************************************************************
 * Globals
 *******************************************************************************/
-extern tsi_sensor_electrode_flags_t tsiSensorActiveElectrodeFlag; /*!< TSI electrode flags */
+
 
 /******************************************************************************
 * Configuration options
@@ -143,7 +102,7 @@ extern tsi_sensor_electrode_flags_t tsiSensorActiveElectrodeFlag; /*!< TSI elect
 *
 * \return       @ref tsi_sensor_status_t Error status.
 ****************************************************************************/
-tsi_sensor_status_t tsi_sensor_init (tsi_sensor_callback_t pCallbackFunc);
+void TSI_Init(void);
 
 /*!***************************************************************************
 * \brief        Starts a single TSI sensor measurement.
@@ -152,15 +111,12 @@ tsi_sensor_status_t tsi_sensor_init (tsi_sensor_callback_t pCallbackFunc);
 *
 * \return       @ref tsi_sensor_status_t Error status.
 ****************************************************************************/
-tsi_sensor_status_t tsi_sensor_start_single_measurement (void);
+void TSI_MeasureOnce(void);
 
 /*!
  * @} End of tsi_sensor
  */
 
-/*!
- * @} End of input_report
- */
 
 #endif
 /* End of file */

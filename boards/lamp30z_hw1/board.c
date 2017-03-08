@@ -46,6 +46,8 @@
 /* core temperature measurement, voltage reference measurement */
 #include "temperature_sensor.h"
 
+/* TPM PWM */
+#include "tpm_pwm_led_ctrl.h" 
 
 #if cPWR_UsePowerDownMode
   #include "PWR_Interface.h"
@@ -149,12 +151,14 @@ void hardware_init(void) {
 
   if((PMC->REGSC & PMC_REGSC_ACKISO_MASK) != 0x00U)
   {
-    PMC->REGSC |= PMC_REGSC_ACKISO_MASK; /* Release hold with ACKISO:  Only has an effect if recovering from VLLSx.*/
-    /*clear power management registers after recovery from vlls*/
+    /* Release hold with ACKISO:  Only has an effect if recovering from VLLSx.*/
+    PMC->REGSC |= PMC_REGSC_ACKISO_MASK; 
+    /* clear power management registers after recovery from vlls*/
     SMC_BWR_STOPCTRL_LLSM(SMC, 0);
     SMC_BWR_PMCTRL_STOPM(SMC, 0);
     SMC_BWR_PMCTRL_RUNM(SMC, 0);
   }
+  
   /* enable clock for PORTs */
   CLOCK_SYS_EnablePortClock(PORTA_IDX);
   CLOCK_SYS_EnablePortClock(PORTB_IDX);
@@ -169,7 +173,8 @@ void hardware_init(void) {
   /* init core temperature value and voltage reference */
   measure_chip_temperature();
   
-
+  /* init PEM TPM driver */
+  TPM_PWM_Init();   
 
   
   initHardwareParameters();
@@ -201,6 +206,7 @@ static void initHardwareParameters(void)
     clone_RSIM_private_static_MAC(gBDAddress_c);
   #endif
 
+ 
    
 }
 

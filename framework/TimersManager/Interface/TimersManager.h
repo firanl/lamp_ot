@@ -728,65 +728,65 @@ uint64_t TMR_GetTimestamp(void);
 
 #else /* stub functions */
 
-#define TMR_Init()
-#define TMR_NotifyClkChanged(clkKhz)
-#define TMR_AllocateTimer()         gTmrInvalidTimerID_c
-#define TMR_AreAllTimersOff()       1
-#define TMR_FreeTimer(timerID)      0
-#define TMR_IsTimerActive(timerID)  0
-#define TMR_StartTimer(timerID,timerType,timeInMilliseconds, pfTimerCallBack, param) 0
-#define TMR_StartLowPowerTimer(timerId,timerType,timeIn,pfTmrCallBack,param) 0
-#if gTMR_EnableMinutesSecondsTimers_d
-#define TMR_StartMinuteTimer(timerId,timeInMinutes,pfTmrCallBack,param) 0
-#endif
-#if gTMR_EnableMinutesSecondsTimers_d
-#define TMR_StartSecondTimer(timerId,timeInSeconds,pfTmrCallBack,param) 0
-#endif
-#define TMR_StartIntervalTimer(timerID,timeInMilliseconds,pfTimerCallBack,param) 0
-#define TMR_StartSingleShotTimer(timerID,timeInMilliseconds,pfTimerCallBack,param) 0
-#define TMR_StopTimer(timerID)              0
-#define TMR_Thread(events)
-#define TMR_EnableTimer(tmrID)
-#define TMR_NotCountedTicksBeforeSleep()    0
-#define TMR_SyncLpmTimers(sleepDurationTmrTicks)
-#define TMR_MakeTMRThreadReady()
-#define TmrTicksFromMilliseconds(milliseconds)      0
-#define TMR_GetTimerFreq()                          0
-#define TMR_GetRemainingTime(tmrID)                 0
-#define TMR_AllocateMinuteTimer()     TMR_AllocateTimer()
-#define TMR_AllocateSecondTimer()     TMR_AllocateTimer()
-#define TMR_FreeMinuteTimer(timerID)  TMR_FreeTimer(timerID)
-#define TMR_FreeSecondTimer(timerID)  TMR_FreeTimer(timerID)
-#define TMR_StopMinuteTimer(timerID)  TMR_StopTimer(timerID)
-#define TMR_StopSecondTimer(timerID)  TMR_StopTimer(timerID)
-#define TMR_TimeStampInit()
-#define TMR_GetTimestamp()                          0
+  #define TMR_Init()
+  #define TMR_NotifyClkChanged(clkKhz)
+  #define TMR_AllocateTimer()         gTmrInvalidTimerID_c
+  #define TMR_AreAllTimersOff()       1
+  #define TMR_FreeTimer(timerID)      0
+  #define TMR_IsTimerActive(timerID)  0
+  #define TMR_StartTimer(timerID,timerType,timeInMilliseconds, pfTimerCallBack, param) 0
+  #define TMR_StartLowPowerTimer(timerId,timerType,timeIn,pfTmrCallBack,param) 0
+  #if gTMR_EnableMinutesSecondsTimers_d
+  #define TMR_StartMinuteTimer(timerId,timeInMinutes,pfTmrCallBack,param) 0
+  #endif
+  #if gTMR_EnableMinutesSecondsTimers_d
+  #define TMR_StartSecondTimer(timerId,timeInSeconds,pfTmrCallBack,param) 0
+  #endif
+  #define TMR_StartIntervalTimer(timerID,timeInMilliseconds,pfTimerCallBack,param) 0
+  #define TMR_StartSingleShotTimer(timerID,timeInMilliseconds,pfTimerCallBack,param) 0
+  #define TMR_StopTimer(timerID)              0
+  #define TMR_Thread(events)
+  #define TMR_EnableTimer(tmrID)
+  #define TMR_NotCountedTicksBeforeSleep()    0
+  #define TMR_SyncLpmTimers(sleepDurationTmrTicks)
+  #define TMR_MakeTMRThreadReady()
+  #define TmrTicksFromMilliseconds(milliseconds)      0
+  #define TMR_GetTimerFreq()                          0
+  #define TMR_GetRemainingTime(tmrID)                 0
+  #define TMR_AllocateMinuteTimer()     TMR_AllocateTimer()
+  #define TMR_AllocateSecondTimer()     TMR_AllocateTimer()
+  #define TMR_FreeMinuteTimer(timerID)  TMR_FreeTimer(timerID)
+  #define TMR_FreeSecondTimer(timerID)  TMR_FreeTimer(timerID)
+  #define TMR_StopMinuteTimer(timerID)  TMR_StopTimer(timerID)
+  #define TMR_StopSecondTimer(timerID)  TMR_StopTimer(timerID)
+  #define TMR_TimeStampInit()
+  #define TMR_GetTimestamp()                          0
 
 #endif /* gTMR_Enabled_d */
 
 #if gPrecision_Timers_Enabled_d
 
-/*---------------------------------------------------------------------------
- * NAME: TMR_PrecisionTimerInit
- * DESCRIPTION: initialize the precision timer module
- * PARAMETERS: -
- * RETURN: -
- *---------------------------------------------------------------------------*/
-void TMR_PrecisionTimerInit(void);
+  /*---------------------------------------------------------------------------
+   * NAME: TMR_PrecisionTimerInit
+   * DESCRIPTION: initialize the precision timer module
+   * PARAMETERS: -
+   * RETURN: -
+   *---------------------------------------------------------------------------*/
+  void TMR_PrecisionTimerInit(void);
 
-/*---------------------------------------------------------------------------
- * NAME: TMR_GetAbsoluteTimeus
- * DESCRIPTION: Gets the absolute time in microseconds.
- * PARAMETERS:  -
- * RETURN: Time in microseconds
- *---------------------------------------------------------------------------*/
-uint64_t TMR_GetAbsoluteTimeus(void);
+  /*---------------------------------------------------------------------------
+   * NAME: TMR_GetAbsoluteTimeus
+   * DESCRIPTION: Gets the absolute time in microseconds.
+   * PARAMETERS:  -
+   * RETURN: Time in microseconds
+   *---------------------------------------------------------------------------*/
+  uint64_t TMR_GetAbsoluteTimeus(void);
 
 #else /*stub functions*/
 
-#define TMR_PrecisionTimerInit() 0
+  #define TMR_PrecisionTimerInit() 0
 
-#define TMR_GetAbsoluteTimeus() 0
+  #define TMR_GetAbsoluteTimeus() 0
 
 #endif /*gPrecision_Timers_Enabled_d*/
    

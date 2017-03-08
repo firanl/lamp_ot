@@ -3,10 +3,10 @@
  * @{
  ********************************************************************************** */
 /*!
- * Copyright (c) 2015, Freescale Semiconductor, Inc.
+ * Copyright (c) 2017, FiranL
  * All rights reserved.
  *
- * \file temperature_service.c
+ * \file lamp_service.c
  *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
@@ -46,11 +46,14 @@
 #include "lamp_interface.h"
 #include "temperature_sensor.h"
 #include "board.h"
+#include "TimersManager.h"
 /* TPM PWM */
 #include "tpm_pwm_led_ctrl.h"
 /************************************************************************************
 * Private constants & macros
 ************************************************************************************/
+
+#define MAXOnOffSecondsDay  (60*60*24+1)
 
 /* core temperature T, signed exponent -2 */
 /* core voltage reference V, signed exponent -3 */
@@ -72,26 +75,47 @@ static deviceId_t mLas_SubscribedClientId;
 
 static deviceId_t mLas_serviceHandle;
 
+  /* Fade in out lamp control */
+  static tmrTimerID_t tmrFadeId;
+  /* Set on lamp timer */
+  static tmrTimerID_t tmrOn_secondsId;
+  /* Set off lamp timer */
+  static tmrTimerID_t tmrOff_secondsId;
+
+
 
 /************************************************************************************
 * Private functions prototypes
 ************************************************************************************/
-// Short BTN press changes
 static void Hls_LampControlNotification(uint16_t handle );
-// Long BTN press canges
 static void Hls_LampWhiteNotification(uint16_t handle);
+
 static bleResult_t  Las_RecordLampControl (uint16_t serviceHandle, uint8_t notify);
 static bleResult_t  Las_RecordLampWhite   (uint16_t serviceHandle, uint8_t notify);
 static bleResult_t  Las_RecordLampRGB     (uint16_t serviceHandle);
 
+static void FadeTimerCallback(void* pParam);
+static void OnTimerCallback(void* pParam);
+static void OffTimerCallback(void* pParam);
+
+/************************************************************************************
+* Extern functions
+************************************************************************************/
+extern void ResetMCU(void);
+
 /************************************************************************************
 * Public functions
 ************************************************************************************/
+
 bleResult_t Las_Start (lasConfig_t *pServiceConfig)
 {    
     bleResult_t result;
       
     mLas_SubscribedClientId = gInvalidDeviceId_c;
+  
+    tmrFadeId             = TMR_AllocateTimer();
+    tmrOn_secondsId       = TMR_AllocateTimer();
+    tmrOff_secondsId      = TMR_AllocateTimer();
     
 //
     /* switch to pre-reset light */
@@ -259,6 +283,11 @@ bleResult_t Las_SetLampControl (uint16_t serviceHandle, uint8_t control, uint8_t
   /* see some differences from old control */   
   if (lamp_ctrl.raw8 != lamp_NVdata.lampControl.raw8)
   { 
+    /* check if reset */
+    /* TODO: send it twice ? */
+    if(lamp_ctrl.raw8 == 0x04) { ResetMCU(); return result; }
+    
+    
     lamp_NVdata.lampControl.bit.BTcon = lamp_ctrl.bit.BTcon;
     lamp_NVdata.lampControl.bit.mix = lamp_ctrl.bit.mix; 
     
@@ -432,6 +461,36 @@ bleResult_t Las_SetLampRGB (uint16_t serviceHandle, uint8_t red, uint8_t green, 
 }
 
 
+bleResult_t Las_SetOnTimer(uint16_t serviceHandle, uint8_t* pSeconds)
+{
+    tmrErrCode_t tmrerr = gTmrInvalidId_c;
+    uint32_t seconds=0;
+    
+    seconds= *( (uint32_t*) pSeconds); 
+    
+    if(seconds>0)
+    {
+      tmrerr = TMR_StartTimer(tmrOn_secondsId, gTmrSingleShotTimer_c, TmrSeconds(seconds), OnTimerCallback, NULL);
+    }
+    
+    return gBleSuccess_c;
+}
+
+
+bleResult_t Las_SetOffTimer(uint16_t serviceHandle, uint8_t* pSeconds)
+{
+    tmrErrCode_t tmrerr = gTmrInvalidId_c;
+    uint32_t seconds=0;
+    
+    seconds= *( (uint32_t*) pSeconds); 
+    
+    if(seconds>0)
+    {
+      tmrerr = TMR_StartTimer(tmrOff_secondsId, gTmrSingleShotTimer_c, TmrSeconds(seconds), OffTimerCallback, NULL);
+    }
+    
+    return gBleSuccess_c;
+}
              
              
 
@@ -519,7 +578,6 @@ static bleResult_t Las_RecordLampRGB (uint16_t serviceHandle)
     return gBleSuccess_c;
 }
 
-// Short BTN press changes
 static void Hls_LampControlNotification( uint16_t handle )
 {
     uint16_t  hCccd;
@@ -537,7 +595,6 @@ static void Hls_LampControlNotification( uint16_t handle )
     }
 }
 
-// Long BTN press canges
 static void Hls_LampWhiteNotification( uint16_t handle )
 {
     uint16_t  hCccd;
@@ -555,7 +612,35 @@ static void Hls_LampWhiteNotification( uint16_t handle )
     }
 }
 
+/*! *********************************************************************************
+* \brief        On Timer for lamp to start after some seconds.
+*
+* \param[in]    pParam        Callback parameters.
+********************************************************************************** */
+static void OnTimerCallback(void * pParam)
+{
+    uint8_t control;
+    
+    /*  lamp was set before */
 
+    /* turn on lamp */
+    control = lamp_NVdata.lampControl.raw8 | 0x80;
+    Las_SetLampControl (mLas_serviceHandle, control, TRUE);
+}
+
+/*! *********************************************************************************
+* \brief        Off Timer for lamp stop after some seconds.
+*
+* \param[in]    pParam        Callback parameters.
+********************************************************************************** */
+static void OffTimerCallback(void * pParam)
+{
+    uint8_t control;
+
+    /* turn off lamp and notify */
+    control = lamp_NVdata.lampControl.raw8 & 0x7F;
+    Las_SetLampControl (mLas_serviceHandle, control, TRUE);  
+}
 
 /*! *********************************************************************************
  * @}

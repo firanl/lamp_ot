@@ -2822,6 +2822,12 @@
     <file>
       <name>$PROJ_DIR$\lamp\bluetooth\addons\tpm_pwm_led\tpm_pwm_led_ctrl.h</name>
     </file>
+    <file>
+      <name>$PROJ_DIR$\lamp\bluetooth\addons\tsi_sensor\tsi_sensor.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\lamp\bluetooth\addons\tsi_sensor\tsi_sensor.h</name>
+    </file>
   </group>
   <group>
     <name>RTOS</name>

@@ -72,7 +72,7 @@ extern uint32_t __BootFlags_Start__[];
 *******************************************************************************
 ******************************************************************************/
 #if gEnableOTAServer_d || gUpgradeImageOnCurrentDevice_d
-static bool_t OtaSupportCalback(clientPacket_t* pData);
+  static bool_t OtaSupportCalback(clientPacket_t* pData);
 #endif
 
 /******************************************************************************
@@ -108,33 +108,33 @@ static  uint32_t  mCurrentEepromAddress = 0;
 static  bool_t    mNewImageReady = FALSE;
 
 #if gEnableOTAServer_d
-/* The FSCI interface used to download an image */
-static  uint8_t   mOtaFsciInterface = 0;
+  /* The FSCI interface used to download an image */
+  static  uint8_t   mOtaFsciInterface = 0;
 #endif
 
 #if gEnableOTAServer_d || gUpgradeImageOnCurrentDevice_d
-/* The size of the image to be downloaded */
-static  uint32_t  mTotalUpdateSize = 0;
+  /* The size of the image to be downloaded */
+  static  uint32_t  mTotalUpdateSize = 0;
 #endif
 
 #if gUpgradeImageOnCurrentDevice_d
-static uint8_t mNextPushChunkSeq;
+  static uint8_t mNextPushChunkSeq;
 #endif
 
 /* Variables used by the Bootloader */
 #if defined(__IAR_SYSTEMS_ICC__)
-#pragma location = "BootloaderFlags"
-const bootInfo_t gBootFlags = 
+  #pragma location = "BootloaderFlags"
+  const bootInfo_t gBootFlags = 
 #elif defined(__GNUC__)
-const bootInfo_t gBootFlags __attribute__ ((section(".BootloaderFlags"))) = 
+  const bootInfo_t gBootFlags __attribute__ ((section(".BootloaderFlags"))) = 
 #else
-const bootInfo_t gBootFlags = 
+  const bootInfo_t gBootFlags = 
 #endif
-{{gBootValueForFALSE_c}, {gBootValueForTRUE_c}, {0x00, 0x02}};
+  {{gBootValueForFALSE_c}, {gBootValueForTRUE_c}, {0x00, 0x02}};
 
 /* Contains Application Callbacks for packets received over the serial interface */
 #if gEnableOTAServer_d
-static otaServer_AppCB_t *mpOTA_AppCB;
+  static otaServer_AppCB_t *mpOTA_AppCB;
 #endif
 
 
@@ -152,22 +152,22 @@ otaMode_t gUpgradeMode = gUpgradeImageOnCurrentDevice_c;
 *******************************************************************************
 ******************************************************************************/
 #if gEnableOTAServer_d || gUpgradeImageOnCurrentDevice_d
-/*****************************************************************************
-*  OTA_Init
-*
-*  This function registers a calback function into the FSCI module.
-*
-*
-*****************************************************************************/
-otaResult_t OTA_RegisterToFsci( uint32_t fsciInterface, otaServer_AppCB_t *pCB)
-{
-    pfFSCI_OtaSupportCalback = OtaSupportCalback;
-#if gEnableOTAServer_d
-    mOtaFsciInterface = (uint8_t)fsciInterface;
-    mpOTA_AppCB = pCB;
-#endif
-    return gOtaSucess_c;
-}
+  /*****************************************************************************
+  *  OTA_Init
+  *
+  *  This function registers a calback function into the FSCI module.
+  *
+  *
+  *****************************************************************************/
+  otaResult_t OTA_RegisterToFsci( uint32_t fsciInterface, otaServer_AppCB_t *pCB)
+  {
+      pfFSCI_OtaSupportCalback = OtaSupportCalback;
+      #if gEnableOTAServer_d
+          mOtaFsciInterface = (uint8_t)fsciInterface;
+          mpOTA_AppCB = pCB;
+      #endif
+      return gOtaSucess_c;
+  }
 #endif
 
 
@@ -351,10 +351,12 @@ void OTA_SetNewImageFlag(void)
 
         if( status != FTFx_OK )
         {
-            return;
+         
         }
-
-        mNewImageReady = FALSE;
+        else
+        {
+           mNewImageReady = FALSE;
+        }
     }
 }
 
@@ -539,77 +541,77 @@ otaResult_t OTA_WriteExternalMemory(uint8_t* pData, uint8_t length, uint32_t add
 
 
 #if gEnableOTAServer_d
-/*****************************************************************************
-*  OTA_QueryImageReq
-*
-*  
-*
-*****************************************************************************/
-void OTA_QueryImageReq(uint16_t devId, uint16_t manufacturer, uint16_t imgType, uint32_t fileVersion)
-{
-    uint8_t idx;
-    clientPacket_t *pPkt;
+  /*****************************************************************************
+  *  OTA_QueryImageReq
+  *
+  *  
+  *
+  *****************************************************************************/
+  void OTA_QueryImageReq(uint16_t devId, uint16_t manufacturer, uint16_t imgType, uint32_t fileVersion)
+  {
+      uint8_t idx;
+      clientPacket_t *pPkt;
 
-    /* compute payload len */
-    idx = sizeof(devId) + sizeof(manufacturer) + sizeof(imgType) + sizeof(fileVersion);
-    pPkt = MEM_BufferAlloc(sizeof(clientPacketHdr_t) + idx + 2);
-    
-    if( NULL == pPkt )
-    {
-        return;
-    }
+      /* compute payload len */
+      idx = sizeof(devId) + sizeof(manufacturer) + sizeof(imgType) + sizeof(fileVersion);
+      pPkt = MEM_BufferAlloc(sizeof(clientPacketHdr_t) + idx + 2);
+      
+      if( NULL == pPkt )
+      {
+          return;
+      }
 
-    pPkt->structured.header.opGroup = gFSCI_ReqOpcodeGroup_c;
-    pPkt->structured.header.opCode = mFsciOtaSupportQueryImageReq_c;
-    pPkt->structured.header.len = idx;
+      pPkt->structured.header.opGroup = gFSCI_ReqOpcodeGroup_c;
+      pPkt->structured.header.opCode = mFsciOtaSupportQueryImageReq_c;
+      pPkt->structured.header.len = idx;
 
-    // Copy data into the payload buffer
-    idx = 0;
-    FLib_MemCpy(&pPkt->structured.payload[idx], &devId, sizeof(devId));
-    idx +=sizeof(devId);
-    FLib_MemCpy(&pPkt->structured.payload[idx], &manufacturer, sizeof(manufacturer));
-    idx +=sizeof(manufacturer);
-    FLib_MemCpy(&pPkt->structured.payload[idx], &imgType, sizeof(imgType));
-    idx +=sizeof(imgType);
-    FLib_MemCpy(&pPkt->structured.payload[idx], &fileVersion, sizeof(fileVersion));
+      // Copy data into the payload buffer
+      idx = 0;
+      FLib_MemCpy(&pPkt->structured.payload[idx], &devId, sizeof(devId));
+      idx +=sizeof(devId);
+      FLib_MemCpy(&pPkt->structured.payload[idx], &manufacturer, sizeof(manufacturer));
+      idx +=sizeof(manufacturer);
+      FLib_MemCpy(&pPkt->structured.payload[idx], &imgType, sizeof(imgType));
+      idx +=sizeof(imgType);
+      FLib_MemCpy(&pPkt->structured.payload[idx], &fileVersion, sizeof(fileVersion));
 
-    FSCI_transmitFormatedPacket(pPkt, mOtaFsciInterface);
-}
+      FSCI_transmitFormatedPacket(pPkt, mOtaFsciInterface);
+  }
 
 
-/*****************************************************************************
-*  OTA_ImageChunkReq
-*
-*  
-*
-*****************************************************************************/
-void OTA_ImageChunkReq(uint32_t offset, uint8_t len, uint16_t devId)
-{
-    uint8_t idx;
-    clientPacket_t *pPkt;
+  /*****************************************************************************
+  *  OTA_ImageChunkReq
+  *
+  *  
+  *
+  *****************************************************************************/
+  void OTA_ImageChunkReq(uint32_t offset, uint8_t len, uint16_t devId)
+  {
+      uint8_t idx;
+      clientPacket_t *pPkt;
 
-    idx = sizeof(offset) + sizeof(len) + sizeof(devId);
-    pPkt = MEM_BufferAlloc(sizeof(clientPacketHdr_t) + idx + 2);
+      idx = sizeof(offset) + sizeof(len) + sizeof(devId);
+      pPkt = MEM_BufferAlloc(sizeof(clientPacketHdr_t) + idx + 2);
 
-    if( NULL == pPkt )
-    {
-        return;
-    }
+      if( NULL == pPkt )
+      {
+          return;
+      }
 
-    pPkt->structured.header.opGroup = gFSCI_ReqOpcodeGroup_c;
-    pPkt->structured.header.opCode = mFsciOtaSupportImageChunkReq_c;
-    pPkt->structured.header.len = idx;
+      pPkt->structured.header.opGroup = gFSCI_ReqOpcodeGroup_c;
+      pPkt->structured.header.opCode = mFsciOtaSupportImageChunkReq_c;
+      pPkt->structured.header.len = idx;
 
-    // Copy data into the payload buffer
-    idx = 0;
-    FLib_MemCpy(&pPkt->structured.payload[idx], &devId, sizeof(devId));
-    idx +=sizeof(devId);
-    FLib_MemCpy(&pPkt->structured.payload[idx], &offset, sizeof(offset));
-    idx +=sizeof(offset);
-    FLib_MemCpy(&pPkt->structured.payload[idx], &len, sizeof(len));
+      // Copy data into the payload buffer
+      idx = 0;
+      FLib_MemCpy(&pPkt->structured.payload[idx], &devId, sizeof(devId));
+      idx +=sizeof(devId);
+      FLib_MemCpy(&pPkt->structured.payload[idx], &offset, sizeof(offset));
+      idx +=sizeof(offset);
+      FLib_MemCpy(&pPkt->structured.payload[idx], &len, sizeof(len));
 
-    FSCI_transmitFormatedPacket(pPkt, mOtaFsciInterface);
-}
+      FSCI_transmitFormatedPacket(pPkt, mOtaFsciInterface);
+  }
 #endif
 
 

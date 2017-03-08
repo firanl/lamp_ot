@@ -316,6 +316,7 @@
           <state>$PROJ_DIR$/boards/lamp30z_hw1</state>
           <state>$PROJ_DIR$/lamp/bluetooth/addons/tpm_pwm_led</state>
           <state>$PROJ_DIR$/lamp/bluetooth/addons/temperature_sensor</state>
+          <state>$PROJ_DIR$/lamp/bluetooth/addons/tsi_sensor</state>
           <state>$PROJ_DIR$/platform/devices</state>
           <state>$PROJ_DIR$/platform/devices/MKW30Z4/include</state>
           <state>$PROJ_DIR$/platform/devices/MKW30Z4/startup</state>
@@ -751,7 +752,7 @@
           <state>gUseBootloaderLink_d=1</state>
           <state>gUseInternalStorageLink_d=0</state>
           <state>__ram_vector_table__=1</state>
-          <state>__stack_size__=568</state>
+          <state>__stack_size__=600</state>
           <state>__heap_size__=0</state>
         </option>
         <option>
@@ -1338,6 +1339,7 @@
           <state>$PROJ_DIR$/boards/lamp30z_hw1</state>
           <state>$PROJ_DIR$/lamp/bluetooth/addons/tpm_pwm_led</state>
           <state>$PROJ_DIR$/lamp/bluetooth/addons/temperature_sensor</state>
+          <state>$PROJ_DIR$/lamp/bluetooth/addons/tsi_sensor</state>
           <state>$PROJ_DIR$/platform/devices</state>
           <state>$PROJ_DIR$/platform/devices/MKW30Z4/include</state>
           <state>$PROJ_DIR$/platform/devices/MKW30Z4/startup</state>
@@ -1773,7 +1775,7 @@
           <state>gUseBootloaderLink_d=1</state>
           <state>gUseInternalStorageLink_d=0</state>
           <state>__ram_vector_table__=1</state>
-          <state>__stack_size__=568</state>
+          <state>__stack_size__=600</state>
           <state>__heap_size__=0</state>
         </option>
         <option>
@@ -2773,6 +2775,12 @@
     </file>
     <file>
       <name>$PROJ_DIR$\lamp\bluetooth\addons\tpm_pwm_led\tpm_pwm_led_ctrl.h</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\lamp\bluetooth\addons\tsi_sensor\tsi_sensor.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\lamp\bluetooth\addons\tsi_sensor\tsi_sensor.h</name>
     </file>
   </group>
   <group>

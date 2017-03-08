@@ -34,7 +34,7 @@ PRIMARY_SERVICE(service_device_info, gBleSig_DeviceInformationService_d)
         VALUE(value_pnp_id, gBleSig_PnpId_d, (gPermissionFlagReadable_c), 7, DI_PnpId)           
           
 PRIMARY_SERVICE_UUID128(service_lamp, uuid_service_lamp)
-    CHARACTERISTIC_UUID128(char_lamp_Control, uuid_char_lamp_Control, (gGattCharPropNotify_c | gGattCharPropRead_c | gGattCharPropWrite_c | gGattCharPropWriteWithoutRsp_c) )
+    CHARACTERISTIC_UUID128(char_lamp_Control, uuid_char_lamp_Control, (gGattCharPropNotify_c | gGattCharPropRead_c | gGattCharPropWrite_c ) )
         VALUE_UUID128(value_lamp_Control, uuid_char_lamp_Control, (gPermissionFlagReadable_c | gPermissionFlagWritable_c), 1, LA_LAMP_CONTROL)
         CCCD(cccd_lamp_Control)
 
@@ -51,7 +51,7 @@ PRIMARY_SERVICE_UUID128(service_lamp, uuid_service_lamp)
         DESCRIPTOR(desc_core_temperature, gBleSig_CharPresFormatDescriptor_d, (gPermissionFlagReadable_c), gBleSig_CharPresFormatDescriptorBytes_d, gBleSig_signed_16_bit_integer_d, gBleSig_Exponent_neg2_d, gBleSig_Celsius_temperature_d, gBleSig_Bluetooth_SIG_Assigned_Numbers_d , gBleSig_unknown_d)
         CCCD(cccd_core_temperature)          
 
-    CHARACTERISTIC_UUID128(char_core_voltage, uuid_char_core_voltage, (gGattCharPropNotify_c | gGattCharPropRead_c) )
+    CHARACTERISTIC_UUID128(char_core_voltage, uuid_char_core_voltage, (gGattCharPropRead_c) )
         VALUE_UUID128(value_core_voltage, uuid_char_core_voltage, (gPermissionFlagReadable_c ),  2, LA_LAMP_VCC)
         DESCRIPTOR(desc_core_voltage, gBleSig_CharPresFormatDescriptor_d, (gPermissionFlagReadable_c), gBleSig_CharPresFormatDescriptorBytes_d, gBleSig_signed_16_bit_integer_d, gBleSig_Exponent_neg3_d, gBleSig_electric_potential_difference_d, gBleSig_No_Namespaces_d, gBleSig_unknown_d)
         CCCD(cccd_core_voltage)
@@ -60,11 +60,11 @@ PRIMARY_SERVICE_UUID128(service_lamp, uuid_service_lamp)
         VALUE(value_lamp_clock,  gBleSig_Date_Time_d, (gPermissionFlagReadable_c | gPermissionFlagWritable_c), 7, LA_DATE_TIME_Y, LA_DATE_TIME_M, LA_DATE_TIME_D, LA_DATE_TIME_H, LA_DATE_TIME_MI, LA_DATE_TIME_S )
         CCCD(cccd_lamp_clock) 
  
-    CHARACTERISTIC_UUID128(char_lamp_onHHMM, uuid_char_lamp_onHHMM, (gGattCharPropRead_c | gGattCharPropWrite_c | gGattCharPropWriteWithoutRsp_c) )
-        VALUE_UUID128(value_lamp_onHHMM, uuid_char_lamp_onHHMM, (gPermissionFlagReadable_c | gPermissionFlagWritable_c), 2, 0x00, 0x00)
+    CHARACTERISTIC_UUID128(char_lamp_on_sec, uuid_char_lamp_on_sec, ( gGattCharPropWrite_c ) )
+        VALUE_UUID128(value_lamp_on_sec, uuid_char_lamp_on_sec, (gPermissionFlagWritable_c), 4, 0x00, 0x00, 0x00, 0x00)
  
-    CHARACTERISTIC_UUID128(char_lamp_offHHMM, uuid_char_lamp_offHHMM, (gGattCharPropRead_c | gGattCharPropWrite_c | gGattCharPropWriteWithoutRsp_c) )
-        VALUE_UUID128(value_lamp_offHHMM, uuid_char_lamp_offHHMM, (gPermissionFlagReadable_c | gPermissionFlagWritable_c), 2, 0x00, 0x00)          
+    CHARACTERISTIC_UUID128(char_lamp_off_sec, uuid_char_lamp_off_sec, ( gGattCharPropWrite_c ) )
+        VALUE_UUID128(value_lamp_off_sec, uuid_char_lamp_off_sec, (gPermissionFlagWritable_c), 4, 0x00, 0x00, 0x00, 0x00)          
 
 PRIMARY_SERVICE_UUID128(service_otap, uuid_service_otap)
     CHARACTERISTIC_UUID128(char_otap_control_point, uuid_char_otap_control_point, (gGattCharPropWrite_c | gGattCharPropIndicate_c))
