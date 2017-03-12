@@ -94,7 +94,7 @@ extern "C" {
 void BleApp_Init(void);
 void BleApp_Start(void);
 void BleApp_HandleKeys(key_event_t events);
-void BleApp_HandleTouch(uint8_t event);
+void BleApp_HandleTouch(uint8_t* pEvent);
 void BleApp_GenericCallback (gapGenericEvent_t* pGenericEvent);
 
 

@@ -66,15 +66,25 @@ tsi_sensor_callback_t userCallbackFunction;
 #define BOARD_TSI_INSTANCE        0
   /*!< Electrode channel */
   #define BOARD_TSI_BTN_CHANNEL               15u
-  static uint16_t BOARD_TSI_BTN_treshold;
-  
-  /* Touch Sensing sensor timer  */
-  static tmrTimerID_t tmrTsiId;  
+
+
+/*!< Threshold value to detect a touch event */
+uint16_t TSI_SENSOR_THRESHOLD_ADDER = 10; 
+/*!< TSI update time in mS */
+#define gTsiUpdateTime_c                30   
+
+static uint16_t BOARD_TSI_BTN_treshold;
+
+/* Touch Sensing sensor timer  */
+static tmrTimerID_t tmrTsiId;  
+
+static int8_t hit_cnt;
+static uint8_t tsi_event;
 
 /******************************************************************************
 * Globals
 *******************************************************************************/
-uint8_t tsiSensorActiveElectrodeFlag;
+
 
 
 /******************************************************************************
@@ -88,7 +98,7 @@ static void tsiIrqCallback(uint32_t instance, void* usrData);
 ************************************************************************************/
 
 extern void TSI_DRV_IRQHandler(uint32_t instance);
-extern void BleApp_HandleTouch(uint8_t event);
+extern void BleApp_HandleTouch(uint8_t* pEvent);
 
 /******************************************************************************
 * Public Functions
@@ -131,21 +141,16 @@ void TSI_Init ()
   /* Configure all electrode channels */
   result = TSI_DRV_EnableElectrode(BOARD_TSI_INSTANCE, BOARD_TSI_BTN_CHANNEL, true);
 
-  /* Start measurements */
-  result = TSI_DRV_MeasureBlocking(BOARD_TSI_INSTANCE);
-  
   /* Calibrate all electrode channels */
+  result = TSI_DRV_MeasureBlocking(BOARD_TSI_INSTANCE);
   result = TSI_DRV_GetCounter(BOARD_TSI_INSTANCE, BOARD_TSI_BTN_CHANNEL, &BOARD_TSI_BTN_treshold);
   BOARD_TSI_BTN_treshold += TSI_SENSOR_THRESHOLD_ADDER;
-  
-  
-  tsiSensorActiveElectrodeFlag = 0;
   
   tmrTsiId = TMR_AllocateTimer(); /* TSI */
   
   /* Start TSI timer for capacitive touch BTN */     
   tmrerr = TMR_StartTimer(tmrTsiId, gTmrIntervalTimer_c, gTsiUpdateTime_c, TsiTimerCallback, NULL);  
-  
+  tsi_event = 0;
 }
 
 void TSI_MeasureOnce(void)
@@ -167,11 +172,30 @@ static void tsiIrqCallback(uint32_t instance, void* usrData)
   //Read current measurement
   TSI_DRV_GetCounter(BOARD_TSI_INSTANCE, BOARD_TSI_BTN_CHANNEL, &tsiChannelReading); 
   
-  //Compare measurement with thresshold Check if some electrode was pressed. Executes callback if true
-  if(tsiChannelReading > BOARD_TSI_BTN_treshold) 
+  if(!tsi_event)
   {
-    tsiSensorActiveElectrodeFlag=1; 
-    BleApp_HandleTouch(1);
+    //Compare measurement with thresshold Check if some electrode was pressed. 
+    if(tsiChannelReading > BOARD_TSI_BTN_treshold) 
+    {
+      hit_cnt++; 
+      if(hit_cnt > 5) 
+      {  
+        tsi_event = gTSI_EventLongPush_c;
+        BleApp_HandleTouch(&tsi_event);
+        hit_cnt=0;  
+      }
+    }
+    else
+    {
+      if(hit_cnt > 3) 
+      { 
+        tsi_event = gTSI_EventShortPush_c;
+        BleApp_HandleTouch(&tsi_event);
+        hit_cnt=0;
+      }
+      hit_cnt--;
+      if(hit_cnt<0) hit_cnt=0;
+    }
   }
   
 }

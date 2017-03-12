@@ -116,8 +116,8 @@
 #define LA_LAMP_CONTROL      0xB0
 #define LA_LAMP_WARM_WHITE   0x00
 #define LA_LAMP_COLD_WHITE   0x00
-#define LA_LAMP_R            0x10
-#define LA_LAMP_G            0x05     
+#define LA_LAMP_R            0x00
+#define LA_LAMP_G            0x01     
 #define LA_LAMP_B            0x00 
 
 /* temperature value - default 20.01 */
@@ -155,7 +155,7 @@ typedef union lamp_control_tag {
 		uint8_t padding0   : 1; /*!< LSB   xxxx xxx1 - not used 0  */	
 		uint8_t padding1   : 1; /*!<       xxxx xx1x - not used 0  */
 		uint8_t reset      : 1; /*!<       0000 0100 - triggers a sw reset  */
-		uint8_t mix        : 1; /*!<       xxxx 1xxx - White mix lock / unlock (long press btn functionality)  */
+		uint8_t mix        : 1; /*!<       xxxx 1xxx - White mix lock 1 / unlock 0 (long press btn functionality)  */
 						
 		uint8_t BTcon      : 1; /*!<       xxx1 xxxx - Lost connection enable switch on/off (byte 4 – On = 1 Off = 0)  */
 		uint8_t Color      : 1; /*!<       xx1x xxxx - Lamp Color Light On Off - (byte 5 – On = 1 Off = 0)  */
@@ -164,11 +164,17 @@ typedef union lamp_control_tag {
 	} bit;
 } lamp_control_t;
 
+enum
+{
+  whiteMixLock_c = 0,
+  whiteMixUnLock_c, 
+};
+
 typedef union lamp_white_tag {
 	uint16_t raw16;
 	struct {
-		uint8_t coldW;   /*!<  LSB  cold white          */
-		uint8_t warmW;   /*!<  MSB  warm white          */
+		uint8_t warmW;   /*!<  LSB  warm white          */
+		uint8_t coldW;   /*!<  MSB  cold white          */                
 	} uint8;
 } lamp_white_t;
 

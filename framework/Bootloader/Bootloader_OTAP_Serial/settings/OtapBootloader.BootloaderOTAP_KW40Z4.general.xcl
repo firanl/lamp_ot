@@ -6,8 +6,6 @@
 
 --plugin "C:\Program Files (x86)\IAR Systems\Embedded Workbench 7.3\arm\bin\armbat.dll" 
 
- --attach 
-
 --device_macro "C:\Program Files (x86)\IAR Systems\Embedded Workbench 7.3\arm\config\debugger\Freescale\KLxx.dmac" 
 
 

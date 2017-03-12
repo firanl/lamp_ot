@@ -752,7 +752,7 @@
           <state>gUseBootloaderLink_d=1</state>
           <state>gUseInternalStorageLink_d=0</state>
           <state>__ram_vector_table__=1</state>
-          <state>__stack_size__=600</state>
+          <state>__stack_size__=584</state>
           <state>__heap_size__=0</state>
         </option>
         <option>

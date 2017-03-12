@@ -112,6 +112,52 @@ void Boot_ResetMCU(void)
     while(1);
 }
 
+void Boot_Delay(uint32_t cnt)
+{
+    while(cnt--){ asm("NOP"); };
+}
+
+void Boot_LedOK(void)
+{
+  int8_t cnt=3;
+  
+  while(cnt--)
+  {
+    G_hi();  
+    Boot_Delay(0x00120000);
+    G_lo(); 
+    Boot_Delay(0x00120000);
+  }
+}
+
+void Boot_LedNOK(void)
+{
+  int8_t cnt=3;
+  
+  while(cnt--)
+  {
+    R_hi();  
+    Boot_Delay(0x00120000);
+    R_lo(); 
+    Boot_Delay(0x00120000);
+  }
+}
+
+void Boot_LedRainbow(void)
+{
+  
+    CW_hi();  
+    Boot_Delay(0x0006F000);
+    CW_lo(); R_hi();
+    Boot_Delay(0x0009F000);
+    R_lo(); WW_hi();
+    Boot_Delay(0x0009F000);
+    WW_lo(); G_hi();
+    Boot_Delay(0x0007F000);    
+    G_lo(); B_hi();
+    Boot_Delay(0x0009F000);    
+  
+}
 
 /*! *********************************************************************************
 * \brief   Start the user application
@@ -159,17 +205,20 @@ void Boot_LoadImage (void)
 
     /* Init the external storage - if fails reset - true return point */
     if(EEPROM_Init() != ee_ok) 
-         gHandleBootError_d();
+         HandleBootError();
 
     /* Read image size - if fails reset - true return point  */
     if (EEPROM_ReadData(gBootData_ImageLength_Size_c,gBootData_ImageLength_Offset_c, (uint8_t*)(&remaingImgSize)) != ee_ok) 
-        gHandleBootError_d();
+        HandleBootError();
 
     /* Read sector bitmap - if fails reset - true return point */
     if (EEPROM_ReadData(gBootData_SectorsBitmap_Size_c, gBootData_SectorsBitmap_Offset_c, bitmapBuffer)  != ee_ok ) 
-        gHandleBootError_d();
+        HandleBootError();
 
-    
+    #if gInitLeds_c  
+      Boot_LedOK();
+    #endif    
+      
     /* TODO: first sector to erase should contain bootInfo_t flags - setting them to FALSE, FALSE */
     /* implement field - how many times the device was flashed */
     
@@ -186,17 +235,13 @@ void Boot_LoadImage (void)
         {
             /* Erase Flash sector */
             if (FLASH_OK != FLASH_EraseSector(flashAddr))
-              if (FLASH_OK != FLASH_EraseSector(flashAddr))
-                if (FLASH_OK != FLASH_EraseSector(flashAddr))
-                  gHandleBootError_d();
+                  HandleBootError();
 
             if (len)
             {
                 /* Read a new image block - if fails reset - false return point */
                 if (EEPROM_ReadData(len, flashAddr + gBootData_Image_Offset_c, buffer)  != ee_ok )
-                    if (EEPROM_ReadData(len, flashAddr + gBootData_Image_Offset_c, buffer)  != ee_ok ) 
-                       if (EEPROM_ReadData(len, flashAddr + gBootData_Image_Offset_c, buffer)  != ee_ok ) 
-                          gHandleBootError_d();
+                          HandleBootError();
 
 
                 if( (flashAddr <= gBootImageFlagsAddress_c) && (flashAddr + len > gBootImageFlagsAddress_c) )
@@ -205,9 +250,7 @@ void Boot_LoadImage (void)
                     
                     /* Program the Flash before boot flags  - if fails reset - false return point*/
                     if(FLASH_OK != FLASH_Program(flashAddr, (uint32_t)buffer, offset))
-                       if(FLASH_OK != FLASH_Program(flashAddr, (uint32_t)buffer, offset))
-                          if(FLASH_OK != FLASH_Program(flashAddr, (uint32_t)buffer, offset))
-                            gHandleBootError_d();
+                            HandleBootError();
 
                     /* Keep the boot flags set  until the all image is downloaded */
                     for( i=0; i<gEepromParams_WriteAlignment_c; i++ )
@@ -222,17 +265,13 @@ void Boot_LoadImage (void)
 
                     /* Program the Flash after the boot flags*/
                     if(FLASH_OK != FLASH_Program(flashAddr + offset, (uint32_t)(&buffer[offset]), len - offset))
-                      if(FLASH_OK != FLASH_Program(flashAddr + offset, (uint32_t)(&buffer[offset]), len - offset))
-                        if(FLASH_OK != FLASH_Program(flashAddr + offset, (uint32_t)(&buffer[offset]), len - offset))
-                          gHandleBootError_d();
+                          HandleBootError();
                 }
                 else
                 {
                     /* Program the image block to Flash */
                     if(FLASH_OK != FLASH_Program(flashAddr, (uint32_t)buffer, len))
-                      if(FLASH_OK != FLASH_Program(flashAddr, (uint32_t)buffer, len))
-                        if(FLASH_OK != FLASH_Program(flashAddr, (uint32_t)buffer, len))
-                          gHandleBootError_d();
+                          HandleBootError();
                 }
             }
         }
@@ -258,12 +297,28 @@ void Boot_LoadImage (void)
 
     /* Set the bBootProcessCompleted Flag */
     if( FLASH_OK != FLASH_Program((uint32_t)gBootImageFlagsAddress_c, (uint32_t)&flags, sizeof(flags)) )
-       if( FLASH_OK != FLASH_Program((uint32_t)gBootImageFlagsAddress_c, (uint32_t)&flags, sizeof(flags)) )
-          if( FLASH_OK != FLASH_Program((uint32_t)gBootImageFlagsAddress_c, (uint32_t)&flags, sizeof(flags)) )
-            gHandleBootError_d();
+            HandleBootError();
 
+#if gInitLeds_c    
+    Boot_LedRainbow();
+#endif
+    
     /* Reseting MCU */
     Boot_ResetMCU();
+}
+
+/* Defines how the bootloader should handle errors */
+void HandleBootError(void)
+{
+#if gInitLeds_c  
+  Boot_LedNOK();
+#endif
+  
+#ifdef gBootLoaderDebug_c
+  {  while(1); }
+#else
+  { Boot_ResetMCU(); }
+#endif
 }
 
 /*! *********************************************************************************
@@ -311,9 +366,51 @@ int main(int argc, char **argv)
     }
 #endif
 
-    gpBootInfo = (bootInfo_t*)gBootImageFlagsAddress_c;
+#if gInitLeds_c
+    #ifndef gBootLoaderDebug_c
+      PortA_ClockEnable(); 
+      // Set Alternative 1 Mux WW
+      PORT_PCR_REG(PORTA_BASE_PTR,  0u) &= ~PORT_PCR_MUX_MASK;
+      PORT_PCR_REG(PORTA_BASE_PTR,  0u) |= PORT_PCR_MUX(1);
+      // Set pin as output WW
+      GPIOA_PDDR |= 1 << 0u;
+    #endif
+      
+    PortB_ClockEnable();
+    // Set Alternative 1 Mux CW
+    PORT_PCR_REG(PORTB_BASE_PTR,  3u) &= ~PORT_PCR_MUX_MASK;
+    PORT_PCR_REG(PORTB_BASE_PTR,  3u) |= PORT_PCR_MUX(1);
+    // Set pin as output
+    GPIOB_PDDR |= 1 << 3u;    
+    // Set Alternative 1 Mux R
+    PORT_PCR_REG(PORTB_BASE_PTR, 18u) &= ~PORT_PCR_MUX_MASK;
+    PORT_PCR_REG(PORTB_BASE_PTR, 18u) |= PORT_PCR_MUX(1);
+    // Set pin as output
+    GPIOB_PDDR |= 1 << 18u; 
+    
+    PortC_ClockEnable();
+    // Set Alternative 1 Mux  G
+    PORT_PCR_REG(PORTC_BASE_PTR,  0u) &= ~PORT_PCR_MUX_MASK;
+    PORT_PCR_REG(PORTC_BASE_PTR,  0u) |= PORT_PCR_MUX(1);
+    // Set pin as output
+    GPIOC_PDDR |= 1 << 0u;     
+    // Set Alternative 1 Mux  B
+    PORT_PCR_REG(PORTC_BASE_PTR,  1u) &= ~PORT_PCR_MUX_MASK;
+    PORT_PCR_REG(PORTC_BASE_PTR,  1u) |= PORT_PCR_MUX(1);
+    // Set pin as output
+    GPIOC_PDDR |= 1 << 1u;     
 
-    /* TODO implement a visual way if device is stil in bootloader */
+    /* Set led pins to low */
+    WW_lo();
+    CW_lo();
+    R_lo();
+    G_lo();
+    B_lo();
+    
+ #endif  
+  
+    
+    gpBootInfo = (bootInfo_t*)gBootImageFlagsAddress_c;
     
     /* if new image available and bootProcessCompleted or not */
     if ( (gpBootInfo->newBootImageAvailable[0] == gBootValueForTRUE_c) )
@@ -338,6 +435,6 @@ int main(int argc, char **argv)
 void defaultISR(void)
 {
     /* ISR code */
-    gHandleBootError_d();
+    HandleBootError();
 }
 //-----------------------------------------------------------------------------

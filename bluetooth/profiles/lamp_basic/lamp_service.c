@@ -87,8 +87,8 @@ static deviceId_t mLas_serviceHandle;
 /************************************************************************************
 * Private functions prototypes
 ************************************************************************************/
-static void Hls_LampControlNotification(uint16_t handle );
-static void Hls_LampWhiteNotification(uint16_t handle);
+static void Hls_LampNotification(uint16_t handle);
+
 
 static bleResult_t  Las_RecordLampControl (uint16_t serviceHandle, uint8_t notify);
 static bleResult_t  Las_RecordLampWhite   (uint16_t serviceHandle, uint8_t notify);
@@ -224,8 +224,6 @@ bleResult_t Las_Unsubscribe()
 bleResult_t Las_RecordMeasurementTV (uint16_t serviceHandle)
 {
     uint16_t  handle;
-    uint16_t  hCccd;
-    bool_t isNotificationActive;
     bleResult_t result;
     bleUuid_t uuidT = Uuid16(gBleSig_Temperature_d);
     bleUuid_t* pUuidV = (bleUuid_t*)&uuid_char_core_voltage;
@@ -240,6 +238,15 @@ bleResult_t Las_RecordMeasurementTV (uint16_t serviceHandle)
     result = GattDb_WriteAttribute(handle, sizeof(int16_t), (uint8_t*) &g_chip_TV.int16.gCoreTemperature);
 
     if (result != gBleSuccess_c) return result;
+    
+    // if ctitical or warning values send notification
+    //if(g_chip_TV.int16.gCoreTemperature > gCoreTemperatureNotify_d)
+    {
+      //Hls_LampNotification(handle);
+    }
+
+    Hls_LampNotification(handle);
+    
    
     /* Get handle of CoreVoltage characteristic */
     result = GattDb_FindCharValueHandleInService(serviceHandle,
@@ -252,21 +259,6 @@ bleResult_t Las_RecordMeasurementTV (uint16_t serviceHandle)
 
     if (result != gBleSuccess_c) return result;
     
-    // if ctitical or warning values send notification
-    if(g_chip_TV.int16.gCoreTemperature > gCoreTemperatureNotify_d)
-    {
-        /* Get handle of CCCD */
-        if (GattDb_FindCccdHandleForCharValueHandle(serviceHandle, &hCccd) == gBleSuccess_c)
-        {
-          if (gBleSuccess_c == Gap_CheckNotificationStatus
-              (mLas_SubscribedClientId, hCccd, &isNotificationActive) &&
-              TRUE == isNotificationActive)
-          {
-              GattServer_SendNotification(mLas_SubscribedClientId, serviceHandle);
-          }
-        }
-    }
-
     return gBleSuccess_c;
 }
 
@@ -520,7 +512,7 @@ static bleResult_t Las_RecordLampControl (uint16_t serviceHandle, uint8_t notify
       if (result != gBleSuccess_c)
           return result;
 
-      if (notify) Hls_LampControlNotification(handle);
+      if (notify) Hls_LampNotification(handle);
     }
 
     return gBleSuccess_c;
@@ -547,7 +539,7 @@ static bleResult_t Las_RecordLampWhite (uint16_t serviceHandle, uint8_t notify)
       if (result != gBleSuccess_c)
           return result;
 
-      if (notify) Hls_LampWhiteNotification(handle);
+      if (notify) Hls_LampNotification(handle);
     }
 
     return gBleSuccess_c;
@@ -578,7 +570,9 @@ static bleResult_t Las_RecordLampRGB (uint16_t serviceHandle)
     return gBleSuccess_c;
 }
 
-static void Hls_LampControlNotification( uint16_t handle )
+/* notifications */
+
+static void Hls_LampNotification( uint16_t handle )
 {
     uint16_t  hCccd;
     bool_t isNotificationActive;
@@ -595,22 +589,7 @@ static void Hls_LampControlNotification( uint16_t handle )
     }
 }
 
-static void Hls_LampWhiteNotification( uint16_t handle )
-{
-    uint16_t  hCccd;
-    bool_t isNotificationActive;
 
-    /* Get handle of CCCD */
-    if (GattDb_FindCccdHandleForCharValueHandle(handle, &hCccd) != gBleSuccess_c)
-        return;
-
-    if (gBleSuccess_c == Gap_CheckNotificationStatus
-        (mLas_SubscribedClientId, hCccd, &isNotificationActive) &&
-        TRUE == isNotificationActive)
-    {
-        GattServer_SendNotification(mLas_SubscribedClientId, handle);
-    }
-}
 
 /*! *********************************************************************************
 * \brief        On Timer for lamp to start after some seconds.

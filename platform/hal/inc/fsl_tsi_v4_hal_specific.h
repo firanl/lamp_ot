@@ -56,10 +56,8 @@ extern uint32_t tsi_hal_gencs/*[TSI_INSTANCE_COUNT]*/;
  */
 typedef enum _tsi_analog_mode_select {
     kTsiAnalogModeSel_Capacitive = 0,     /*!< Active TSI capacitive sensing mode */
-    kTsiAnalogModeSel_NoiseNoFreqLim = 4, /*!< TSI works in single threshold noise detection mode and the freq. limitation
-is disabled */
-    kTsiAnalogModeSel_NoiseFreqLim = 8,   /*!< TSI analog works in single threshold noise detection mode and the freq. limitation
-is enabled */
+    kTsiAnalogModeSel_NoiseNoFreqLim = 4, /*!< TSI works in single threshold noise detection mode and the freq. limitation is disabled */
+    kTsiAnalogModeSel_NoiseFreqLim = 8,   /*!< TSI analog works in single threshold noise detection mode and the freq. limitation is enabled */
     kTsiAnalogModeSel_AutoNoise = 12,     /*!/ Active TSI analog in automatic noise detection mode */
 } tsi_analog_mode_select_t;
 

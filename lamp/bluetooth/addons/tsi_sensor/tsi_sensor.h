@@ -58,14 +58,17 @@
 /******************************************************************************
 * User definitions
 *******************************************************************************/
-/*!< Threshold value to detect a touch event */
-#define TSI_SENSOR_THRESHOLD_ADDER       10 
-/*!< TSI update time in mS */
-#define gTsiUpdateTime_c                150     
+  
 
 /******************************************************************************
 * Type definitions
 ******************************************************************************/
+
+
+typedef struct tsi_touch_tag {
+    uint16_t low;
+    uint16_t sensitivity;
+} tsi_touch_t;
 
 /*!
  * TSI Sensor return status for functions
@@ -80,7 +83,22 @@ typedef enum tsiSensorStatus{
 /*!
  * TSI Sensor callback function type
  */
-typedef void (*tsi_sensor_callback_t) (uint8_t* pElectrodeFlags);
+typedef void (*tsi_sensor_callback_t) (uint8_t events);
+
+/*
+ * Name: tsi_event_t
+ * Description: tsi event call (see the following enumerations)
+ */
+typedef uint8_t tsi_event_t;
+
+/*
+ * Description: TSI push events defintion
+ */
+enum
+{
+    gTSI_EventShortPush_c = 1,         /* Short push button  */
+    gTSI_EventLongPush_c,              /* Long push button  */
+};
 
 /******************************************************************************
 * Globals

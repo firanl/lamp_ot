@@ -53,10 +53,8 @@ enum _gpio_pins
     kGpioLED3        = GPIO_MAKE_PIN(GPIOB_IDX, 18),  /* lamp Red LED 3        */
     kGpioLED4        = GPIO_MAKE_PIN(GPIOB_IDX, 3),   /* lamp Cold White LED 4 */
     
-    //kGpioSW1         = GPIO_MAKE_PIN(GPIOA_IDX, 18),  /* FRDM-KW40Z4 switchPin1 */
     kGpioSW1         = GPIO_MAKE_PIN(GPIOC_IDX, 3),  /* lamp CapacitiveTouch switchPin1 */
-    //kGpioSW2         = GPIO_MAKE_PIN(GPIOA_IDX, 19),  /* FRDM-KW40Z4 switchPin2 */
-    kGpioSW2         = GPIO_MAKE_PIN(GPIOB_IDX, 16),  /* lamp EXTAL32K switchPin2 */
+
     
     //kGpioI2cDAP      = GPIO_MAKE_PIN(GPIOB_IDX, 1),  
     kGpioI2cDAP      = GPIO_MAKE_PIN(GPIOC_IDX, 2),   /* lamp MIC_DATA    */
@@ -70,7 +68,7 @@ extern gpio_output_pin_user_config_t ledPins[];
 /* MKW30Z lamp pinout
 32QFN,PinName,DEFAULT  , PCB function, used
  1,PTC19     ,DISABLED , SPI0_PCS0   , yes to AT45DB021E-SSHN-T  +10K pullup
- 2,PTA0      ,SWD_DIO  , TPM1_CH0    , yes in debug SWD_DIO
+ 2,PTA0      ,SWD_DIO  , TPM1_CH0    , yes in debug SWD_DIO and Warm White Leds channel BSS205
  3,PTA1      ,SWD_CLK  , SWD_CLK     , yes in debug SWD_CLK
  4,PTA2      ,RESET_b  , RESET_b     , yes
  5,PSWITCH   ,PSWITCH  , PSWITCH     , yes tied to GND

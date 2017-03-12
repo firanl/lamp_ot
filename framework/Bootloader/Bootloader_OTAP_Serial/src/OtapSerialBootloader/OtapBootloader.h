@@ -63,13 +63,33 @@
 ********************************************************************************** */
 
 /*
- * Name: gFlashProtection_c
- * Description: The value for FPROT register. By default the Flash is not Protected
+ * Name: gSerialBootloaderEnable_c
+ * Description: Enable UART Serial Boot. By default FALSE
  */
 #ifndef gSerialBootloaderEnable_c
   #define gSerialBootloaderEnable_c FALSE
 #endif
 
+#ifndef gInitLeds_c
+  #define gInitLeds_c TRUE
+#endif
+
+//#define gBootLoaderDebug_c TRUE
+
+#define PortA_ClockEnable()    SIM_SCGC5 |= SIM_SCGC5_PORTA_MASK;
+#define PortB_ClockEnable()    SIM_SCGC5 |= SIM_SCGC5_PORTB_MASK;
+#define PortC_ClockEnable()    SIM_SCGC5 |= SIM_SCGC5_PORTC_MASK;
+
+#define  WW_lo()   {GPIOA_PCOR |= 1 <<  0u;}
+#define  WW_hi()   {GPIOA_PSOR |= 1 <<  0u;}
+#define  CW_lo()   {GPIOB_PCOR |= 1 <<  3u;}
+#define  CW_hi()   {GPIOB_PSOR |= 1 <<  3u;}
+#define  R_lo()    {GPIOB_PCOR |= 1 << 18u;}
+#define  R_hi()    {GPIOB_PSOR |= 1 << 18u;}
+#define  G_lo()    {GPIOC_PCOR |= 1 <<  0u;}
+#define  G_hi()    {GPIOC_PSOR |= 1 <<  0u;}
+#define  B_lo()    {GPIOC_PCOR |= 1 <<  1u;}
+#define  B_hi()    {GPIOC_PSOR |= 1 <<  1u;}      
 
 /*
  * Name: gFlashProtection_c
@@ -142,12 +162,7 @@
  */
 #define gInternalStorageStartAddressOffset_c (0x44)
 
-/* Defines how the bootloader should handle errors */
-#ifdef gBootLoaderDebug_c
-  #define gHandleBootError_d() while(1);
-#else
-  #define gHandleBootError_d() Boot_ResetMCU();
-#endif
+
 
 /* Defines used for implementing the boolean types when working with Flash */
 #define gBootInvalidAddress_c          0xFFFFFFFF
@@ -164,7 +179,6 @@ indicates which Flash sectors are write protected and should not be updated */
 #define gBootData_SectorsBitmap_Size_c       (32)
 #define gBootData_Image_Offset_c             gEepromAlignAddr_d(gBootData_SectorsBitmap_Offset_c + \
                                                                 gBootData_SectorsBitmap_Size_c)
-
 
 
 
@@ -225,6 +239,11 @@ void __thumb_startup(void);
 int main(int argc, char **argv);
 void defaultISR(void);
 void Boot_ResetMCU(void);
+void Boot_Delay(uint32_t cnt);
+void Boot_LedOK(void);
+void Boot_LedNOK(void);
+void Boot_LedRainbow(void);
+void HandleBootError(void);
 
 #ifdef __cplusplus
 }

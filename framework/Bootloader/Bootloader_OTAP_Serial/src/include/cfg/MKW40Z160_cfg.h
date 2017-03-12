@@ -2,7 +2,7 @@
 * Copyright (c) 2015, Freescale Semiconductor, Inc.
 * All rights reserved.
 *
-* \file MKW40Z160.h
+* \file MKW40Z160_cfg.h
 * This file contains configuration options for the above processor
 *
 * Redistribution and use in source and binary forms, with or without modification,
@@ -33,9 +33,9 @@
 
 /**************************************************/
 /** USER SETTINGS OF KINETIS MCU */
-/**  Kinetis ARM Cortex-M4 model */
-#ifndef _MK21D256_CFG_H
-#define _MK21D256_CFG_H
+/**  Kinetis ARM Cortex-M0+ model */
+#ifndef _MKW40Z160_CFG_H
+#define _MKW40Z160_CFG_H
 
 
 
@@ -163,7 +163,7 @@
 //#define ID_STRING_MAX 5
 
 /* Description string */
-#define KINETIS_MODEL_STR "KL46"
+#define KINETIS_MODEL_STR "KW40"
 #define FLASH_INIT_FLASH_CLOCK { SIM_SCGC6 |= SIM_SCGC6_FTF_MASK; }
 #define FLASH_BASE_PTR                FTFA_BASE_PTR
 #define FLASH_FSTAT                   FTFA_FSTAT                                  
@@ -172,4 +172,5 @@
 #define FLASH_FSTAT_FPVIOL_MASK       FTFA_FSTAT_FPVIOL_MASK
 #define FLASH_FSTAT_RDCOLERR_MASK     FTFA_FSTAT_RDCOLERR_MASK
 #define FLASH_FSTAT_MGSTAT0_MASK      FTFA_FSTAT_MGSTAT0_MASK 
-#endif//MK21D5_CFG_H
+
+#endif//MKW40Z160_CFG_H

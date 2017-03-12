@@ -172,6 +172,12 @@ static otapClientConfig_t otapServiceConfig = {service_otap};
 static basConfig_t basServiceConfig = {service_battery, 0};
 
 
+static uint8_t whiteLightRamp;
+enum {
+  whiteLightRampUP_c = 0,
+  whiteLightRampDN_c,
+};
+
 static uint16_t WriteNotifHandles[] =     {value_otap_control_point,
                                            value_otap_data,
                                            value_lamp_Control,
@@ -320,10 +326,8 @@ void BleApp_HandleKeys(key_event_t events)
           case gKBD_EventPressPB1_c:
           {
 
-            BleApp_Start();
           }  break;
-          
-          
+           
           case gKBD_EventLongPB1_c:
           {
 
@@ -331,8 +335,7 @@ void BleApp_HandleKeys(key_event_t events)
 
           default:
           {
-              if (mPeerDeviceId != gInvalidDeviceId_c)
-                  Gap_Disconnect(mPeerDeviceId);
+
           }  break;
       }
     
@@ -344,9 +347,106 @@ void BleApp_HandleKeys(key_event_t events)
 *
 * \param[in]    pElectrodeFlags    Electrode flags.
 ********************************************************************************** */
-void BleApp_HandleTouch(uint8_t events)
+void BleApp_HandleTouch(tsi_event_t* pEvent)
 {
+  uint8_t control;
+  uint8_t event;
+  int8_t warmW, coldW;
   
+  event = *pEvent;
+  switch (event)
+      {
+        
+          case gTSI_EventShortPush_c:
+          {
+            if(lamp_NVdata.lampControl.bit.OnOff)
+            {
+              control = lamp_NVdata.lampControl.raw8 & 0x7F;           
+              Las_SetLampControl (lasServiceConfig.serviceHandle, control, TRUE); 
+            }
+            else
+            {
+              control = lamp_NVdata.lampControl.raw8 | 0x80;
+              Las_SetLampControl (lasServiceConfig.serviceHandle, control, TRUE);
+            }
+            
+          }  break;
+          
+          case gTSI_EventLongPush_c:
+          {
+             warmW = (int8_t) lamp_NVdata.lampWhite.uint8.warmW;
+             coldW = (int8_t) lamp_NVdata.lampWhite.uint8.coldW;
+             
+            if( whiteLightRamp == whiteLightRampUP_c )
+            { 
+                /* Ramp up - increment */
+                if( (warmW < 100) ) { warmW++; }
+                if( (coldW < 100) ) { coldW++; } 
+                
+                /* check for ramp change */
+                if( (warmW >=100) && (coldW >= 100) )
+                { 
+                  whiteLightRamp = whiteLightRampDN_c; 
+                }
+                else
+                {
+                  /* mix is loked */
+                  if(lamp_NVdata.lampControl.bit.mix)
+                  {
+                    if( (warmW >= 100) || (coldW >= 100) )
+                    { 
+                      whiteLightRamp = whiteLightRampDN_c; 
+                    }
+                  }
+                }
+
+            }
+            else
+            {
+ 
+                /* Ramp dn - decrement */
+                if( (warmW > 0) ) { warmW--; }
+                if( (coldW > 0) ) { coldW--; } 
+                
+                /* check for ramp change */
+                if( ( warmW <= 0 ) && ( coldW <= 0 ) )
+                { 
+                  whiteLightRamp = whiteLightRampUP_c; 
+                }
+                else
+                {
+                  /* mix is loked */
+                  if(lamp_NVdata.lampControl.bit.mix)
+                  {
+                    if( (warmW <= 0) || (coldW <= 0) )
+                    { 
+                      whiteLightRamp = whiteLightRampUP_c; 
+                    }
+                  }
+                }
+                
+            }
+            
+            Las_SetLampWhite (lasServiceConfig.serviceHandle, warmW, coldW, TRUE);
+            
+            //if lamp off turn it on
+            if( !((lamp_NVdata.lampControl.raw8 & 0xE0) == 0xC0) )
+            {
+              control = (lamp_NVdata.lampControl.raw8 & 0xDF) | 0xC0;
+              Las_SetLampControl (lasServiceConfig.serviceHandle, control, TRUE);
+            }
+  
+            
+          }  break;
+
+          default:
+          {
+
+          }  break;
+      } 
+  
+  /* event  treated */
+  *pEvent = 0;
 }
 
 /*! *********************************************************************************

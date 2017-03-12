@@ -10,8 +10,6 @@
 
 "--drv_verify_download" 
 
-"--drv_attach_to_program" 
-
 "--semihosting=none" 
 
 "--device=MKW30Z160xxx4" 
