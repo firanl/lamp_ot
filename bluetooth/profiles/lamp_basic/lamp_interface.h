@@ -123,7 +123,13 @@ bleResult_t Las_SetLampRGB (uint16_t serviceHandle, uint8_t red, uint8_t green, 
 
 bleResult_t Las_SetOnTimer  (uint16_t serviceHandle, uint8_t* pSeconds);
 
+/* get remaining time of on timer and update record */
+bleResult_t Las_GetOnTimer(uint16_t serviceHandle);
+
 bleResult_t Las_SetOffTimer (uint16_t serviceHandle, uint8_t* pSeconds);
+
+/* get remaining time of off timer and update record */
+bleResult_t Las_GetOffTimer(uint16_t serviceHandle);
 
 
 #ifdef __cplusplus

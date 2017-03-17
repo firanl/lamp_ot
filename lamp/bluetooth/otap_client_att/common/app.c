@@ -830,10 +830,14 @@ static void BleApp_CccdWritten (deviceId_t deviceId, uint16_t handle, gattCccdFl
       measure_chip_temperature();
       Las_RecordMeasurementTV (lasServiceConfig.serviceHandle);
     }
-    else if (handle == cccd_lamp_clock)
+    else if (handle == cccd_lamp_on_sec)
     {
-     
-    } 
+      Las_GetOnTimer(lasServiceConfig.serviceHandle);
+    }
+    else if (handle == cccd_lamp_off_sec)
+    {
+       Las_GetOffTimer(lasServiceConfig.serviceHandle);    
+    }     
 }
 
 static void BleApp_AttributeWritten(deviceId_t  deviceId,
@@ -964,7 +968,7 @@ static void BleApp_AttributeWritten(deviceId_t  deviceId,
     {
       if ( (length==4) )
       {
-         Las_SetOnTimer(lasServiceConfig.serviceHandle, pValue);
+        bleResult = Las_SetOnTimer(lasServiceConfig.serviceHandle, pValue);
         // Report status to client
         BleApp_SendAttWriteResponse (deviceId, handle, bleResult);
       }
@@ -973,7 +977,7 @@ static void BleApp_AttributeWritten(deviceId_t  deviceId,
     {
       if ( (length==4) )
       {
-         Las_SetOffTimer(lasServiceConfig.serviceHandle, pValue);
+        bleResult = Las_SetOffTimer(lasServiceConfig.serviceHandle, pValue);
         // Report status to client
         BleApp_SendAttWriteResponse (deviceId, handle, bleResult);
       }

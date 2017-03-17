@@ -60,11 +60,13 @@ PRIMARY_SERVICE_UUID128(service_lamp, uuid_service_lamp)
         VALUE(value_lamp_clock,  gBleSig_Date_Time_d, (gPermissionFlagReadable_c | gPermissionFlagWritable_c), 7, LA_DATE_TIME_Y, LA_DATE_TIME_M, LA_DATE_TIME_D, LA_DATE_TIME_H, LA_DATE_TIME_MI, LA_DATE_TIME_S )
         CCCD(cccd_lamp_clock) 
  
-    CHARACTERISTIC_UUID128(char_lamp_on_sec, uuid_char_lamp_on_sec, ( gGattCharPropWrite_c ) )
-        VALUE_UUID128(value_lamp_on_sec, uuid_char_lamp_on_sec, (gPermissionFlagWritable_c), 4, 0x00, 0x00, 0x00, 0x00)
+    CHARACTERISTIC_UUID128(char_lamp_on_sec, uuid_char_lamp_on_sec, ( gGattCharPropNotify_c | gGattCharPropRead_c | gGattCharPropWrite_c ) )
+        VALUE_UUID128(value_lamp_on_sec, uuid_char_lamp_on_sec, (gPermissionFlagReadable_c | gPermissionFlagWritable_c), 4, 0x00, 0x00, 0x00, 0x00)
+        CCCD(cccd_lamp_on_sec) 
  
-    CHARACTERISTIC_UUID128(char_lamp_off_sec, uuid_char_lamp_off_sec, ( gGattCharPropWrite_c ) )
-        VALUE_UUID128(value_lamp_off_sec, uuid_char_lamp_off_sec, (gPermissionFlagWritable_c), 4, 0x00, 0x00, 0x00, 0x00)          
+    CHARACTERISTIC_UUID128(char_lamp_off_sec, uuid_char_lamp_off_sec, ( gGattCharPropNotify_c | gGattCharPropRead_c | gGattCharPropWrite_c ) )
+        VALUE_UUID128(value_lamp_off_sec, uuid_char_lamp_off_sec, (gPermissionFlagReadable_c | gPermissionFlagWritable_c), 4, 0x00, 0x00, 0x00, 0x00)   
+        CCCD(cccd_lamp_off_sec)           
 
 PRIMARY_SERVICE_UUID128(service_otap, uuid_service_otap)
     CHARACTERISTIC_UUID128(char_otap_control_point, uuid_char_otap_control_point, (gGattCharPropWrite_c | gGattCharPropIndicate_c))

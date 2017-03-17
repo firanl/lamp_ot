@@ -75,6 +75,7 @@ static deviceId_t mLas_SubscribedClientId;
 
 static deviceId_t mLas_serviceHandle;
 
+/* timers 3 */
   /* Fade in out lamp control */
   static tmrTimerID_t tmrFadeId;
   /* Set on lamp timer */
@@ -93,6 +94,7 @@ static void Hls_LampNotification(uint16_t handle);
 static bleResult_t  Las_RecordLampControl (uint16_t serviceHandle, uint8_t notify);
 static bleResult_t  Las_RecordLampWhite   (uint16_t serviceHandle, uint8_t notify);
 static bleResult_t  Las_RecordLampRGB     (uint16_t serviceHandle);
+static bleResult_t  Las_RecordOnTimer     (uint16_t serviceHandle, uint8_t timerOnOff, uint32_t seconds);
 
 static void FadeTimerCallback(void* pParam);
 static void OnTimerCallback(void* pParam);
@@ -114,8 +116,7 @@ bleResult_t Las_Start (lasConfig_t *pServiceConfig)
     mLas_SubscribedClientId = gInvalidDeviceId_c;
   
     tmrFadeId             = TMR_AllocateTimer();
-    tmrOn_secondsId       = TMR_AllocateTimer();
-    tmrOff_secondsId      = TMR_AllocateTimer();
+
     
 //
     /* switch to pre-reset light */
@@ -462,12 +463,29 @@ bleResult_t Las_SetOnTimer(uint16_t serviceHandle, uint8_t* pSeconds)
     
     if(seconds>0)
     {
-      tmrerr = TMR_StartTimer(tmrOn_secondsId, gTmrSingleShotTimer_c, TmrSeconds(seconds), OnTimerCallback, NULL);
+      tmrOn_secondsId  = TMR_AllocateTimer();
+      tmrerr = TMR_StartSingleShotTimer(tmrOn_secondsId, TmrSeconds(seconds), OnTimerCallback, NULL);
     }
+    else
+    {
+      tmrerr = TMR_FreeTimer(tmrOn_secondsId);
+    }
+    
+    Las_RecordOnTimer(serviceHandle, 1, seconds);
     
     return gBleSuccess_c;
 }
 
+/* get remaining time of on timer and update record */
+bleResult_t Las_GetOnTimer(uint16_t serviceHandle)
+{
+    uint32_t seconds=0;
+    
+    seconds = TMR_GetRemainingTime(tmrOn_secondsId)  / 1000;
+    Las_RecordOnTimer(serviceHandle, 1, seconds);
+    
+    return gBleSuccess_c;
+}
 
 bleResult_t Las_SetOffTimer(uint16_t serviceHandle, uint8_t* pSeconds)
 {
@@ -478,13 +496,29 @@ bleResult_t Las_SetOffTimer(uint16_t serviceHandle, uint8_t* pSeconds)
     
     if(seconds>0)
     {
-      tmrerr = TMR_StartTimer(tmrOff_secondsId, gTmrSingleShotTimer_c, TmrSeconds(seconds), OffTimerCallback, NULL);
+      tmrOff_secondsId  = TMR_AllocateTimer();
+      tmrerr = TMR_StartSingleShotTimer(tmrOff_secondsId, TmrSeconds(seconds), OffTimerCallback, NULL);
     }
+    else
+    {
+       tmrerr = TMR_FreeTimer(tmrOff_secondsId);
+    }
+
+    Las_RecordOnTimer(serviceHandle, 0, seconds);
     
     return gBleSuccess_c;
 }
              
-             
+/* get remaining time of off timer and update record */
+bleResult_t Las_GetOffTimer(uint16_t serviceHandle)
+{
+    uint32_t seconds=0;
+    
+    seconds = TMR_GetRemainingTime(tmrOff_secondsId) / 1000;
+    Las_RecordOnTimer(serviceHandle, 0, seconds);
+    
+    return gBleSuccess_c;
+}             
 
 /************************************************************************************
 * Private functions
@@ -560,7 +594,7 @@ static bleResult_t Las_RecordLampRGB (uint16_t serviceHandle)
       if (result != gBleSuccess_c)
           return result;
       
-      /* Update characteristic value */
+      /* Update characteristic value - only first 3 bytes */
       result = GattDb_WriteAttribute(handle, 3, (uint8_t*)&lamp_NVdata.lampRGB.raw32);
 
       if (result != gBleSuccess_c)
@@ -569,6 +603,38 @@ static bleResult_t Las_RecordLampRGB (uint16_t serviceHandle)
 
     return gBleSuccess_c;
 }
+
+static bleResult_t Las_RecordOnTimer (uint16_t serviceHandle, uint8_t timerOnOff, uint32_t seconds)
+{
+    uint16_t  handle;
+    bleResult_t result;
+    bleUuid_t* pUuid ;
+
+    if(timerOnOff)
+      pUuid = (bleUuid_t*)&uuid_char_lamp_on_sec;
+    else
+      pUuid = (bleUuid_t*)&uuid_char_lamp_off_sec;
+    
+    if(mLas_SubscribedClientId != gInvalidDeviceId_c)
+    {
+      /* Get handle of Temperature characteristic */
+      result = GattDb_FindCharValueHandleInService(serviceHandle,
+          gBleUuidType128_c, pUuid, &handle);
+
+      if (result != gBleSuccess_c)
+          return result;
+      
+      /* Update characteristic value */
+      result = GattDb_WriteAttribute(handle, sizeof(uint32_t), (uint8_t*)&seconds);
+
+      if (result != gBleSuccess_c)
+          return result;
+
+    }
+
+    return gBleSuccess_c;
+}
+
 
 /* notifications */
 
