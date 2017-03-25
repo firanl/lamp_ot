@@ -64,7 +64,9 @@
 #include "otap_interface.h"
 #include "lamp_interface.h"
 
-#include "battery_interface.h"
+#if (gBatteryServiceSupported_d) 
+  #include "battery_interface.h"
+#endif
 
 /* core temperature measurement, voltage reference measurement */
 #include "temperature_sensor.h"
@@ -86,6 +88,8 @@
 /* core temperature T, signed exponent -2 */
 /* core voltage reference V, signed exponent -3 */
 extern chip_TempVoltage_t g_chip_TV;
+/* core temperature at witch the sistem should disable all outputs, exponent -2 */
+extern int16_t gCoreTemperatureFaliure;    
 
 /* lamp control light data */
 extern lamp_NVdata_t lamp_NVdata;
@@ -165,11 +169,13 @@ static deviceId_t  mPeerDeviceId = gInvalidDeviceId_c;
 static bool_t   mSendDataAfterEncStart = FALSE;
 
 /* Service Data */
-static lasConfig_t lasServiceConfig         = {service_lamp};
+       lasConfig_t lasServiceConfig         = {service_lamp};
 static disConfig_t disServiceConfig         = {service_device_info};
 static otapClientConfig_t otapServiceConfig = {service_otap};
 
-static basConfig_t basServiceConfig = {service_battery, 0};
+#if (gBatteryServiceSupported_d)
+  static basConfig_t basServiceConfig = {service_battery, 0};
+#endif
 
 
 static uint8_t whiteLightRamp;
@@ -183,7 +189,7 @@ static uint16_t WriteNotifHandles[] =     {value_otap_control_point,
                                            value_lamp_Control,
                                            value_lamp_White, 
                                            value_lamp_RGB,
-                                           value_lamp_clock,
+                                           value_core_temperature,
                                            value_lamp_on_sec,
                                            value_lamp_off_sec};
 
@@ -277,10 +283,13 @@ void BleApp_Init(void)
      tmrErrCode_t tmrerr = gTmrInvalidId_c;
      
     /* Initialize application support for drivers */          
-      
+     
     /* Initialize TSI sensor */
     TSI_Init();
-  
+    
+    /* init PWM TPM driver */
+    TPM_PWM_Init();   
+    
     /* Init timers */    
     tmrMeasurementTimerId = TMR_AllocateTimer(); /* T+V */
       
@@ -357,8 +366,13 @@ void BleApp_HandleTouch(tsi_event_t* pEvent)
   switch (event)
       {
         
-          case gTSI_EventShortPush_c:
-          {
+      case gTSI_EventIdle_c :
+        {
+           whiteLightRamp = whiteLightRampDN_c; 
+        }  break;
+        
+       case gTSI_EventShortPush_c :
+        {
             if(lamp_NVdata.lampControl.bit.OnOff)
             {
               control = lamp_NVdata.lampControl.raw8 & 0x7F;           
@@ -368,12 +382,11 @@ void BleApp_HandleTouch(tsi_event_t* pEvent)
             {
               control = lamp_NVdata.lampControl.raw8 | 0x80;
               Las_SetLampControl (lasServiceConfig.serviceHandle, control, TRUE);
-            }
-            
-          }  break;
-          
-          case gTSI_EventLongPush_c:
-          {
+            }          
+        } break;
+        
+      case gTSI_EventLongPush_c :
+        {
              warmW = (int8_t) lamp_NVdata.lampWhite.uint8.warmW;
              coldW = (int8_t) lamp_NVdata.lampWhite.uint8.coldW;
              
@@ -429,24 +442,23 @@ void BleApp_HandleTouch(tsi_event_t* pEvent)
             
             Las_SetLampWhite (lasServiceConfig.serviceHandle, warmW, coldW, TRUE);
             
+            
             //if lamp off turn it on
-            if( !((lamp_NVdata.lampControl.raw8 & 0xE0) == 0xC0) )
+            if( !((lamp_NVdata.lampControl.raw8 & 0xC0) == 0xC0) )
             {
               control = (lamp_NVdata.lampControl.raw8 & 0xDF) | 0xC0;
               Las_SetLampControl (lasServiceConfig.serviceHandle, control, TRUE);
             }
-  
             
-          }  break;
-
-          default:
-          {
-
-          }  break;
-      } 
+            
+          
+        }  break;  
+        
+      }
   
-  /* event  treated */
-  *pEvent = 0;
+      /* event  treated */
+      *pEvent = 0;
+
 }
 
 /*! *********************************************************************************
@@ -547,12 +559,16 @@ static void BleApp_Config()
     mAdvState.advOn = FALSE;
 
     /* Start services */
-    basServiceConfig.batteryLevel = 90;
-    Bas_Start(&basServiceConfig);
-    
     Dis_Start(&disServiceConfig);  
     OtapCS_Start(&otapServiceConfig);
     Las_Start(&lasServiceConfig);
+    
+    #if (gBatteryServiceSupported_d)
+      basServiceConfig.batteryLevel = 90;
+      Bas_Start(&basServiceConfig);
+    #endif  
+    
+
    
     
     // start advertising
@@ -616,8 +632,9 @@ static void BleApp_ConnectionCallback (deviceId_t peerDeviceId, gapConnectionEve
             mPeerDeviceId = peerDeviceId;
 	    Las_Subscribe(peerDeviceId);		
 	    OtapCS_Subscribe(peerDeviceId);
-			
-            Bas_Subscribe(peerDeviceId);
+	    #if (gBatteryServiceSupported_d)		
+              Bas_Subscribe(peerDeviceId);
+  #endif
                     
             mSendDataAfterEncStart = FALSE;
             if (gBleSuccess_c == Gap_CheckIfBonded(peerDeviceId, &isBonded) &&
@@ -640,8 +657,9 @@ static void BleApp_ConnectionCallback (deviceId_t peerDeviceId, gapConnectionEve
             mPeerDeviceId = gInvalidDeviceId_c;
             Las_Unsubscribe();
             OtapCS_Unsubscribe();
-            
-            Bas_Unsubscribe();
+            #if (gBatteryServiceSupported_d)
+              Bas_Unsubscribe();
+            #endif
             
             /* UI */
             
@@ -954,16 +972,16 @@ static void BleApp_AttributeWritten(deviceId_t  deviceId,
         // Report status to client
         BleApp_SendAttWriteResponse (deviceId, handle, bleResult);
       }
-    }   
-    else if (handle == value_lamp_clock)
+    }      
+    else if (handle == value_core_temperature)
     {
-      if ( (length==7) )
+      if ( (length==2) )
       {
-
+        bleResult = set_chip_critical_temperature ( *( (int16_t*) pValue) );
         // Report status to client
         BleApp_SendAttWriteResponse (deviceId, handle, bleResult);
       }
-    }
+    }    
     else if (handle == value_lamp_on_sec)
     {
       if ( (length==4) )
@@ -1046,7 +1064,7 @@ static void BleApp_AttributeWrittenWithoutResponse (deviceId_t deviceId,
                 otapClientData.lastCmdSentToOtapServer = gOtapCmdIdErrorNotification_c;
             }
             else
-            {
+            {   //TODO this is for debug, remove in production, or send some notification
                 /*! A BLE error has occurred - Disconnect */
                 Gap_Disconnect (deviceId);
             }
@@ -2145,8 +2163,10 @@ static void MeasurementTimerCallback(void * pParam)
     {
       Las_RecordMeasurementTV (lasServiceConfig.serviceHandle);
     
-      basServiceConfig.batteryLevel = 90;
-      Bas_RecordBatteryMeasurement(basServiceConfig.serviceHandle, basServiceConfig.batteryLevel);
+      #if (gBatteryServiceSupported_d)
+        basServiceConfig.batteryLevel = 90;
+        Bas_RecordBatteryMeasurement(basServiceConfig.serviceHandle, basServiceConfig.batteryLevel);
+      #endif
     }
 
 }

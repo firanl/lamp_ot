@@ -71,14 +71,22 @@ tsi_sensor_callback_t userCallbackFunction;
 /*!< Threshold value to detect a touch event */
 uint16_t TSI_SENSOR_THRESHOLD_ADDER = 10; 
 /*!< TSI update time in mS */
-#define gTsiUpdateTime_c                30   
+#define gTsiUpdateTime_c                15  
+
+#define gTsiShortPTime_c                50  
+
+#define gTsiLongPTime_c                 230 
+
+
+
+
 
 static uint16_t BOARD_TSI_BTN_treshold;
 
 /* Touch Sensing sensor timer  */
 static tmrTimerID_t tmrTsiId;  
 
-static int8_t hit_cnt;
+
 static uint8_t tsi_event;
 
 /******************************************************************************
@@ -108,6 +116,8 @@ void TSI_Init ()
 {
   tsi_status_t result;
   tmrErrCode_t tmrerr = gTmrInvalidId_c;
+  
+  uint32_t  lowestSignal;
   
   /* Set up the HW configuration for normal mode of TSI */
   /* FSL_FEATURE_TSI_VERSION == 4 */
@@ -144,7 +154,10 @@ void TSI_Init ()
   /* Calibrate all electrode channels */
   result = TSI_DRV_MeasureBlocking(BOARD_TSI_INSTANCE);
   result = TSI_DRV_GetCounter(BOARD_TSI_INSTANCE, BOARD_TSI_BTN_CHANNEL, &BOARD_TSI_BTN_treshold);
+  //TSI_DRV_Recalibrate(BOARD_TSI_INSTANCE, &lowestSignal);
+  
   BOARD_TSI_BTN_treshold += TSI_SENSOR_THRESHOLD_ADDER;
+  
   
   tmrTsiId = TMR_AllocateTimer(); /* TSI */
   
@@ -167,36 +180,79 @@ void TSI_MeasureOnce(void)
 ******************************************************************************/
 static void tsiIrqCallback(uint32_t instance, void* usrData)
 {
+  static bool_t isCalibrated = TRUE;
+  static uint8_t hitCnt = 0;
+  static uint8_t missCnt = 0;
+  static uint8_t state = 0;
   uint16_t tsiChannelReading;
+  bool_t hit = 0;
 
+
+
+      
+  if( (!tsi_event) && isCalibrated   )
+  {
+    
   //Read current measurement
   TSI_DRV_GetCounter(BOARD_TSI_INSTANCE, BOARD_TSI_BTN_CHANNEL, &tsiChannelReading); 
   
-  if(!tsi_event)
+  if(tsiChannelReading > BOARD_TSI_BTN_treshold)
   {
-    //Compare measurement with thresshold Check if some electrode was pressed. 
-    if(tsiChannelReading > BOARD_TSI_BTN_treshold) 
-    {
-      hit_cnt++; 
-      if(hit_cnt > 5) 
-      {  
+      hitCnt++;
+      if( hitCnt >= (gTsiLongPTime_c/gTsiUpdateTime_c) )
+      {
         tsi_event = gTSI_EventLongPush_c;
+        missCnt = 0; hitCnt = 0; state=0;
         BleApp_HandleTouch(&tsi_event);
-        hit_cnt=0;  
       }
-    }
-    else
-    {
-      if(hit_cnt > 3) 
-      { 
-        tsi_event = gTSI_EventShortPush_c;
-        BleApp_HandleTouch(&tsi_event);
-        hit_cnt=0;
+      
+      if(state==1)
+      {
+        if ( hitCnt >= (gTsiShortPTime_c/gTsiUpdateTime_c) )
+        { state = 2; missCnt = 0; }
       }
-      hit_cnt--;
-      if(hit_cnt<0) hit_cnt=0;
-    }
+      
   }
+  else 
+  {
+      missCnt++;
+      if( missCnt >= (gTsiLongPTime_c/gTsiUpdateTime_c) )
+      {
+        tsi_event = gTSI_EventIdle_c;
+        missCnt = 0; hitCnt = 0; state=0;
+        BleApp_HandleTouch(&tsi_event);
+      }
+      
+      if (state==0)
+      {
+        if ( missCnt >= ( ( gTsiShortPTime_c)/gTsiUpdateTime_c) )
+        {
+          state=1; hitCnt = 0;
+        }
+      } else if (state==2)
+      {
+        if ( missCnt >= ( (gTsiLongPTime_c - gTsiShortPTime_c)/gTsiUpdateTime_c) )
+        {
+	  tsi_event = gTSI_EventShortPush_c;
+          missCnt = 0; hitCnt = 0; state=0;
+          BleApp_HandleTouch(&tsi_event);
+        }
+      
+      }
+  }
+ 
+
+  
+    
+    
+    
+  }
+  /* start recalibrate */
+  else
+  {
+  }
+  
+  
   
 }
 

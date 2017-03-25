@@ -115,59 +115,15 @@ bleResult_t Las_Start (lasConfig_t *pServiceConfig)
       
     mLas_SubscribedClientId = gInvalidDeviceId_c;
   
-    tmrFadeId             = TMR_AllocateTimer();
-
+    tmrFadeId  = TMR_AllocateTimer();
     
-//
-    /* switch to pre-reset light */
-    if(lamp_NVdata.lampControl.bit.OnOff)
-    {
-      /* the lamp is on */
-      if(lamp_NVdata.lampControl.bit.White)
-      {
-        /* white light is on */
-        TPM_PWM_WarmWhite(lamp_NVdata.lampWhite.uint8.warmW);
-        TPM_PWM_ColdWhite(lamp_NVdata.lampWhite.uint8.coldW);
-      }
-      else
-      {
-        TPM_PWM_WarmWhiteOff();
-        TPM_PWM_ColdWhiteOff();
-      }
-      
-      if(lamp_NVdata.lampControl.bit.Color)
-      {
-         /* color RGB light is on */
-         TPM_PWM_Red  (lamp_NVdata.lampRGB.uint8.r);
-         TPM_PWM_Green(lamp_NVdata.lampRGB.uint8.g);
-         TPM_PWM_Blue (lamp_NVdata.lampRGB.uint8.b);
-      } 
-      else
-      {
-         TPM_PWM_RedOff  ();
-         TPM_PWM_GreenOff();
-         TPM_PWM_BlueOff ();
-      }
-      
-    }
-    else  
-    {
-      TPM_PWM_Off();
-    }
-//
-    //TODO entry change 
-    //Las_SetLampWhite (uint16_t serviceHandle, uint8_t warmW, uint8_t coldW, uint8_t notify)
-    //Las_SetLampRGB (uint16_t serviceHandle, uint8_t red, uint8_t green, uint8_t blue)
-    //Las_SetLampControl (mLas_serviceHandle, control, TRUE);
+    TPM_PWM_Off();
+
+    /* TODO: get data from Flash using some board.c function to read */  
+    result = Las_SetLampWhite   (pServiceConfig->serviceHandle, LA_LAMP_WARM_WHITE, LA_LAMP_COLD_WHITE, FALSE);
+    result = Las_SetLampRGB     (pServiceConfig->serviceHandle, LA_LAMP_R, LA_LAMP_G, LA_LAMP_B);
+    result = Las_SetLampControl (pServiceConfig->serviceHandle, LA_LAMP_CONTROL, FALSE);
     
-    result = Las_RecordLampControl (pServiceConfig->serviceHandle, FALSE);
-    if(result != gBleSuccess_c) return result;
-
-    result = Las_RecordLampWhite (pServiceConfig->serviceHandle, FALSE);
-    if(result != gBleSuccess_c) return result; 
-
-    result = Las_RecordLampRGB (pServiceConfig->serviceHandle);
-    if(result != gBleSuccess_c) return result;   
     
     mLas_serviceHandle = pServiceConfig->serviceHandle;
     
@@ -239,13 +195,8 @@ bleResult_t Las_RecordMeasurementTV (uint16_t serviceHandle)
     result = GattDb_WriteAttribute(handle, sizeof(int16_t), (uint8_t*) &g_chip_TV.int16.gCoreTemperature);
 
     if (result != gBleSuccess_c) return result;
-    
-    // if ctitical or warning values send notification
-    //if(g_chip_TV.int16.gCoreTemperature > gCoreTemperatureNotify_d)
-    {
-      //Hls_LampNotification(handle);
-    }
 
+    /* notify temperature */
     Hls_LampNotification(handle);
     
    
@@ -259,6 +210,9 @@ bleResult_t Las_RecordMeasurementTV (uint16_t serviceHandle)
     result = GattDb_WriteAttribute(handle, sizeof(int16_t), (uint8_t*)&g_chip_TV.int16.g_vReference);
 
     if (result != gBleSuccess_c) return result;
+    
+    /* notify voltage */
+    Hls_LampNotification(handle);    
     
     return gBleSuccess_c;
 }

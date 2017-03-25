@@ -46,19 +46,15 @@ PRIMARY_SERVICE_UUID128(service_lamp, uuid_service_lamp)
     CHARACTERISTIC_UUID128(char_lamp_RGB, uuid_char_lamp_RGB, (gGattCharPropRead_c | gGattCharPropWrite_c | gGattCharPropWriteWithoutRsp_c) )
         VALUE_UUID128(value_lamp_RGB, uuid_char_lamp_RGB, (gPermissionFlagReadable_c | gPermissionFlagWritable_c), 3, LA_LAMP_R, LA_LAMP_G, LA_LAMP_B)
  
-    CHARACTERISTIC(char_core_temperature, gBleSig_Temperature_d, (gGattCharPropRead_c | gGattCharPropNotify_c))
-        VALUE(value_core_temperature, gBleSig_Temperature_d, (gPermissionFlagReadable_c), 2, LA_LAMP_TEMP)
+    CHARACTERISTIC(char_core_temperature, gBleSig_Temperature_d, (gGattCharPropNotify_c | gGattCharPropRead_c | gGattCharPropWrite_c))
+        VALUE(value_core_temperature, gBleSig_Temperature_d, (gPermissionFlagReadable_c | gPermissionFlagWritable_c), 2, LA_LAMP_TEMP)
         DESCRIPTOR(desc_core_temperature, gBleSig_CharPresFormatDescriptor_d, (gPermissionFlagReadable_c), gBleSig_CharPresFormatDescriptorBytes_d, gBleSig_signed_16_bit_integer_d, gBleSig_Exponent_neg2_d, gBleSig_Celsius_temperature_d, gBleSig_Bluetooth_SIG_Assigned_Numbers_d , gBleSig_unknown_d)
         CCCD(cccd_core_temperature)          
 
-    CHARACTERISTIC_UUID128(char_core_voltage, uuid_char_core_voltage, (gGattCharPropRead_c) )
+    CHARACTERISTIC_UUID128(char_core_voltage, uuid_char_core_voltage, (gGattCharPropNotify_c | gGattCharPropRead_c) )
         VALUE_UUID128(value_core_voltage, uuid_char_core_voltage, (gPermissionFlagReadable_c ),  2, LA_LAMP_VCC)
         DESCRIPTOR(desc_core_voltage, gBleSig_CharPresFormatDescriptor_d, (gPermissionFlagReadable_c), gBleSig_CharPresFormatDescriptorBytes_d, gBleSig_signed_16_bit_integer_d, gBleSig_Exponent_neg3_d, gBleSig_electric_potential_difference_d, gBleSig_No_Namespaces_d, gBleSig_unknown_d)
         CCCD(cccd_core_voltage)
-             
-    CHARACTERISTIC(char_lamp_clock, gBleSig_Date_Time_d, (gGattCharPropNotify_c | gGattCharPropRead_c | gGattCharPropWrite_c) )
-        VALUE(value_lamp_clock,  gBleSig_Date_Time_d, (gPermissionFlagReadable_c | gPermissionFlagWritable_c), 7, LA_DATE_TIME_Y, LA_DATE_TIME_M, LA_DATE_TIME_D, LA_DATE_TIME_H, LA_DATE_TIME_MI, LA_DATE_TIME_S )
-        CCCD(cccd_lamp_clock) 
  
     CHARACTERISTIC_UUID128(char_lamp_on_sec, uuid_char_lamp_on_sec, ( gGattCharPropNotify_c | gGattCharPropRead_c | gGattCharPropWrite_c ) )
         VALUE_UUID128(value_lamp_on_sec, uuid_char_lamp_on_sec, (gPermissionFlagReadable_c | gPermissionFlagWritable_c), 4, 0x00, 0x00, 0x00, 0x00)
@@ -66,7 +62,11 @@ PRIMARY_SERVICE_UUID128(service_lamp, uuid_service_lamp)
  
     CHARACTERISTIC_UUID128(char_lamp_off_sec, uuid_char_lamp_off_sec, ( gGattCharPropNotify_c | gGattCharPropRead_c | gGattCharPropWrite_c ) )
         VALUE_UUID128(value_lamp_off_sec, uuid_char_lamp_off_sec, (gPermissionFlagReadable_c | gPermissionFlagWritable_c), 4, 0x00, 0x00, 0x00, 0x00)   
-        CCCD(cccd_lamp_off_sec)           
+        CCCD(cccd_lamp_off_sec)     
+          
+     CHARACTERISTIC_UUID128(char_lamp_TSI, uuid_char_lamp_TSI, ( gGattCharPropNotify_c | gGattCharPropRead_c | gGattCharPropWrite_c ) )
+        VALUE_UUID128(value_lamp_TSI, uuid_char_lamp_TSI, (gPermissionFlagReadable_c | gPermissionFlagWritable_c), 3, 0x00, 0x00, 0x00)   
+        CCCD(cccd_lamp_TSI)          
 
 PRIMARY_SERVICE_UUID128(service_otap, uuid_service_otap)
     CHARACTERISTIC_UUID128(char_otap_control_point, uuid_char_otap_control_point, (gGattCharPropWrite_c | gGattCharPropIndicate_c))
@@ -75,8 +75,4 @@ PRIMARY_SERVICE_UUID128(service_otap, uuid_service_otap)
     CHARACTERISTIC_UUID128(char_otap_data, uuid_char_otap_data, (gGattCharPropWriteWithoutRsp_c))
         VALUE_UUID128_VARLEN(value_otap_data, uuid_char_otap_data, (gPermissionFlagWritable_c), 20, 20, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00)
  
- PRIMARY_SERVICE(service_battery, gBleSig_BatteryService_d)
-    CHARACTERISTIC(char_battery_level, gBleSig_BatteryLevel_d, (gGattCharPropNotify_c | gGattCharPropRead_c))
-        VALUE(value_battery_level, gBleSig_BatteryLevel_d, (gPermissionFlagReadable_c), 1, 0x5A)
-        DESCRIPTOR(desc_bat_level, gBleSig_CharPresFormatDescriptor_d, (gPermissionFlagReadable_c), 7, 0x04, 0x00, 0xAD, 0x27, 0x01, 0x01, 0x00)
-        CCCD(cccd_battery_level)         
+       

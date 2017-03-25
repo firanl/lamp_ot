@@ -54,6 +54,7 @@
 ******************************************************************************/
 // Stack header files
 #include "EmbeddedTypes.h"
+#include "ble_general.h"
 
 /******************************************************************************
 * User definitions
@@ -91,15 +92,18 @@ typedef union lamp_TempVoltage_tag {
 * Globals
 *******************************************************************************/
 
-/* core temperature at witch the sistem should disable all outputs, exponent -2 */
+
+/* core temperature at witch the sistem should switch off all outputs, exponent -2 */
 #ifndef gCoreTemperatureFaliure_d 
-  #define gCoreTemperatureFaliure_d     7900
+  #define gCoreTemperatureFaliure_d    7500
 #endif
 
-/* core temperature at witch the sistem should  BLE notify, exponent -2 */
-#ifndef gCoreTemperatureNotify_d 
-  #define gCoreTemperatureNotify_d     6900
-#endif
+/* core temperature at upper limit, exponent -2 */
+#define gCoreTemperatureFaliureUL_d    15000
+
+/* core temperature at lower limit, exponent -2 */
+//#define gCoreTemperatureFaliureLL_d    3500
+#define gCoreTemperatureFaliureLL_d    2000
 
 
 /******************************************************************************
@@ -129,6 +133,8 @@ temperature_sensor_status_t temperature_sensor_init (void);
 *               Core Voltage reference g_vReference
 ****************************************************************************/
 void measure_chip_temperature (void);
+
+bleResult_t set_chip_critical_temperature (int16_t new_critical_temperature);
 
 /*!
  * @} End of temperature_sensor

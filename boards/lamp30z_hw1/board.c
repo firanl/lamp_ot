@@ -45,7 +45,7 @@
 
 /* core temperature measurement, voltage reference measurement */
 #include "temperature_sensor.h"
-
+  
 /* TPM PWM */
 #include "tpm_pwm_led_ctrl.h" 
 
@@ -79,51 +79,54 @@ lamp_NVdata_t lamp_NVdata;
 
 
 
+#if (gKeyBoardSupported_d)
+  /* Declare Input GPIO pins */
+  gpio_input_pin_user_config_t switchPins[] = {
+      {
+          .pinName = kGpioSW1,
+          .config.isPullEnable = true,
+          .config.pullSelect = kPortPullUp,
+          .config.isPassiveFilterEnabled = false,
+          .config.interrupt = kPortIntFallingEdge,
+      },
+      {
+          .pinName = GPIO_PINS_OUT_OF_RANGE,
+      }
+  };
+#endif
 
-/* Declare Input GPIO pins */
-gpio_input_pin_user_config_t switchPins[] = {
-    {
-        .pinName = kGpioSW1,
-        .config.isPullEnable = true,
-        .config.pullSelect = kPortPullUp,
-        .config.isPassiveFilterEnabled = false,
-        .config.interrupt = kPortIntFallingEdge,
-    },
-    {
-        .pinName = GPIO_PINS_OUT_OF_RANGE,
-    }
-};
-
-/* Declare Output GPIO pins */
-gpio_output_pin_user_config_t ledPins[] = {
-    {
-        .pinName = kGpioLED1,
-        .config.outputLogic = 1,
-        .config.slewRate = kPortSlowSlewRate,
-        .config.driveStrength = kPortLowDriveStrength,
-    },
-    {
-        .pinName = kGpioLED2,
-        .config.outputLogic = 1,
-        .config.slewRate = kPortSlowSlewRate,
-        .config.driveStrength = kPortLowDriveStrength,
-    },
-    {
-        .pinName = kGpioLED3,
-        .config.outputLogic = 1,
-        .config.slewRate = kPortSlowSlewRate,
-        .config.driveStrength = kPortLowDriveStrength,
-    },
-    {
-        .pinName = kGpioLED4,
-        .config.outputLogic = 1,
-        .config.slewRate = kPortSlowSlewRate,
-        .config.driveStrength = kPortLowDriveStrength,
-    },
-    {
-        .pinName = GPIO_PINS_OUT_OF_RANGE,
-    }
-};
+#if (gLEDSupported_d)
+  /* Declare Output GPIO pins */
+  gpio_output_pin_user_config_t ledPins[] = {
+      {
+          .pinName = kGpioLED1,
+          .config.outputLogic = 1,
+          .config.slewRate = kPortSlowSlewRate,
+          .config.driveStrength = kPortLowDriveStrength,
+      },
+      {
+          .pinName = kGpioLED2,
+          .config.outputLogic = 1,
+          .config.slewRate = kPortSlowSlewRate,
+          .config.driveStrength = kPortLowDriveStrength,
+      },
+      {
+          .pinName = kGpioLED3,
+          .config.outputLogic = 1,
+          .config.slewRate = kPortSlowSlewRate,
+          .config.driveStrength = kPortLowDriveStrength,
+      },
+      {
+          .pinName = kGpioLED4,
+          .config.outputLogic = 1,
+          .config.slewRate = kPortSlowSlewRate,
+          .config.driveStrength = kPortLowDriveStrength,
+      },
+      {
+          .pinName = GPIO_PINS_OUT_OF_RANGE,
+      }
+  };
+#endif 
 
 
 /* ***********************************************************************************
@@ -172,9 +175,6 @@ void hardware_init(void) {
   temperature_sensor_init ();
   /* init core temperature value and voltage reference */
   measure_chip_temperature();
-  
-  /* init PEM TPM driver */
-  TPM_PWM_Init();   
 
   
   initHardwareParameters();
@@ -194,12 +194,14 @@ void hardware_init(void) {
 static void initHardwareParameters(void)
 { 
   /* init lamp data */
+  /*
   lamp_NVdata.lampControl.raw8 = LA_LAMP_CONTROL;
   lamp_NVdata.lampWhite.uint8.warmW = LA_LAMP_WARM_WHITE;
   lamp_NVdata.lampWhite.uint8.coldW = LA_LAMP_COLD_WHITE;
   lamp_NVdata.lampRGB.uint8.r = LA_LAMP_R;
   lamp_NVdata.lampRGB.uint8.g = LA_LAMP_G;
   lamp_NVdata.lampRGB.uint8.b = LA_LAMP_B;
+  */
   
   /* init MAC ADRESS */  
   #if (!initConstPublicDeviceAddress_d)

@@ -96,8 +96,9 @@ typedef uint8_t tsi_event_t;
  */
 enum
 {
-    gTSI_EventShortPush_c = 1,         /* Short push button  */
-    gTSI_EventLongPush_c,              /* Long push button  */
+    gTSI_EventIdle_c = 1,              /* No push button     */
+    gTSI_EventShortPush_c,         /* Short push button  */
+    gTSI_EventLongPush_c,              /* Long push button   */
 };
 
 /******************************************************************************

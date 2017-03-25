@@ -124,6 +124,13 @@
 #define LA_LAMP_TEMP         0xD1, 0x07
 /* core voltage - default 3.303 */
 #define LA_LAMP_VCC          0xE4, 0x0C
+
+/* from gatt_db.h
+    CHARACTERISTIC(char_lamp_clock, gBleSig_Date_Time_d, (gGattCharPropNotify_c | gGattCharPropRead_c | gGattCharPropWrite_c) )
+        VALUE(value_lamp_clock,  gBleSig_Date_Time_d, (gPermissionFlagReadable_c | gPermissionFlagWritable_c), 7, LA_DATE_TIME_Y, LA_DATE_TIME_M, LA_DATE_TIME_D, LA_DATE_TIME_H, LA_DATE_TIME_MI, LA_DATE_TIME_S )
+        CCCD(cccd_lamp_clock) 
+*/
+/*
 // Year 1582 9999 defaulf 2017
 #define LA_DATE_TIME_Y       0xE1, 0x07  
 // Month 0 	12 values: 0 Month is not known; default 1 January
@@ -136,7 +143,8 @@
 #define LA_DATE_TIME_MI      0x23
 // default 
 #define LA_DATE_TIME_S       0x01
- 
+*/
+
   
    
 

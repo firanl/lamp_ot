@@ -46,6 +46,7 @@
 
 // Stack header files
 #include "EmbeddedTypes.h"
+#include "ble_general.h"
 
 // Application header files
 #include "temperature_sensor.h"
@@ -53,6 +54,11 @@
 // KSDK header files
 #include "fsl_adc16_driver.h"
 #include "fsl_pmc_hal.h"
+
+#include "board.h"
+
+/* Profile / Services */
+#include "lamp_interface.h"
 
 /******************************************************************************
 * Locals
@@ -95,6 +101,13 @@ const adc16_chn_config_t temperatureSensorBandgapVoltageChannel = {
 /* core voltage reference, exponent -3 */
 chip_TempVoltage_t g_chip_TV;
 
+/* core temperature at witch the sistem should disable all outputs, exponent -2 */
+int16_t gCoreTemperatureFaliure;   
+
+/* lamp control light data */
+extern lamp_NVdata_t lamp_NVdata;
+extern lasConfig_t lasServiceConfig;
+
 /******************************************************************************
 * Private Function prototypes
 ******************************************************************************/
@@ -110,6 +123,8 @@ temperature_sensor_status_t temperature_sensor_init (void){
   pmc_bandgap_buffer_config_t pmcBandgapConfiguration = {
     .enable = TRUE,
   };
+  
+  gCoreTemperatureFaliure = gCoreTemperatureFaliure_d;
   
   /* Initialize ADC driver */
   result = ADC16_DRV_Init(TEMPERATURE_SENSOR_ADC_INSTANCE, &temperatureSensorAdcConfig);
@@ -138,6 +153,7 @@ void measure_chip_temperature (void){
   adc16_status_t result;
   int16_t bandgapVoltageAdcReading, temperatureChannelAdcReading;
   int16_t vTemperatureSensor;
+  uint8_t control;
 
   
   /* Start Bandgap Voltage Measurements */
@@ -178,13 +194,26 @@ void measure_chip_temperature (void){
               g_chip_TV.int16.gCoreTemperature = 2500 - (((vTemperatureSensor - TEMPERATURE_SENSOR_VTEMP25_mV)*1000*100)/TEMPERATURE_SENSOR_SLOPE_uV); 
               
               /* If failure temperature is reached stop all PWM TPM outputs and try to BT notify */
-              if(g_chip_TV.int16.gCoreTemperature > gCoreTemperatureFaliure_d)
+              if(g_chip_TV.int16.gCoreTemperature > gCoreTemperatureFaliure)
               {
-                  //TPM_PWM_Off();
+                control = lamp_NVdata.lampControl.raw8 & 0x7F;           
+                Las_SetLampControl (lasServiceConfig.serviceHandle, control, TRUE); 
+                // TODO if fails TPM_PWM_Off();
               }
         }
   }
   
+}
+
+bleResult_t set_chip_critical_temperature (int16_t new_critical_temperature)
+{
+  if( (new_critical_temperature <= gCoreTemperatureFaliureUL_d) && ( new_critical_temperature >= gCoreTemperatureFaliureLL_d ) )
+  {
+    gCoreTemperatureFaliure = new_critical_temperature;
+    return gBleSuccess_c;
+  }
+  
+  return gBleOverflow_c;
 }
 
 /******************************************************************************
