@@ -130,7 +130,7 @@
       #define gTmrTaskStackSize_c  384
                
       /* Defines number of timers needed by the application, default 4 */
-      #define gTmrApplicationTimers_c         5
+      #define gTmrApplicationTimers_c         6
 
       /* Defines number of timers needed by the protocol stack, default 4 */
       /* Range   default 4 */

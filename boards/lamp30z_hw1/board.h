@@ -94,20 +94,30 @@
 
 /* service_lamp db defaults */
    
-#define LA_LAMP_GapAdShortenedLocalName  "FSL_OTAC"
-#define LA_LAMP_GapAd_uuid_service       uuid_service_otap 
+#define LA_LAMP_GapAdShortenedLocalName  "Lampster"
+#define LA_LAMP_GapAd_uuid_service   uuid_service_otap
+    //uuid_service_otap 
    //uuid_service_lamp
    
    
-#define LA_LAMP_GapDeviceName            "FSL_BLE_OTAP_CLIENT"
+#define LA_LAMP_GapDeviceName            "Lampster"
 
 
 #define DI_ManufacturerNameString  "Freescale"
-#define DI_ModelNumberString       "OTAP Demo"
-#define DI_SerialNumberString      "BLESN01"
-#define DI_HardwareRevisionString  "FRDM-KW40Z"
-#define DI_FirmwareRevisionString  "1.1.1"
-#define DI_SoftwareRevisionString  "1.1.4"
+#define DI_ModelNumberString       "LA-2017"
+#define DI_SerialNumberString      "123"
+#define DI_HardwareRevisionString  "002"
+#define DI_FirmwareRevisionString  "001"
+#define DI_SoftwareRevisionString  "001"
+
+/* from gatt_db.h
+        VALUE(value_system_id, gBleSig_SystemId_d, (gPermissionFlagReadable_c), sizeof(DI_SystemId), DI_SystemId)
+    CHARACTERISTIC(char_rcdl, gBleSig_IeeeRcdl_d, (gGattCharPropRead_c) )
+        VALUE(value_rcdl, gBleSig_IeeeRcdl_d, (gPermissionFlagReadable_c), 4, DI_IeeeRcdl)
+    CHARACTERISTIC(char_pnp_id, gBleSig_PnpId_d, (gGattCharPropRead_c) )
+        VALUE(value_pnp_id, gBleSig_PnpId_d, (gPermissionFlagReadable_c), 7, DI_PnpId)   
+*/
+
 #define DI_SystemId                "\x00\x00\x00\xFE\xFF\x9F\x04\x00"
 #define DI_IeeeRcdl                0x00, 0x00, 0x00, 0x00
 #define DI_PnpId                   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00

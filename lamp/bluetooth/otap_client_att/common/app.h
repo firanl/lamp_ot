@@ -48,12 +48,12 @@
      
 /*! Enable/disable bonding capability */
 #ifndef gBondingSupported_d
-#define gBondingSupported_d  FALSE
+  #define gBondingSupported_d  FALSE
 #endif
 
 /*! Enable/disable service security */
 #ifndef gUseServiceSecurity_d
-#define gUseServiceSecurity_d  FALSE
+  #define gUseServiceSecurity_d  FALSE
 #endif
 
 #define gPasskeyValue_c                1234
@@ -92,7 +92,7 @@ extern "C" {
 #endif
 
 void BleApp_Init(void);
-void BleApp_Start(void);
+void BleApp_Start(void* pParam);
 void BleApp_HandleKeys(key_event_t events);
 void BleApp_HandleTouch(uint8_t* pEvent);
 void BleApp_GenericCallback (gapGenericEvent_t* pGenericEvent);

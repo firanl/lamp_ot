@@ -58,7 +58,11 @@
 /******************************************************************************
 * User definitions
 *******************************************************************************/
-  
+
+/*! Enable/disable Stuck Button capability */
+#ifndef gUseStuckButtonCounter_d
+  #define gUseStuckButtonCounter_d  1
+#endif
 
 /******************************************************************************
 * Type definitions
@@ -66,18 +70,42 @@
 
 
 typedef struct tsi_touch_tag {
-    uint16_t low;
-    uint16_t sensitivity;
+    uint16_t low;              /*!< TSI idle value sensor not pressed  */
+    uint8_t sensitivity;       /*!< TSI treshold add value, default 10 */
+    uint8_t tmr;               /*!< TSI update time in mili seconds, default 15 ms */
+    
+    uint8_t InitHitCnt;         /* Intermediate state hit cnt  */
+    uint8_t InitIdleCnt;        /* Intermediate state idle cnt */
+    uint8_t InitHitHitCnt;      /* Long Press Series hit cnt */
+    uint8_t InitHitIdleCnt;     /* Intermediate not used state idle cnt  */
+    
+    uint8_t InitIdleHitCnt;     /* Intermediate state hit cnt */
+    uint8_t InitIdleIdleCnt;    /* Idle state idle cnt  */
+    uint8_t InitIdleHitHitCnt;  /* First Long Press hit cnt */
+    uint8_t InitIdleHitIdleCnt; /* Short Press  idle cnt */
+    
+    uint16_t stuckBtnCntMax;     /*!< TSI  Long Press Series succesive count that triggers recalibration, default 5 minutes */ 
 } tsi_touch_t;
 
 /*!
- * TSI Sensor return status for functions
+ * TSI Sensor states
+                           |-> hit  Long Press Series  -> kTsiInit
+           |-> hit  kTsiHit|
+           |               |-> idle Intermediate not used state -> kTsiInit
+   kTsiInit|
+           |                                                           |-> hit   First Long Press   -> kTsiInit
+           |                |-> hit  Intermediate state -> kTsiIdle_Hit|
+           |                |                                          |-> idle  Short Press        -> kTsiInit                                 
+           |-> idle kTsiIdle|
+                            |-> idle  Idle state   -> kTsiInit
  */
 typedef enum tsiSensorStatus{
-  kTsiOk,               /*!< No error */
-  kTsiInitError,        /*!< Error initializing the module */
-  kTsiStartError,       /*!< Error starting the measurements */
-}tsi_sensor_status_t;
+  kTsiInit,             /*!<  Start state  */
+  kTsiIdle,             /*!<  Intermediate state */
+  kTsiHit,              /*!<  Intermediate state */
+  kTsiIdle_Hit,         /*!<  Intermediate state */  
+} tsi_states_t;
+
 
 
 /*!
@@ -97,7 +125,7 @@ typedef uint8_t tsi_event_t;
 enum
 {
     gTSI_EventIdle_c = 1,              /* No push button     */
-    gTSI_EventShortPush_c,         /* Short push button  */
+    gTSI_EventShortPush_c,             /* Short push button  */
     gTSI_EventLongPush_c,              /* Long push button   */
 };
 

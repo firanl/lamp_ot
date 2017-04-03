@@ -21,7 +21,7 @@ TraceBufferSize=0x00010000
 TraceStallIfFIFOFull=0x00000000
 TracePortSize=0x00000000
 [DebugChecksum]
-Checksum=810438459
+Checksum=-389202253
 [CodeCoverage]
 Enabled=_ 0
 [Exceptions]
@@ -39,7 +39,8 @@ ShowSource=1
 [Disassemble mode]
 mode=0
 [Breakpoints2]
-Count=0
+Bp0=_ 0 "EMUL_CODE" "{$PROJ_DIR$\lamp\bluetooth\otap_client_att\common\app.c}.496.13" 0 0 1 "" 0 "" 0
+Count=1
 [Log file]
 LoggingEnabled=_ 0
 LogFile=_ ""

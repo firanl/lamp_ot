@@ -157,6 +157,7 @@ static advState_t  mAdvState;
 /* Timers */
   /* Temperature voltage timer  */
   static tmrTimerID_t tmrMeasurementTimerId;
+  static tmrTimerID_t tmrAdvStartTimerId;
 
 
 static deviceId_t  mPeerDeviceId = gInvalidDeviceId_c;
@@ -292,6 +293,7 @@ void BleApp_Init(void)
     
     /* Init timers */    
     tmrMeasurementTimerId = TMR_AllocateTimer(); /* T+V */
+    tmrAdvStartTimerId    = TMR_AllocateTimer();
       
    /* start timers */  
     /* Start 5 second measurements voltage and temperature */
@@ -305,7 +307,7 @@ void BleApp_Init(void)
 * \brief    Starts the BLE application.
 *
 ********************************************************************************** */
-void BleApp_Start(void)
+void BleApp_Start(void* pParam)
 {
     
     if (mPeerDeviceId == gInvalidDeviceId_c)
@@ -568,11 +570,9 @@ static void BleApp_Config()
       Bas_Start(&basServiceConfig);
     #endif  
     
-
-   
-    
+ 
     // start advertising
-    BleApp_Start();
+    tmrerr =  TMR_StartSingleShotTimer(tmrAdvStartTimerId, TmrSeconds(3), BleApp_Start, NULL);
 }
 
 /*! *********************************************************************************
@@ -634,7 +634,7 @@ static void BleApp_ConnectionCallback (deviceId_t peerDeviceId, gapConnectionEve
 	    OtapCS_Subscribe(peerDeviceId);
 	    #if (gBatteryServiceSupported_d)		
               Bas_Subscribe(peerDeviceId);
-  #endif
+            #endif
                     
             mSendDataAfterEncStart = FALSE;
             if (gBleSuccess_c == Gap_CheckIfBonded(peerDeviceId, &isBonded) &&
@@ -662,11 +662,11 @@ static void BleApp_ConnectionCallback (deviceId_t peerDeviceId, gapConnectionEve
             #endif
             
             /* UI */
-            
-            /* Restart advertising*/
-            BleApp_Start();
 
             OtapClient_HandleDisconnectionEvent (peerDeviceId);
+            
+            /* Restart advertising*/
+            TMR_StartSingleShotTimer(tmrAdvStartTimerId, TmrSeconds(3), BleApp_Start, NULL);
         }
         break;
 
@@ -2140,9 +2140,6 @@ static otapStatus_t OtapClient_IsImageFileHeaderValid (bleOtaImageFileHeader_t* 
     
     return gOtapStatusSuccess_c;
 }
-
-
-
 
 
 

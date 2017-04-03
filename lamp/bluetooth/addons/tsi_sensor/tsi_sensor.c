@@ -62,32 +62,20 @@
 tsi_state_t tsiSensorState;
 tsi_sensor_callback_t userCallbackFunction;
 
+tsi_touch_t tsi;
+
 /* The TPM instance/channel used for board */
 #define BOARD_TSI_INSTANCE        0
   /*!< Electrode channel */
   #define BOARD_TSI_BTN_CHANNEL               15u
 
 
-/*!< Threshold value to detect a touch event */
-uint16_t TSI_SENSOR_THRESHOLD_ADDER = 10; 
-/*!< TSI update time in mS */
-#define gTsiUpdateTime_c                15  
-
-#define gTsiShortPTime_c                50  
-
-#define gTsiLongPTime_c                 230 
-
-
-
-
-
-static uint16_t BOARD_TSI_BTN_treshold;
 
 /* Touch Sensing sensor timer  */
 static tmrTimerID_t tmrTsiId;  
 
-
 static uint8_t tsi_event;
+
 
 /******************************************************************************
 * Globals
@@ -100,6 +88,7 @@ static uint8_t tsi_event;
 ******************************************************************************/
 static void TsiTimerCallback(void* pParam);
 static void tsiIrqCallback(uint32_t instance, void* usrData);
+static tsi_status_t TsiCalibrate(void);
 
 /************************************************************************************
 * Extern functions
@@ -141,6 +130,25 @@ void TSI_Init ()
     .usrData = (void*)0x00,
   };
   
+  /*!< Threshold value to detect a touch event */
+  tsi.sensitivity = 200; //10
+  /*!< TSI update time in ms */
+  tsi.tmr = 12; // 15
+  
+  tsi.InitHitCnt = 4;         /* Intermediate state hit cnt, time is  tmr*InitHitCnt ms */
+  tsi.InitIdleCnt = 4;        /* Intermediate state idle cnt */
+  tsi.InitHitHitCnt = 4;      /* Long Press Series hit cnt */
+  tsi.InitHitIdleCnt = 6;     /* Intermediate not used state idle cnt  */
+      
+  tsi.InitIdleHitCnt = 5;     /* Intermediate state hit cnt */
+  tsi.InitIdleIdleCnt = 8;    /* Idle state idle cnt  */
+  tsi.InitIdleHitHitCnt = 45;  /* First Long Press hit cnt */
+  tsi.InitIdleHitIdleCnt = 5; /* Short Press  idle cnt */  
+  
+  /*!< TSI  Long Press Series succesive count that triggers recalibration - 5 minutes */
+  tsi.stuckBtnCntMax = (5 * 60 * 1000) / ( (tsi.InitHitCnt + tsi.InitHitHitCnt) * tsi.tmr );
+  
+  
   //configure_tsi_pins
   /* TSI0_CH15 */
   PORT_HAL_SetMuxMode(PORTC, 3u, kPortPinDisabled);  
@@ -152,17 +160,12 @@ void TSI_Init ()
   result = TSI_DRV_EnableElectrode(BOARD_TSI_INSTANCE, BOARD_TSI_BTN_CHANNEL, true);
 
   /* Calibrate all electrode channels */
-  result = TSI_DRV_MeasureBlocking(BOARD_TSI_INSTANCE);
-  result = TSI_DRV_GetCounter(BOARD_TSI_INSTANCE, BOARD_TSI_BTN_CHANNEL, &BOARD_TSI_BTN_treshold);
-  //TSI_DRV_Recalibrate(BOARD_TSI_INSTANCE, &lowestSignal);
-  
-  BOARD_TSI_BTN_treshold += TSI_SENSOR_THRESHOLD_ADDER;
-  
+  result = TsiCalibrate();
   
   tmrTsiId = TMR_AllocateTimer(); /* TSI */
   
   /* Start TSI timer for capacitive touch BTN */     
-  tmrerr = TMR_StartTimer(tmrTsiId, gTmrIntervalTimer_c, gTsiUpdateTime_c, TsiTimerCallback, NULL);  
+  tmrerr = TMR_StartTimer(tmrTsiId, gTmrIntervalTimer_c, tsi.tmr, TsiTimerCallback, NULL);  
   tsi_event = 0;
 }
 
@@ -180,86 +183,137 @@ void TSI_MeasureOnce(void)
 ******************************************************************************/
 static void tsiIrqCallback(uint32_t instance, void* usrData)
 {
-  static bool_t isCalibrated = TRUE;
   static uint8_t hitCnt = 0;
-  static uint8_t missCnt = 0;
-  static uint8_t state = 0;
+  static uint8_t idleCnt = 0;
+  static tsi_states_t state = kTsiInit;
   uint16_t tsiChannelReading;
-  bool_t hit = 0;
+  #if (gUseStuckButtonCounter_d)
+    /* Stuck Button counter */
+    static uint16_t stuckBtnCnt = 0;
+  #endif
 
 
-
-      
-  if( (!tsi_event) && isCalibrated   )
+     
+  if( (!tsi_event) )
   {
     
-  //Read current measurement
-  TSI_DRV_GetCounter(BOARD_TSI_INSTANCE, BOARD_TSI_BTN_CHANNEL, &tsiChannelReading); 
-  
-  if(tsiChannelReading > BOARD_TSI_BTN_treshold)
-  {
-      hitCnt++;
-      if( hitCnt >= (gTsiLongPTime_c/gTsiUpdateTime_c) )
+   //Read current measurement
+   TSI_DRV_GetCounter(BOARD_TSI_INSTANCE, BOARD_TSI_BTN_CHANNEL, &tsiChannelReading); 
+   if( tsiChannelReading > tsi.low ) hitCnt++;
+   else idleCnt++;
+   
+   switch (state)
+   {
+    case kTsiInit:
+     {
+      if(hitCnt >= tsi.InitHitCnt) //4
       {
+        /* Intermediate state */
+        state = kTsiHit; idleCnt = 0; hitCnt = 0;
+      }
+      else if (idleCnt >= tsi.InitIdleCnt) //4
+      {
+        /* Intermediate state */
+        state = kTsiIdle; idleCnt = 0; hitCnt = 0;
+        #if (gUseStuckButtonCounter_d)
+         stuckBtnCnt=0;
+        #endif
+      }
+     } break;
+     
+    case kTsiHit:
+     {
+      if(hitCnt >= tsi.InitHitHitCnt) // 3
+      {
+       /*  Confirm Long Press Series state hit hit*/ 
         tsi_event = gTSI_EventLongPush_c;
-        missCnt = 0; hitCnt = 0; state=0;
-        BleApp_HandleTouch(&tsi_event);
+        idleCnt = 0; hitCnt = 0; state=kTsiInit;
+        BleApp_HandleTouch(&tsi_event); 
+        
+        #if (gUseStuckButtonCounter_d)
+          stuckBtnCnt++;
+          /* trigger recalibration */
+          if (stuckBtnCnt==tsi.stuckBtnCntMax)
+          {          
+            /* Calibrate electrode channel - try lower treshold */
+            if(tsi.low > tsi.sensitivity)  { tsi.low = tsi.low - tsi.sensitivity; }
+            else { TsiCalibrate(); }
+            stuckBtnCnt=0;
+            state = kTsiIdle; idleCnt = 0; hitCnt = 0;
+          }
+        #endif
       }
-      
-      if(state==1)
+      else if (idleCnt >= tsi.InitHitIdleCnt)  // 6
       {
-        if ( hitCnt >= (gTsiShortPTime_c/gTsiUpdateTime_c) )
-        { state = 2; missCnt = 0; }
+        /* Intermediate state hit idle */
+        idleCnt = 0; hitCnt = 0; state=kTsiInit;
       }
-      
-  }
-  else 
-  {
-      missCnt++;
-      if( missCnt >= (gTsiLongPTime_c/gTsiUpdateTime_c) )
+     } break;     
+     
+    case kTsiIdle:
+     {
+      if(hitCnt >= tsi.InitIdleHitCnt) // 5
       {
-        tsi_event = gTSI_EventIdle_c;
-        missCnt = 0; hitCnt = 0; state=0;
-        BleApp_HandleTouch(&tsi_event);
+        /* Intermediate state idle hit */
+        idleCnt = 0; hitCnt = 0; state=kTsiIdle_Hit;
       }
-      
-      if (state==0)
+      else if (idleCnt >= tsi.InitIdleIdleCnt) // 8
       {
-        if ( missCnt >= ( ( gTsiShortPTime_c)/gTsiUpdateTime_c) )
+        /* Confirm Idle state idle idle */
+        if( tsi_event != gTSI_EventIdle_c )
         {
-          state=1; hitCnt = 0;
+          tsi_event = gTSI_EventIdle_c;
+          idleCnt = 0; hitCnt = 0; state=kTsiInit;
+          BleApp_HandleTouch(&tsi_event); 
         }
-      } else if (state==2)
-      {
-        if ( missCnt >= ( (gTsiLongPTime_c - gTsiShortPTime_c)/gTsiUpdateTime_c) )
-        {
-	  tsi_event = gTSI_EventShortPush_c;
-          missCnt = 0; hitCnt = 0; state=0;
-          BleApp_HandleTouch(&tsi_event);
-        }
-      
       }
-  }
- 
+     } break; 
+     
+    case kTsiIdle_Hit:
+     {
+      if(hitCnt >= tsi.InitIdleHitHitCnt) // 45
+      {
+        /*  Confirm First Long Press state */ 
+        tsi_event = gTSI_EventLongPush_c;
+        idleCnt = 0; hitCnt = 0; state=kTsiInit;
+        BleApp_HandleTouch(&tsi_event); 
+      }
+      else if (idleCnt >= tsi.InitIdleHitIdleCnt) // 5
+      {
+        /* Confirm Short Press state */ 
+        tsi_event = gTSI_EventShortPush_c;
+        idleCnt = 0; hitCnt = 0; state=kTsiInit;
+        BleApp_HandleTouch(&tsi_event); 
+      }
+     } break; 
+     
+   }
 
-  
-    
-    
-    
   }
-  /* start recalibrate */
-  else
-  {
-  }
+
+ 
+}
+
+tsi_status_t TsiCalibrate(void)
+{
+  tsi_status_t result;
   
+  //TODO use TSI_DRV_Recalibrate
+    
+  /* Calibrate all electrode channels */
+  result = TSI_DRV_MeasureBlocking(BOARD_TSI_INSTANCE);
+  result = TSI_DRV_GetCounter(BOARD_TSI_INSTANCE, BOARD_TSI_BTN_CHANNEL, &tsi.low);
+  //TSI_DRV_Recalibrate(BOARD_TSI_INSTANCE, &lowestSignal);
   
-  
+  tsi.low += tsi.sensitivity;
+
+  return result;
 }
 
 /*! *********************************************************************************
-* \brief        Handles TSI sensor timer callback
-*
-* \param[in]    pParam        Callback parameters.
+ * \brief        Handles TSI sensor timer callback
+ *
+ * \param[in]    pParam        Callback parameters.
 ********************************************************************************** */
 static void TsiTimerCallback(void* pParam)
 {
@@ -267,11 +321,11 @@ static void TsiTimerCallback(void* pParam)
   TSI_MeasureOnce();
 }
 
-/*!
+/*! *********************************************************************************
  * @brief Implementation of TSI0 handler named in startup code.
  *
  * Passes instance to generic TSI IRQ handler.
- */
+********************************************************************************** */
 void TSI0_IRQHandler(void)
 {
     TSI_DRV_IRQHandler(0);
