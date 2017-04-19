@@ -120,7 +120,7 @@ bleResult_t Las_SetLampControl (uint16_t serviceHandle, lamp_control_t control, 
 
 bleResult_t Las_SetLampWhite (uint16_t serviceHandle, uint8_t warmW, uint8_t coldW, bool notify, bool showMax);
 
-bleResult_t Las_SetLampRGB (uint16_t serviceHandle, uint8_t red, uint8_t green, uint8_t blue);
+bleResult_t Las_SetLampRGB (uint16_t serviceHandle, uint8_t red, uint8_t green, uint8_t blue, bool notify);
 
 bleResult_t Las_SetOnTimer  (uint16_t serviceHandle, uint8_t* pSeconds);
 

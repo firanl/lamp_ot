@@ -118,11 +118,12 @@ define symbol m_fsl_prodInfo_end       = __region_ROM_end__;
 define exported symbol FREESCALE_PROD_DATA_BASE_ADDR = m_fsl_prodInfo_start;
 
 /*** hardwareParameters end of flash offsets */  
-define symbol m_hp_bluetooth_address_offset = 50;  
+define symbol NVparam_offset = 48;  
 
-define symbol m_hp_bluetooth_address_start =  m_fsl_prodInfo_start + m_hp_bluetooth_address_offset;
+define symbol m_paramHWv =  m_fsl_prodInfo_start + NVparam_offset;
+define symbol m_serialNo =  m_paramHWv + 16;
 
-
+define exported symbol SERIAL_NUMBER_ADDR = m_serialNo;
 
 
 /*** NVM Configuration ***/
@@ -220,7 +221,8 @@ do not initialize  { section .noinit };
 
 /*** Memory placements ***/
 place at address mem: m_interrupts_start                      { readonly section .intvec };
-place at address mem: m_hp_bluetooth_address_start            { section gBDAddress_ROM };
+place at address mem: m_paramHWv                              { readonly section HwRevStringMem };
+place at address mem: m_serialNo                              { readonly section SerialNumberMem };
 place in TEXT_region                                          { readonly };
 place in DATA_region                                          { readwrite, zi };
 place in HEAP_region                                          { block HEAP };

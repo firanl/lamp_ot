@@ -82,13 +82,24 @@ typedef struct pnpId_tag
     uint16_t    productVersion;
 }pnpId_t;
 
+/* Lamp Serial Number */
+typedef union serial_number_tag {
+        uint8_t ch[4];       
+	struct {
+                uint16_t UnitId;       /*!<  LSB unit produce in day of year  */
+		uint16_t DOY    : 12; /*!<   LSB   day of year since 01 01 2017   */	
+                uint16_t Prod   :  4; /*!<   MSB   Production  parameters         */	
+	} param;
+} serial_number_t;
+
 /*! Device Info - Configuration */
 typedef struct disConfig_tag
 {
     uint16_t            serviceHandle;
-    utf8s_t             serialNumber;
 
 } disConfig_t;
+
+
 
 /************************************************************************************
 *************************************************************************************

@@ -21,9 +21,9 @@ PRIMARY_SERVICE(service_device_info, gBleSig_DeviceInformationService_d)
     CHARACTERISTIC(char_serial_no, gBleSig_SerialNumberString_d, (gGattCharPropRead_c) )
         VALUE(value_serial_no, gBleSig_SerialNumberString_d, (gPermissionFlagReadable_c), sizeof(DI_SerialNumberString), DI_SerialNumberString)
     CHARACTERISTIC(char_hw_rev, gBleSig_HardwareRevisionString_d, (gGattCharPropRead_c) )
-        VALUE(value_hw_rev, gBleSig_HardwareRevisionString_d, (gPermissionFlagReadable_c), sizeof(DI_HardwareRevisionString), DI_HardwareRevisionString)
+        VALUE(value_hw_rev, gBleSig_HardwareRevisionString_d, (gPermissionFlagReadable_c), 4, DI_HardwareRevisionString)
     CHARACTERISTIC(char_fw_rev, gBleSig_FirmwareRevisionString_d, (gGattCharPropRead_c) )
-        VALUE(value_fw_rev, gBleSig_FirmwareRevisionString_d, (gPermissionFlagReadable_c), 2, DI_FirmwareRevisionMajor, DI_FirmwareRevisionMinor)
+        VALUE(value_fw_rev, gBleSig_FirmwareRevisionString_d, (gPermissionFlagReadable_c), 2, DI_FirmwareRevision )
     CHARACTERISTIC(char_sw_rev, gBleSig_SoftwareRevisionString_d, (gGattCharPropRead_c) )
         VALUE(value_sw_rev, gBleSig_SoftwareRevisionString_d, (gPermissionFlagReadable_c), sizeof(DI_SoftwareRevisionString), DI_SoftwareRevisionString)
           
@@ -38,8 +38,9 @@ PRIMARY_SERVICE_UUID128(service_lamp, uuid_service_lamp)
         DESCRIPTOR(desc_lamp_White, gBleSig_CharPresFormatDescriptor_d, (gPermissionFlagReadable_c), gBleSig_CharPresFormatDescriptorBytes_d, gBleSig_unsigned_16_bit_integer_d, gBleSig_Exponent_0_d, gBleSig_percentage_d, gBleSig_No_Namespaces_d, gBleSig_unknown_d)
         CCCD(cccd_White)
 
-    CHARACTERISTIC_UUID128(char_lamp_RGB, uuid_char_lamp_RGB, (gGattCharPropRead_c | gGattCharPropWrite_c | gGattCharPropWriteWithoutRsp_c) )
+    CHARACTERISTIC_UUID128(char_lamp_RGB, uuid_char_lamp_RGB, (gGattCharPropNotify_c | gGattCharPropRead_c | gGattCharPropWrite_c | gGattCharPropWriteWithoutRsp_c) )
         VALUE_UUID128(value_lamp_RGB, uuid_char_lamp_RGB, (gPermissionFlagReadable_c | gPermissionFlagWritable_c), 3, LA_LAMP_R, LA_LAMP_G, LA_LAMP_B)
+        CCCD(cccd_RGB)
  
     CHARACTERISTIC(char_core_temperature, gBleSig_Temperature_d, (gGattCharPropNotify_c | gGattCharPropRead_c | gGattCharPropWrite_c))
         VALUE(value_core_temperature, gBleSig_Temperature_d, (gPermissionFlagReadable_c | gPermissionFlagWritable_c), 2, LA_LAMP_TEMP)
@@ -59,8 +60,8 @@ PRIMARY_SERVICE_UUID128(service_lamp, uuid_service_lamp)
         VALUE_UUID128(value_lamp_off_sec, uuid_char_lamp_off_sec, (gPermissionFlagReadable_c | gPermissionFlagWritable_c), 4, 0x00, 0x00, 0x00, 0x00)   
         CCCD(cccd_lamp_off_sec)     
           
-     CHARACTERISTIC_UUID128(char_lamp_config, uuid_char_lamp_config, ( gGattCharPropNotify_c | gGattCharPropRead_c | gGattCharPropWrite_c ) )
-        VALUE_UUID128(value_lamp_config, uuid_char_lamp_config, (gPermissionFlagReadable_c | gPermissionFlagWritable_c), 3, 0x00, 0x00, 0x00)   
+     CHARACTERISTIC_UUID128(char_lamp_config, uuid_char_lamp_config, ( gGattCharPropNotify_c | gGattCharPropRead_c | gGattCharPropWrite_c ) )  
+        VALUE_UUID128_VARLEN(value_lamp_config, uuid_char_lamp_config, (gPermissionFlagReadable_c | gPermissionFlagWritable_c), 5, 1, 0x00, 0x00, 0x00, 0x00, 0x00)
         CCCD(cccd_lamp_TSI)          
 
           

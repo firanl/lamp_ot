@@ -94,6 +94,9 @@ extern int16_t gCoreTemperatureFaliure;
 /* lamp control light data */
 extern lamp_NVdata_t lamp_NVdata;
 
+/* lamp cfg params */
+extern lamp_config_t lamp_cfg;
+
 /************************************************************************************
 * Extern functions
 ************************************************************************************/
@@ -363,7 +366,8 @@ void BleApp_HandleTouch(tsi_event_t* pEvent)
 {
   lamp_control_t control;
   uint8_t event;
-  int8_t warmW, coldW;
+  uint8_t warmW, coldW, R, G, B;
+  bool isMax = false;
   
   event = *pEvent;
   switch (event)
@@ -385,79 +389,153 @@ void BleApp_HandleTouch(tsi_event_t* pEvent)
             {
               control.bit.OnOff = 1;            
             }
-            Las_SetLampControl (lasServiceConfig.serviceHandle, control, TRUE, lamp_NVdata.fadeSpeedMs);
+            Las_SetLampControl (lasServiceConfig.serviceHandle, control, TRUE, lamp_cfg.fadeTimeMs);
             
         } break;
         
       case gTSI_EventLongPush_c :
         {
-             warmW = (int8_t) lamp_NVdata.lampWhite.uint8.warmW;
-             coldW = (int8_t) lamp_NVdata.lampWhite.uint8.coldW;
-             
+             warmW =  lamp_NVdata.lampWhite.uint8.warmW;
+             coldW =  lamp_NVdata.lampWhite.uint8.coldW;
+                 R =  lamp_NVdata.lampRGB.uint8.r;
+                 G =  lamp_NVdata.lampRGB.uint8.g;
+                 B =  lamp_NVdata.lampRGB.uint8.b;
+                 
+             control = lamp_NVdata.lampControl;    
+                 
+            //if lamp off turn it on - or white off
+            if( !lamp_NVdata.lampControl.bit.OnOff )
+            {
+              control.bit.OnOff = 1;
+              
+              if( !lamp_NVdata.lampControl.bit.White )
+              {
+                control.bit.White = 1;
+                control.bit.Color = 0;
+              }
+              Las_SetLampControl (lasServiceConfig.serviceHandle, control, TRUE, lamp_cfg.fadeTimeMs);
+            }
+            else
+            {
+              if( !lamp_NVdata.lampControl.bit.White )
+              {
+                control.bit.White = 1;
+                control.bit.Color = 0;
+                Las_SetLampControl (lasServiceConfig.serviceHandle, control, TRUE, lamp_cfg.fadeTimeMs);
+              }
+            
+            }
+            
+            
+            // whiteLightRampUP_c
             if( whiteLightRamp == whiteLightRampUP_c )
             { 
                 /* Ramp up - increment */
-                if( (warmW < 100) ) { warmW++; }
-                if( (coldW < 100) ) { coldW++; } 
+                if( (warmW < PWM_factor_MAX) ) { warmW++; }
+                if( (coldW < PWM_factor_MAX) ) { coldW++; } 
+                if( (    R < PWM_factor_MAX) ) {     R++; }
+                if( (    G < PWM_factor_MAX) ) {     G++; } 
+                if( (    B < PWM_factor_MAX) ) {     B++; }                 
                 
                 /* check for ramp change */
-                if( (warmW >=100) && (coldW >= 100) )
-                { 
-                  whiteLightRamp = whiteLightRampDN_c; 
-                }
-                else
+                if(!lamp_NVdata.lampControl.bit.Color) // no overdrive - just white
                 {
-                  /* mix is loked */
-                  if(lamp_NVdata.lampControl.bit.mix)
+                  if( (warmW >=PWM_factor_MAX) && (coldW >= PWM_factor_MAX) )
+                  { 
+                    whiteLightRamp = whiteLightRampDN_c; 
+                    isMax = true;
+                  }
+                  else
                   {
-                    if( (warmW >= 100) || (coldW >= 100) )
-                    { 
-                      whiteLightRamp = whiteLightRampDN_c; 
+                    /* mix is loked */
+                    if(lamp_NVdata.lampControl.bit.mix)
+                    {
+                      if( (warmW >= PWM_factor_MAX) || (coldW >= PWM_factor_MAX) )
+                      { 
+                        whiteLightRamp = whiteLightRampDN_c; 
+                        isMax = true;
+                      }
                     }
                   }
-                }
-
+                } else 
+                // overdrive white+RGB
+                {
+                  if( (warmW >=PWM_factor_MAX) && (coldW >= PWM_factor_MAX) && ( R >= PWM_factor_MAX) && ( G >= PWM_factor_MAX) && ( B >= PWM_factor_MAX) )
+                  { 
+                    whiteLightRamp = whiteLightRampDN_c; 
+                    isMax = true;
+                  }
+                  else
+                  {
+                    /* mix is loked */
+                    if(lamp_NVdata.lampControl.bit.mix)
+                    {
+                      if( (warmW >= PWM_factor_MAX) || (coldW >= PWM_factor_MAX) || (R >= PWM_factor_MAX) || (G >= PWM_factor_MAX) || (B >= PWM_factor_MAX) )
+                      { 
+                        whiteLightRamp = whiteLightRampDN_c; 
+                        isMax = true;
+                      }
+                    }
+                  }                          
+                } // end overdrive white+RGB
             }
-            else
+            else // whiteLightRampDN_c
             {
  
                 /* Ramp dn - decrement */
                 if( (warmW > 0) ) { warmW--; }
                 if( (coldW > 0) ) { coldW--; } 
-                
+                if( (    R > 0) ) {     R--; }
+                if( (    G > 0) ) {     G--; } 
+                if( (    B > 0) ) {     B--; }                  
                 /* check for ramp change */
-                if( ( warmW <= 0 ) && ( coldW <= 0 ) )
-                { 
-                  whiteLightRamp = whiteLightRampUP_c; 
-                }
-                else
+                if(!lamp_NVdata.lampControl.bit.Color) // no overdrive - just white
                 {
-                  /* mix is loked */
-                  if(lamp_NVdata.lampControl.bit.mix)
-                  {
-                    if( (warmW <= 0) || (coldW <= 0) )
+                    /* check for ramp change */
+                    if( ( warmW <= 0 ) && ( coldW <= 0 ) )
                     { 
                       whiteLightRamp = whiteLightRampUP_c; 
                     }
-                  }
+                    else
+                    {
+                      /* mix is loked */
+                      if(lamp_NVdata.lampControl.bit.mix)
+                      {
+                        if( (warmW <= 0) || (coldW <= 0) )
+                        { 
+                          whiteLightRamp = whiteLightRampUP_c; 
+                        }
+                      }
+                    }
+                } else
+                // overdrive white+RGB
+                {
+                    /* check for ramp change */
+                    if( ( warmW <= 0 ) && ( coldW <= 0 ) && ( R <= 0 ) && ( G <= 0 ) && ( B <= 0 ) )
+                    { 
+                      whiteLightRamp = whiteLightRampUP_c; 
+                    }
+                    else
+                    {
+                      /* mix is loked */
+                      if(lamp_NVdata.lampControl.bit.mix)
+                      {
+                        if( (warmW <= 0) || (coldW <= 0) || ( R <= 0) || ( G <= 0) || ( B <= 0) )
+                        { 
+                          whiteLightRamp = whiteLightRampUP_c; 
+                        }
+                      }
+                    }                 
                 }
                 
             }
             
-            Las_SetLampWhite (lasServiceConfig.serviceHandle, warmW, coldW, TRUE, TRUE);
+            Las_SetLampWhite (lasServiceConfig.serviceHandle, warmW, coldW, TRUE, isMax);
+            if(lamp_NVdata.lampControl.bit.Color) //  overdrive - RGB + W
+               Las_SetLampRGB (lasServiceConfig.serviceHandle, R, G, B, TRUE);
             
-            
-            //if lamp off turn it on - or white off
-            if( !lamp_NVdata.lampControl.bit.OnOff || !lamp_NVdata.lampControl.bit.White )
-            {
-              control = lamp_NVdata.lampControl;
-              control.bit.OnOff = 1;
-              control.bit.White = 1;
-              control.bit.Color = 0;
-              Las_SetLampControl (lasServiceConfig.serviceHandle, control, TRUE, lamp_NVdata.fadeSpeedMs);
-            }
-            
-            
+
+                    
           
         }  break;  
         
@@ -840,14 +918,6 @@ static void BleApp_CccdWritten (deviceId_t deviceId, uint16_t handle, gattCccdFl
         }
     }
     /* lamp cccd */
-    else if (handle == cccd_lamp_Control)
-    {
-     
-    }
-    else if (handle == cccd_White)
-    {
-     
-    }
     else if (handle == cccd_core_temperature)
     {
       measure_chip_temperature();
@@ -957,7 +1027,7 @@ static void BleApp_AttributeWritten(deviceId_t  deviceId,
       {
         lamp_control_t control;
         control.raw8 = pValue[0];
-        bleResult = Las_SetLampControl(lasServiceConfig.serviceHandle, control, FALSE, lamp_NVdata.fadeSpeedMs);
+        bleResult = Las_SetLampControl(lasServiceConfig.serviceHandle, control, FALSE, lamp_cfg.fadeTimeMs);
         // Report status to client
         BleApp_SendAttWriteResponse (deviceId, handle, bleResult);
       }
@@ -975,7 +1045,7 @@ static void BleApp_AttributeWritten(deviceId_t  deviceId,
     {
        if ( (length==3) && (pValue[0] <= PWM_factor_MAX) && (pValue[1] <= PWM_factor_MAX) && (pValue[2] <= PWM_factor_MAX))
       {
-        bleResult = Las_SetLampRGB (lasServiceConfig.serviceHandle, pValue[0], pValue[1], pValue[2]);
+        bleResult = Las_SetLampRGB (lasServiceConfig.serviceHandle, pValue[0], pValue[1], pValue[2], FALSE);
         // Report status to client
         BleApp_SendAttWriteResponse (deviceId, handle, bleResult);
       }
@@ -1090,7 +1160,7 @@ static void BleApp_AttributeWrittenWithoutResponse (deviceId_t deviceId,
     {
        if ( (length==3) && (pValue[0] <= PWM_factor_MAX) && (pValue[1] <= PWM_factor_MAX) && (pValue[2] <= PWM_factor_MAX))
       {
-        bleResult = Las_SetLampRGB (lasServiceConfig.serviceHandle, pValue[0], pValue[1], pValue[2]);
+        bleResult = Las_SetLampRGB (lasServiceConfig.serviceHandle, pValue[0], pValue[1], pValue[2], FALSE);
       }
     }
 

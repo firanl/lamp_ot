@@ -38,9 +38,36 @@
 #include "gpio_pins.h"
 
 /*************************************************************************************
-* Public macros
+* ---------------- Software versioning
 *************************************************************************************/
 
+/* BLE Device Info service default data from gatt_db.h  */
+
+  /* Software revision Major.Minor.Build */
+  #define DI_SoftwareRevisionString  "0.0.1"
+
+  /* Hardware Revision 4 bytes Major byte, Minor byte, Revision byte, Variant byte */
+  /* NON Volatile storage */
+  #define DI_HardwareRevisionString  '1', '0', '0', 'A'
+
+  /* Firmware Revision BOOTLOADER 2 bytes Major byte, Minor byte ASCII 0x30 - 0x39 and 0x41 0x5A and 0x61 0x7A */ 
+  /* NON Volatile storage */
+  #define DI_FirmwareRevision   '1', '0'
+
+  #define DI_ManufacturerNameString  "Win Enterprise Holdings LLC"
+  /* Lamp Model string */
+  #define DI_ModelNumberString       "LA-2017"
+
+  /* composed from DI_SerialNumberMem to string */
+  #define DI_SerialNumberString      "00-0000-00000 "
+  /* written in production by programmer 4 bytes, default 0xFF, 0xFF, 0xFF, 0xFF */
+  /* NON Volatile storage - set in production */
+  #define DI_SerialNumberMem         0xFF, 0xFF, 0xFF, 0xFF 
+
+
+/*************************************************************************************
+* Public macros
+*************************************************************************************/
 
 
 
@@ -108,18 +135,6 @@
   #define LA_LAMP_GapDeviceName            "Lampster"
 
 
-/* BLE Device Info service default data from gatt_db.h  */
-  #define DI_ManufacturerNameString  "Win Enterprise Holdings LLC"
-  #define DI_ModelNumberString       "LA-2017"
-  /* written in production by programmer 4 bytes, default 0xFF, 0xFF, 0xFF, 0xFF */
-  #define DI_SerialNumberString      "\xFF\xFF\xFF\xFF"
-  /* Hardware Revision 4 bytes Major byte, Minor byte ASCII 0x30 - 0x39 and 0x41 0x5A and 0x61 0x7A */
-  #define DI_HardwareRevisionString  "100"
-  /* Firmware Revision 2 bytes Major byte, Minor byte ASCII 0x30 - 0x39 and 0x41 0x5A and 0x61 0x7A */ 
-  #define DI_FirmwareRevisionMajor  0x30
-  #define DI_FirmwareRevisionMinor  0x31
-  /* Software revision Major.Minor.Build */
-  #define DI_SoftwareRevisionString  "0.0.1"
 
   /* from gatt_db.h
           VALUE(value_system_id, gBleSig_SystemId_d, (gPermissionFlagReadable_c), sizeof(DI_SystemId), DI_SystemId)
@@ -169,10 +184,14 @@
   */
 
   /* lamp control fade speed */
-  #define fadeSpeedMs_d           17
-  #define fadeSpeedMsTemp_d        6
-  #define blinkSpeedMs_d         300   
-  #define blinkCnt_d               5 
+    /*!< On / off time period of a blink in mili seconds, default 300 ms  */
+    #define blinkTimeMs_d   300  
+    /*!< How many blinks are performed, default 5  */
+    #define blinkCnt_d        5  
+    /*!< Fade refresh time, light increment, default 17 ms */  
+    #define fadeTimeMs_d     17  
+    /*!< Fade refresh time, light increment for temperature shutdown, default 5 ms */
+    #define fadeTimeCritMs_d  5    
    
 
 typedef union prog_cycles_tag {
@@ -225,11 +244,19 @@ typedef union lamp_color_tag {
 } lamp_color_t;
 
 typedef struct lamp_NVdata_tag {
-    uint8_t                  fadeSpeedMs;       // uint8_t
     lamp_control_t           lampControl;       // uint8_t
     lamp_white_t             lampWhite;         // uint16_t
     lamp_color_t             lampRGB;           // uint32_t
 } lamp_NVdata_t;
+
+
+typedef struct lamp_config_tag {
+    uint16_t blinkTimeMs;       /*!< On / off time period of a blink in mili seconds, default 300 ms  */
+    uint8_t  blinkCnt;          /*!< How many blinks are performed, default 5  */
+    uint8_t  fadeTimeMs;        /*!< Fade refresh time, light increment, default 17 ms */    
+    uint8_t fadeTimeCritMs;     /*!< Fade refresh time, light increment for temperature shutdown, default 5 ms */
+
+} lamp_config_t;
 
 
 

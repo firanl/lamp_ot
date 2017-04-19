@@ -62,6 +62,9 @@ extern chip_TempVoltage_t g_chip_TV;
 /* lamp control light data */
 extern lamp_NVdata_t lamp_NVdata;
 
+/* lamp cfg params */
+extern lamp_config_t lamp_cfg;
+
 /************************************************************************************
 * Private type definitions
 ************************************************************************************/
@@ -95,7 +98,7 @@ static void Hls_LampNotification(uint16_t handle);
 
 static bleResult_t  Las_RecordLampControl (uint16_t serviceHandle, uint8_t notify);
 static bleResult_t  Las_RecordLampWhite   (uint16_t serviceHandle, uint8_t notify);
-static bleResult_t  Las_RecordLampRGB     (uint16_t serviceHandle);
+static bleResult_t  Las_RecordLampRGB     (uint16_t serviceHandle, uint8_t notify);
 static bleResult_t  Las_RecordOnTimer     (uint16_t serviceHandle, uint8_t timerOnOff, uint32_t seconds);
 
 static void FadeTimerCallback(void* pParam);
@@ -126,9 +129,9 @@ bleResult_t Las_Start (lasConfig_t *pServiceConfig)
 
     /* TODO: get data from Flash using some board.c function to read */  
     result = Las_SetLampWhite   (pServiceConfig->serviceHandle, LA_LAMP_WARM_WHITE, LA_LAMP_COLD_WHITE, FALSE, FALSE);
-    result = Las_SetLampRGB     (pServiceConfig->serviceHandle, LA_LAMP_R, LA_LAMP_G, LA_LAMP_B);
+    result = Las_SetLampRGB     (pServiceConfig->serviceHandle, LA_LAMP_R, LA_LAMP_G, LA_LAMP_B, FALSE);
     control.raw8 = LA_LAMP_CONTROL;
-    result = Las_SetLampControl (pServiceConfig->serviceHandle, control, FALSE, lamp_NVdata.fadeSpeedMs);
+    result = Las_SetLampControl (pServiceConfig->serviceHandle, control, FALSE, lamp_cfg.fadeTimeMs);
     
     
     mLas_serviceHandle = pServiceConfig->serviceHandle;
@@ -157,7 +160,7 @@ bleResult_t Las_Subscribe(deviceId_t deviceId)
       {
         control = lamp_NVdata.lampControl;
         control.bit.OnOff = 1;
-        Las_SetLampControl (mLas_serviceHandle, control, TRUE, lamp_NVdata.fadeSpeedMs);
+        Las_SetLampControl (mLas_serviceHandle, control, TRUE, lamp_cfg.fadeTimeMs);
       }
     }   
 
@@ -178,7 +181,7 @@ bleResult_t Las_Unsubscribe()
       {
         control = lamp_NVdata.lampControl;
         control.bit.OnOff = 0;
-        Las_SetLampControl (mLas_serviceHandle, control, FALSE, lamp_NVdata.fadeSpeedMs);   
+        Las_SetLampControl (mLas_serviceHandle, control, FALSE, lamp_cfg.fadeTimeMs);   
       }
     }
     
@@ -406,30 +409,14 @@ bleResult_t Las_SetLampWhite (uint16_t serviceHandle, uint8_t warmW, uint8_t col
     /* update DB */
     result = Las_RecordLampWhite(serviceHandle, notify);
     
-    /* when max white is reach - make a blink */
+    /* when max white or rgb is reach - make a blink */
     if (showMax)
     {
-      if( lamp_NVdata.lampControl.bit.mix)
-      {
-        if ( (lamp_NVdata.lampWhite.uint8.warmW == PWM_factor_MAX) || (lamp_NVdata.lampWhite.uint8.coldW == PWM_factor_MAX) )
-        {
-          /* start fade timer - blink */
-          FadeOnMutex=true;
-          tmrFadeId  = TMR_AllocateTimer();
-          temp_lamp_NVdata.lampControl.raw8 = blinkCnt_d;
-          TMR_StartTimer(tmrFadeId, gTmrIntervalTimer_c, TmrMilliseconds(blinkSpeedMs_d), BlinkTimerCallback, NULL); 
-        }
-      } else
-      {
-        if ( (lamp_NVdata.lampWhite.uint8.warmW == PWM_factor_MAX) && (lamp_NVdata.lampWhite.uint8.coldW == PWM_factor_MAX) )
-        {
-          /* start fade timer - blink */
-          FadeOnMutex=true;
-          tmrFadeId  = TMR_AllocateTimer();
-          temp_lamp_NVdata.lampControl.raw8 = blinkCnt_d;
-          TMR_StartTimer(tmrFadeId, gTmrIntervalTimer_c, TmrMilliseconds(blinkSpeedMs_d), BlinkTimerCallback, NULL);           
-        }
-      }
+      /* start fade timer - blink */
+      FadeOnMutex=true;
+      tmrFadeId  = TMR_AllocateTimer();
+      temp_lamp_NVdata.lampControl.raw8 = lamp_cfg.blinkCnt;
+      TMR_StartTimer(tmrFadeId, gTmrIntervalTimer_c, TmrMilliseconds(lamp_cfg.blinkTimeMs), BlinkTimerCallback, NULL); 
     } // end showMax
     
   } // end upd_db
@@ -438,7 +425,7 @@ bleResult_t Las_SetLampWhite (uint16_t serviceHandle, uint8_t warmW, uint8_t col
 }
 
 
-bleResult_t Las_SetLampRGB (uint16_t serviceHandle, uint8_t red, uint8_t green, uint8_t blue)
+bleResult_t Las_SetLampRGB (uint16_t serviceHandle, uint8_t red, uint8_t green, uint8_t blue, bool notify)
 {
   bleResult_t result = gBleSuccess_c;
   uint8_t upd_db = 0;
@@ -482,7 +469,7 @@ bleResult_t Las_SetLampRGB (uint16_t serviceHandle, uint8_t red, uint8_t green, 
   if(upd_db)
   {
     /* update DB */
-    result = Las_RecordLampRGB(serviceHandle);  
+    result = Las_RecordLampRGB(serviceHandle, notify);  
   } 
   
     return result;
@@ -614,7 +601,7 @@ static bleResult_t Las_RecordLampWhite (uint16_t serviceHandle, uint8_t notify)
     return gBleSuccess_c;
 }
 
-static bleResult_t Las_RecordLampRGB (uint16_t serviceHandle)
+static bleResult_t Las_RecordLampRGB (uint16_t serviceHandle, uint8_t notify)
 {
     uint16_t  handle;
     bleResult_t result;
@@ -634,6 +621,8 @@ static bleResult_t Las_RecordLampRGB (uint16_t serviceHandle)
 
       if (result != gBleSuccess_c)
           return result;
+      
+      if (notify) Hls_LampNotification(handle);
     }
 
     return gBleSuccess_c;
@@ -891,8 +880,8 @@ static void BlinkTimerCallback(void * pParam)
         TPM_PWM_ColdWhite( 0 ); 
       } else
       {
-        TPM_PWM_WarmWhite( lamp_NVdata.lampWhite.uint8.warmW );
-        TPM_PWM_ColdWhite( lamp_NVdata.lampWhite.uint8.coldW );         
+        TPM_PWM_WarmWhite( 30 );
+        TPM_PWM_ColdWhite( 30 );         
       }
       
       if(temp_lamp_NVdata.lampControl.raw8 > 0) { temp_lamp_NVdata.lampControl.raw8--; }

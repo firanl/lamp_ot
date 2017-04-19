@@ -70,19 +70,19 @@
 
 
 typedef struct tsi_touch_tag {
-    uint16_t low;              /*!< TSI idle value sensor not pressed  */
-    uint8_t sensitivity;       /*!< TSI treshold add value, default 10 */
-    uint8_t tmr;               /*!< TSI update time in mili seconds, default 15 ms */
+    uint16_t low;               /*!< TSI idle value sensor not pressed  */
+    uint8_t  sensitivity;       /*!< TSI treshold add value, default 10 */
+    uint8_t  tmr;               /*!< TSI update time in mili seconds, default 15 ms */
     
-    uint8_t InitHitCnt;         /* Intermediate state hit cnt  */
-    uint8_t InitIdleCnt;        /* Intermediate state idle cnt */
-    uint8_t InitHitHitCnt;      /* Long Press Series hit cnt */
-    uint8_t InitHitIdleCnt;     /* Intermediate not used state idle cnt  */
+    uint8_t  InitHitCnt;         /* Intermediate state hit cnt  */
+    uint8_t  InitIdleCnt;        /* Intermediate state idle cnt */
+    uint8_t  InitHitHitCnt;      /* Long Press Series hit cnt */
+    uint8_t  InitHitIdleCnt;     /* Intermediate not used state idle cnt  */
     
-    uint8_t InitIdleHitCnt;     /* Intermediate state hit cnt */
-    uint8_t InitIdleIdleCnt;    /* Idle state idle cnt  */
-    uint8_t InitIdleHitHitCnt;  /* First Long Press hit cnt */
-    uint8_t InitIdleHitIdleCnt; /* Short Press  idle cnt */
+    uint8_t  InitIdleHitCnt;     /* Intermediate state hit cnt */
+    uint8_t  InitIdleIdleCnt;    /* Idle state idle cnt  */
+    uint8_t  InitIdleHitHitCnt;  /* First Long Press hit cnt */
+    uint8_t  InitIdleHitIdleCnt; /* Short Press  idle cnt */
     
     uint16_t stuckBtnCntMax;     /*!< TSI  Long Press Series succesive count that triggers recalibration, default 5 minutes */ 
 } tsi_touch_t;

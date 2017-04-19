@@ -108,6 +108,9 @@ int16_t gCoreTemperatureFaliure;
 extern lamp_NVdata_t lamp_NVdata;
 extern lasConfig_t lasServiceConfig;
 
+/* lamp cfg params */
+extern lamp_config_t lamp_cfg;
+
 /******************************************************************************
 * Private Function prototypes
 ******************************************************************************/
@@ -198,7 +201,7 @@ void measure_chip_temperature (void){
               {
                 control = lamp_NVdata.lampControl;     
                 control.bit.OnOff = 0;
-                Las_SetLampControl (lasServiceConfig.serviceHandle, control, TRUE, fadeSpeedMsTemp_d); 
+                Las_SetLampControl (lasServiceConfig.serviceHandle, control, TRUE, lamp_cfg.fadeTimeCritMs); 
               }
         }
   }

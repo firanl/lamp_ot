@@ -71,6 +71,9 @@ extern uint8_t gBDAddress_c[];
 /* lamp control light data */
 lamp_NVdata_t lamp_NVdata;
 
+/* lamp cfg params */
+lamp_config_t lamp_cfg;
+
 /************************************************************************************
 * Private memory declarations
 ************************************************************************************/
@@ -192,15 +195,11 @@ void hardware_init(void) {
 static void initHardwareParameters(void)
 { 
   /* init lamp data */
-  /*
-  lamp_NVdata.lampControl.raw8 = LA_LAMP_CONTROL;
-  lamp_NVdata.lampWhite.uint8.warmW = LA_LAMP_WARM_WHITE;
-  lamp_NVdata.lampWhite.uint8.coldW = LA_LAMP_COLD_WHITE;
-  lamp_NVdata.lampRGB.uint8.r = LA_LAMP_R;
-  lamp_NVdata.lampRGB.uint8.g = LA_LAMP_G;
-  lamp_NVdata.lampRGB.uint8.b = LA_LAMP_B;
-  */
-  lamp_NVdata.fadeSpeedMs = fadeSpeedMs_d;
+
+  lamp_cfg.blinkCnt       = blinkCnt_d;
+  lamp_cfg.blinkTimeMs    = blinkTimeMs_d;
+  lamp_cfg.fadeTimeCritMs = fadeTimeCritMs_d;
+  lamp_cfg.fadeTimeMs     = fadeTimeMs_d;
   
   /* init MAC ADRESS */  
   clone_RSIM_private_static_MAC(gBDAddress_c);

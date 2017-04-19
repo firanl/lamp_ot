@@ -37,6 +37,8 @@
 /************************************************************************************
 * Include
 ************************************************************************************/
+#include <stdio.h>
+
 #include "ble_general.h"
 #include "gatt_db_app_interface.h"
 #include "gatt_server_interface.h"
@@ -44,10 +46,34 @@
 #include "device_info_interface.h"
 #include "OtaSupport.h"
 
+#include "board.h"
+
 /************************************************************************************
 * Private constants & macros
 ************************************************************************************/
-#define DIS_uint32_FF          0xFF,0xFF,0xFF,0xFF
+
+/* Hardware Revision String */
+#if defined(__IAR_SYSTEMS_ICC__)
+  #pragma location = "HwRevStringMem"
+  const uint8_t HRS[4] = 
+#elif defined(__GNUC__)
+  const uint8_t HRS[4]  __attribute__ ((section(".HwRevStringMem"))) = 
+#else
+  const uint8_t HRS[4] = 
+#endif
+{ DI_HardwareRevisionString };
+
+/* Serial Number */
+#if defined(__IAR_SYSTEMS_ICC__)
+  #pragma location = "SerialNumberMem"
+  const serial_number_t SerialNumber = 
+#elif defined(__GNUC__)
+  const serial_number_t SerialNumber  __attribute__ ((section(".SerialNumberMem"))) = 
+#else
+  const serial_number_t SerialNumber = 
+#endif
+{ DI_SerialNumberMem };
+
 
 /************************************************************************************
 * Private type definitions
@@ -59,6 +85,7 @@
 * Private memory declarations
 ************************************************************************************/
 extern const bootInfo_t gBootFlags;
+extern uint32_t SERIAL_NUMBER_ADDR[];
 
 /************************************************************************************
 * Private functions prototypes
@@ -74,12 +101,17 @@ bleResult_t Dis_Start (disConfig_t *pServiceConfig)
 {
     bleResult_t result = gBleSuccess_c;
     bleUuid_t uuid;
+    char SerialNumberString[15] = {0};
+    uint8_t a;
 
-    uuid.uuid16 = gBleSig_SerialNumberString_d;
-    //result = Dis_UpdateDB(pServiceConfig->serviceHandle, uuid, 4, SerialNumberString);
+    /* convert serial number from memory 8 bytes to ASCII */
+    sprintf(SerialNumberString,"%02d-%04d-%05d", SerialNumber.param.Prod, SerialNumber.param.DOY, SerialNumber.param.UnitId);
     
+    uuid.uuid16 = gBleSig_SerialNumberString_d;
+    result = Dis_UpdateDB(pServiceConfig->serviceHandle, uuid, sizeof(DI_SerialNumberString), (uint8_t*) SerialNumberString);
+
     uuid.uuid16 = gBleSig_HardwareRevisionString_d;
-    //result = Dis_UpdateDB(pServiceConfig->serviceHandle, uuid, 4, HardwareRevisionString);
+    result = Dis_UpdateDB(pServiceConfig->serviceHandle, uuid, 4, HRS);
     
     uuid.uuid16 = gBleSig_FirmwareRevisionString_d;
     result = Dis_UpdateDB(pServiceConfig->serviceHandle, uuid, 2, gBootFlags.version);

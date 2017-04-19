@@ -124,7 +124,7 @@ static  bool_t    mNewImageReady = FALSE;
 #else
   const bootInfo_t gBootFlags = 
 #endif
-  { {gBootValueForFALSE_c}, {gBootValueForTRUE_c}, {DI_FirmwareRevisionMajor, DI_FirmwareRevisionMinor} };
+  { {gBootValueForFALSE_c}, {gBootValueForTRUE_c}, {DI_FirmwareRevision} };
 
 /* Contains Application Callbacks for packets received over the serial interface */
 #if gEnableOTAServer_d
