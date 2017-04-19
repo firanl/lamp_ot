@@ -153,7 +153,7 @@ void measure_chip_temperature (void){
   adc16_status_t result;
   int16_t bandgapVoltageAdcReading, temperatureChannelAdcReading;
   int16_t vTemperatureSensor;
-  uint8_t control;
+  lamp_control_t control;
 
   
   /* Start Bandgap Voltage Measurements */
@@ -196,9 +196,9 @@ void measure_chip_temperature (void){
               /* If failure temperature is reached stop all PWM TPM outputs and try to BT notify */
               if(g_chip_TV.int16.gCoreTemperature > gCoreTemperatureFaliure)
               {
-                control = lamp_NVdata.lampControl.raw8 & 0x7F;           
-                Las_SetLampControl (lasServiceConfig.serviceHandle, control, TRUE); 
-                // TODO if fails TPM_PWM_Off();
+                control = lamp_NVdata.lampControl;     
+                control.bit.OnOff = 0;
+                Las_SetLampControl (lasServiceConfig.serviceHandle, control, TRUE, fadeSpeedMsTemp_d); 
               }
         }
   }

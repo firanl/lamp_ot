@@ -2,6 +2,8 @@
  * Copyright (c) 2013 - 2015, Freescale Semiconductor, Inc.
  * All rights reserved.
  *
+ * \file board.h
+ *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
  *
@@ -92,70 +94,85 @@
   #define BOARD_RTC_FUNC_INSTANCE         0
 
 
-/* service_lamp db defaults */
+
    
-#define LA_LAMP_GapAdShortenedLocalName  "Lampster"
-#define LA_LAMP_GapAd_uuid_service   uuid_service_otap
-    //uuid_service_otap 
-   //uuid_service_lamp
+/* BLE Advertising Data from app_config.c */
+  #define LA_LAMP_GapAdShortenedLocalName  "Lampster"
+  /* Adv service support from Kinetis BLE Toolbox - OTAP */ 
+  #define LA_LAMP_GapAd_uuid_service   uuid_service_otap
+  /* Adv service */ 
+  //#define LA_LAMP_GapAd_uuid_service   uuid_service_lamp
+
    
-   
-#define LA_LAMP_GapDeviceName            "Lampster"
+/* BLE GAP service default data from gatt_db.h */   
+  #define LA_LAMP_GapDeviceName            "Lampster"
 
 
-#define DI_ManufacturerNameString  "Freescale"
-#define DI_ModelNumberString       "LA-2017"
-#define DI_SerialNumberString      "123"
-#define DI_HardwareRevisionString  "002"
-#define DI_FirmwareRevisionString  "001"
-#define DI_SoftwareRevisionString  "001"
+/* BLE Device Info service default data from gatt_db.h  */
+  #define DI_ManufacturerNameString  "Win Enterprise Holdings LLC"
+  #define DI_ModelNumberString       "LA-2017"
+  /* written in production by programmer 4 bytes, default 0xFF, 0xFF, 0xFF, 0xFF */
+  #define DI_SerialNumberString      "\xFF\xFF\xFF\xFF"
+  /* Hardware Revision 4 bytes Major byte, Minor byte ASCII 0x30 - 0x39 and 0x41 0x5A and 0x61 0x7A */
+  #define DI_HardwareRevisionString  "100"
+  /* Firmware Revision 2 bytes Major byte, Minor byte ASCII 0x30 - 0x39 and 0x41 0x5A and 0x61 0x7A */ 
+  #define DI_FirmwareRevisionMajor  0x30
+  #define DI_FirmwareRevisionMinor  0x31
+  /* Software revision Major.Minor.Build */
+  #define DI_SoftwareRevisionString  "0.0.1"
 
-/* from gatt_db.h
-        VALUE(value_system_id, gBleSig_SystemId_d, (gPermissionFlagReadable_c), sizeof(DI_SystemId), DI_SystemId)
-    CHARACTERISTIC(char_rcdl, gBleSig_IeeeRcdl_d, (gGattCharPropRead_c) )
-        VALUE(value_rcdl, gBleSig_IeeeRcdl_d, (gPermissionFlagReadable_c), 4, DI_IeeeRcdl)
-    CHARACTERISTIC(char_pnp_id, gBleSig_PnpId_d, (gGattCharPropRead_c) )
-        VALUE(value_pnp_id, gBleSig_PnpId_d, (gPermissionFlagReadable_c), 7, DI_PnpId)   
-*/
+  /* from gatt_db.h
+          VALUE(value_system_id, gBleSig_SystemId_d, (gPermissionFlagReadable_c), sizeof(DI_SystemId), DI_SystemId)
+      CHARACTERISTIC(char_rcdl, gBleSig_IeeeRcdl_d, (gGattCharPropRead_c) )
+          VALUE(value_rcdl, gBleSig_IeeeRcdl_d, (gPermissionFlagReadable_c), 4, DI_IeeeRcdl)
+      CHARACTERISTIC(char_pnp_id, gBleSig_PnpId_d, (gGattCharPropRead_c) )
+          VALUE(value_pnp_id, gBleSig_PnpId_d, (gPermissionFlagReadable_c), 7, DI_PnpId)   
+  */
+  /*
+  #define DI_SystemId                "\x00\x00\x00\xFE\xFF\x9F\x04\x00"
+  #define DI_IeeeRcdl                0x00, 0x00, 0x00, 0x00
+  #define DI_PnpId                   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+  */
 
-#define DI_SystemId                "\x00\x00\x00\xFE\xFF\x9F\x04\x00"
-#define DI_IeeeRcdl                0x00, 0x00, 0x00, 0x00
-#define DI_PnpId                   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+/* BLE Lamp service default data from gatt_db.h  */  
+  #define LA_LAMP_CONTROL      0xC0
+  /*  Values 0% 100% Range 0x00 0x64 */
+  #define LA_LAMP_WARM_WHITE   0x00
+  #define LA_LAMP_COLD_WHITE   0x10
+  #define LA_LAMP_R            0x00
+  #define LA_LAMP_G            0x01     
+  #define LA_LAMP_B            0x00 
 
-  
-#define LA_LAMP_CONTROL      0xB0
-#define LA_LAMP_WARM_WHITE   0x00
-#define LA_LAMP_COLD_WHITE   0x00
-#define LA_LAMP_R            0x00
-#define LA_LAMP_G            0x01     
-#define LA_LAMP_B            0x00 
+  /* temperature value - default 20.01 */
+  #define LA_LAMP_TEMP         0xD1, 0x07
+  /* core voltage - default 3.303 */
+  #define LA_LAMP_VCC          0xE4, 0x0C
 
-/* temperature value - default 20.01 */
-#define LA_LAMP_TEMP         0xD1, 0x07
-/* core voltage - default 3.303 */
-#define LA_LAMP_VCC          0xE4, 0x0C
+  /* from gatt_db.h
+      CHARACTERISTIC(char_lamp_clock, gBleSig_Date_Time_d, (gGattCharPropNotify_c | gGattCharPropRead_c | gGattCharPropWrite_c) )
+          VALUE(value_lamp_clock,  gBleSig_Date_Time_d, (gPermissionFlagReadable_c | gPermissionFlagWritable_c), 7, LA_DATE_TIME_Y, LA_DATE_TIME_M, LA_DATE_TIME_D, LA_DATE_TIME_H, LA_DATE_TIME_MI, LA_DATE_TIME_S )
+          CCCD(cccd_lamp_clock) 
+  */
+  /*
+  // Year 1582 9999 defaulf 2017
+  #define LA_DATE_TIME_Y       0xE1, 0x07  
+  // Month 0 	12 values: 0 Month is not known; default 1 January
+  #define LA_DATE_TIME_M       0x01  
+  // Day 1 	31
+  #define LA_DATE_TIME_D       0x07
+  // Hours 0 	23
+  #define LA_DATE_TIME_H       0x09
+  // default 35
+  #define LA_DATE_TIME_MI      0x23
+  // default 
+  #define LA_DATE_TIME_S       0x01
+  */
 
-/* from gatt_db.h
-    CHARACTERISTIC(char_lamp_clock, gBleSig_Date_Time_d, (gGattCharPropNotify_c | gGattCharPropRead_c | gGattCharPropWrite_c) )
-        VALUE(value_lamp_clock,  gBleSig_Date_Time_d, (gPermissionFlagReadable_c | gPermissionFlagWritable_c), 7, LA_DATE_TIME_Y, LA_DATE_TIME_M, LA_DATE_TIME_D, LA_DATE_TIME_H, LA_DATE_TIME_MI, LA_DATE_TIME_S )
-        CCCD(cccd_lamp_clock) 
-*/
-/*
-// Year 1582 9999 defaulf 2017
-#define LA_DATE_TIME_Y       0xE1, 0x07  
-// Month 0 	12 values: 0 Month is not known; default 1 January
-#define LA_DATE_TIME_M       0x01  
-// Day 1 	31
-#define LA_DATE_TIME_D       0x07
-// Hours 0 	23
-#define LA_DATE_TIME_H       0x09
-// default 35
-#define LA_DATE_TIME_MI      0x23
-// default 
-#define LA_DATE_TIME_S       0x01
-*/
-
-  
+  /* lamp control fade speed */
+  #define fadeSpeedMs_d           17
+  #define fadeSpeedMsTemp_d        6
+  #define blinkSpeedMs_d         300   
+  #define blinkCnt_d               5 
    
 
 typedef union prog_cycles_tag {
@@ -182,11 +199,12 @@ typedef union lamp_control_tag {
 	} bit;
 } lamp_control_t;
 
-enum
+enum mix_e
 {
   whiteMixLock_c = 0,
   whiteMixUnLock_c, 
 };
+
 
 typedef union lamp_white_tag {
 	uint16_t raw16;
@@ -199,14 +217,15 @@ typedef union lamp_white_tag {
 typedef union lamp_color_tag {
 	uint32_t raw32;
 	struct {	
-		uint8_t r;	  /*!< 	LSB  red          */
-		uint8_t g;        /*!<       green         */
-		uint8_t b;        /*!<       blue           */
+		uint8_t r;	  /*!< 	LSB  red               */
+		uint8_t g;        /*!<       green             */
+		uint8_t b;        /*!<       blue              */
 		uint8_t padding;  /*!<  MSB	 - not used 0  */
 	} uint8;
 } lamp_color_t;
 
 typedef struct lamp_NVdata_tag {
+    uint8_t                  fadeSpeedMs;       // uint8_t
     lamp_control_t           lampControl;       // uint8_t
     lamp_white_t             lampWhite;         // uint16_t
     lamp_color_t             lampRGB;           // uint32_t

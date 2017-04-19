@@ -1,5 +1,5 @@
 PRIMARY_SERVICE(service_gatt, gBleSig_GenericAttributeProfile_d)
-    CHARACTERISTIC(char_service_changed, gBleSig_GattServiceChanged_d, (gGattCharPropRead_c | gGattCharPropNotify_c) )
+    CHARACTERISTIC(char_service_changed, gBleSig_GattServiceChanged_d, ( gGattCharPropNotify_c) )
         VALUE(value_service_changed, gBleSig_GattServiceChanged_d, (gPermissionNone_c), gBleSig_GattServiceChanged_Bytes_d, gBleSig_GattServiceChanged_SAAHR_d, gBleSig_GattServiceChanged_EAAHR_d)
         CCCD(cccd_service_changed)
 
@@ -23,15 +23,10 @@ PRIMARY_SERVICE(service_device_info, gBleSig_DeviceInformationService_d)
     CHARACTERISTIC(char_hw_rev, gBleSig_HardwareRevisionString_d, (gGattCharPropRead_c) )
         VALUE(value_hw_rev, gBleSig_HardwareRevisionString_d, (gPermissionFlagReadable_c), sizeof(DI_HardwareRevisionString), DI_HardwareRevisionString)
     CHARACTERISTIC(char_fw_rev, gBleSig_FirmwareRevisionString_d, (gGattCharPropRead_c) )
-        VALUE(value_fw_rev, gBleSig_FirmwareRevisionString_d, (gPermissionFlagReadable_c), sizeof(DI_FirmwareRevisionString), DI_FirmwareRevisionString)
+        VALUE(value_fw_rev, gBleSig_FirmwareRevisionString_d, (gPermissionFlagReadable_c), 2, DI_FirmwareRevisionMajor, DI_FirmwareRevisionMinor)
     CHARACTERISTIC(char_sw_rev, gBleSig_SoftwareRevisionString_d, (gGattCharPropRead_c) )
         VALUE(value_sw_rev, gBleSig_SoftwareRevisionString_d, (gPermissionFlagReadable_c), sizeof(DI_SoftwareRevisionString), DI_SoftwareRevisionString)
-    CHARACTERISTIC(char_system_id, gBleSig_SystemId_d, (gGattCharPropRead_c) )
-        VALUE(value_system_id, gBleSig_SystemId_d, (gPermissionFlagReadable_c), sizeof(DI_SystemId), DI_SystemId)
-    CHARACTERISTIC(char_rcdl, gBleSig_IeeeRcdl_d, (gGattCharPropRead_c) )
-        VALUE(value_rcdl, gBleSig_IeeeRcdl_d, (gPermissionFlagReadable_c), 4, DI_IeeeRcdl)
-    CHARACTERISTIC(char_pnp_id, gBleSig_PnpId_d, (gGattCharPropRead_c) )
-        VALUE(value_pnp_id, gBleSig_PnpId_d, (gPermissionFlagReadable_c), 7, DI_PnpId)           
+          
           
 PRIMARY_SERVICE_UUID128(service_lamp, uuid_service_lamp)
     CHARACTERISTIC_UUID128(char_lamp_Control, uuid_char_lamp_Control, (gGattCharPropNotify_c | gGattCharPropRead_c | gGattCharPropWrite_c ) )
@@ -64,10 +59,11 @@ PRIMARY_SERVICE_UUID128(service_lamp, uuid_service_lamp)
         VALUE_UUID128(value_lamp_off_sec, uuid_char_lamp_off_sec, (gPermissionFlagReadable_c | gPermissionFlagWritable_c), 4, 0x00, 0x00, 0x00, 0x00)   
         CCCD(cccd_lamp_off_sec)     
           
-     CHARACTERISTIC_UUID128(char_lamp_TSI, uuid_char_lamp_TSI, ( gGattCharPropNotify_c | gGattCharPropRead_c | gGattCharPropWrite_c ) )
-        VALUE_UUID128(value_lamp_TSI, uuid_char_lamp_TSI, (gPermissionFlagReadable_c | gPermissionFlagWritable_c), 3, 0x00, 0x00, 0x00)   
+     CHARACTERISTIC_UUID128(char_lamp_config, uuid_char_lamp_config, ( gGattCharPropNotify_c | gGattCharPropRead_c | gGattCharPropWrite_c ) )
+        VALUE_UUID128(value_lamp_config, uuid_char_lamp_config, (gPermissionFlagReadable_c | gPermissionFlagWritable_c), 3, 0x00, 0x00, 0x00)   
         CCCD(cccd_lamp_TSI)          
 
+          
 PRIMARY_SERVICE_UUID128(service_otap, uuid_service_otap)
     CHARACTERISTIC_UUID128(char_otap_control_point, uuid_char_otap_control_point, (gGattCharPropWrite_c | gGattCharPropIndicate_c))
         VALUE_UUID128_VARLEN(value_otap_control_point, uuid_char_otap_control_point, (gPermissionFlagWritable_c), 16, 16, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00)

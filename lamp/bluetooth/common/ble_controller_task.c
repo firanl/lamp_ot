@@ -81,17 +81,8 @@ OSA_TASK_DEFINE(CTRLR, gControllerTaskStackSize_c);
 #define BD_ADDR_BYTES 6   
 
 /* Public Device Address */
-#if (initConstPublicDeviceAddress_d)
-  #if defined(__IAR_SYSTEMS_ICC__)
-    #pragma location = "gBDAddress_ROM"
-    const uint8_t gBDAddress_c[BD_ADDR_BYTES] 
-  #else
-    const uint8_t gBDAddress_c[BD_ADDR_BYTES]  
-  #endif
-   = {BD_ADDR}; //  = {BD_ADDR_FF};
-#else
-    uint8_t gBDAddress_c[BD_ADDR_BYTES] = {BD_ADDR};
-#endif
+uint8_t gBDAddress_c[BD_ADDR_BYTES] = {BD_ADDR};
+
     
 /* Time between the beginning of two consecutive advertising PDU's */
 const uint8_t gAdvertisingPacketInterval_c = mcAdvertisingPacketInterval_c;

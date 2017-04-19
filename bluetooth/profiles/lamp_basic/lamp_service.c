@@ -75,6 +75,8 @@ static deviceId_t mLas_SubscribedClientId;
 
 static deviceId_t mLas_serviceHandle;
 
+static bool FadeOnMutex;
+
 /* timers 3 */
   /* Fade in out lamp control */
   static tmrTimerID_t tmrFadeId;
@@ -83,7 +85,7 @@ static deviceId_t mLas_serviceHandle;
   /* Set off lamp timer */
   static tmrTimerID_t tmrOff_secondsId;
 
-
+static lamp_NVdata_t temp_lamp_NVdata; 
 
 /************************************************************************************
 * Private functions prototypes
@@ -97,6 +99,7 @@ static bleResult_t  Las_RecordLampRGB     (uint16_t serviceHandle);
 static bleResult_t  Las_RecordOnTimer     (uint16_t serviceHandle, uint8_t timerOnOff, uint32_t seconds);
 
 static void FadeTimerCallback(void* pParam);
+static void BlinkTimerCallback(void * pParam);
 static void OnTimerCallback(void* pParam);
 static void OffTimerCallback(void* pParam);
 
@@ -112,17 +115,20 @@ extern void ResetMCU(void);
 bleResult_t Las_Start (lasConfig_t *pServiceConfig)
 {    
     bleResult_t result;
+    lamp_control_t control;
       
     mLas_SubscribedClientId = gInvalidDeviceId_c;
-  
-    tmrFadeId  = TMR_AllocateTimer();
     
     TPM_PWM_Off();
+    
+    FadeOnMutex=false;
+    temp_lamp_NVdata.lampControl.raw8 = 0;
 
     /* TODO: get data from Flash using some board.c function to read */  
-    result = Las_SetLampWhite   (pServiceConfig->serviceHandle, LA_LAMP_WARM_WHITE, LA_LAMP_COLD_WHITE, FALSE);
+    result = Las_SetLampWhite   (pServiceConfig->serviceHandle, LA_LAMP_WARM_WHITE, LA_LAMP_COLD_WHITE, FALSE, FALSE);
     result = Las_SetLampRGB     (pServiceConfig->serviceHandle, LA_LAMP_R, LA_LAMP_G, LA_LAMP_B);
-    result = Las_SetLampControl (pServiceConfig->serviceHandle, LA_LAMP_CONTROL, FALSE);
+    control.raw8 = LA_LAMP_CONTROL;
+    result = Las_SetLampControl (pServiceConfig->serviceHandle, control, FALSE, lamp_NVdata.fadeSpeedMs);
     
     
     mLas_serviceHandle = pServiceConfig->serviceHandle;
@@ -138,7 +144,7 @@ bleResult_t Las_Stop (lasConfig_t *pServiceConfig)
 
 bleResult_t Las_Subscribe(deviceId_t deviceId)
 {
-   uint8_t control;
+   lamp_control_t control;
    
     mLas_SubscribedClientId = deviceId;
    
@@ -147,10 +153,11 @@ bleResult_t Las_Subscribe(deviceId_t deviceId)
     if(lamp_NVdata.lampControl.bit.BTcon)
     {
       /* and lamp was set before */
-      if(lamp_NVdata.lampControl.bit.White || lamp_NVdata.lampControl.bit.Color)
+      if( (!lamp_NVdata.lampControl.bit.OnOff) && (lamp_NVdata.lampControl.bit.White || lamp_NVdata.lampControl.bit.Color) )
       {
-        control = lamp_NVdata.lampControl.raw8 | 0x80;
-        Las_SetLampControl (mLas_serviceHandle, control, TRUE);
+        control = lamp_NVdata.lampControl;
+        control.bit.OnOff = 1;
+        Las_SetLampControl (mLas_serviceHandle, control, TRUE, lamp_NVdata.fadeSpeedMs);
       }
     }   
 
@@ -159,7 +166,7 @@ bleResult_t Las_Subscribe(deviceId_t deviceId)
 
 bleResult_t Las_Unsubscribe()
 {
-   uint8_t control;
+   lamp_control_t control;
 
     mLas_SubscribedClientId = gInvalidDeviceId_c;
     
@@ -167,10 +174,11 @@ bleResult_t Las_Unsubscribe()
     if(lamp_NVdata.lampControl.bit.BTcon)
     {
       /* and lamp was set before */
-      if(lamp_NVdata.lampControl.bit.White || lamp_NVdata.lampControl.bit.Color)
+      if(lamp_NVdata.lampControl.bit.OnOff && ( lamp_NVdata.lampControl.bit.White || lamp_NVdata.lampControl.bit.Color) )
       {
-        control = lamp_NVdata.lampControl.raw8 & 0x7F;
-        Las_SetLampControl (mLas_serviceHandle, control, FALSE);   
+        control = lamp_NVdata.lampControl;
+        control.bit.OnOff = 0;
+        Las_SetLampControl (mLas_serviceHandle, control, FALSE, lamp_NVdata.fadeSpeedMs);   
       }
     }
     
@@ -220,119 +228,159 @@ bleResult_t Las_RecordMeasurementTV (uint16_t serviceHandle)
 
 
 
-bleResult_t Las_SetLampControl (uint16_t serviceHandle, uint8_t control, uint8_t notify)
+bleResult_t Las_SetLampControl (uint16_t serviceHandle, lamp_control_t control, bool notify, uint8_t speedMs)
 {
   bleResult_t result = gBleSuccess_c;
-  lamp_control_t lamp_ctrl;
 
-  lamp_ctrl.raw8 = control;
+
+  /* check if reset */
+  /* TODO: send it twice ? */
+  if(control.raw8 == 0x04) { ResetMCU(); return gBleSuccess_c; }
   
-  /* see some differences from old control */   
-  if (lamp_ctrl.raw8 != lamp_NVdata.lampControl.raw8)
-  { 
-    /* check if reset */
-    /* TODO: send it twice ? */
-    if(lamp_ctrl.raw8 == 0x04) { ResetMCU(); return result; }
+  /* if fade timer is on do not enter control */ 
+  if(FadeOnMutex) { return gBleUnavailable_c; }
+
+  if (control.raw8 != lamp_NVdata.lampControl.raw8)
+  {
+    temp_lamp_NVdata.lampControl.raw8 = 0;
+    lamp_NVdata.lampControl.bit.BTcon = control.bit.BTcon;
+    lamp_NVdata.lampControl.bit.mix   = control.bit.mix; 
     
-    
-    lamp_NVdata.lampControl.bit.BTcon = lamp_ctrl.bit.BTcon;
-    lamp_NVdata.lampControl.bit.mix = lamp_ctrl.bit.mix; 
-    
-    /* the on off state is changed */
-    if(lamp_ctrl.bit.OnOff != lamp_NVdata.lampControl.bit.OnOff)
+    /* do not permit special states */
+      /* 000x xxxx */
+      if( !(control.raw8 & 0xE0) ) { return gBleUnavailable_c; }
+      /* 100x xxxx */
+      if( (control.raw8 & 0xE0) == 0x80 ) { return gBleUnavailable_c; }
+  
+    /* turn off lamp - off state 0xx ( and 000 ) */
+    if( !control.bit.OnOff ) 
     {
-      lamp_NVdata.lampControl.bit.White = lamp_ctrl.bit.White; 
-      lamp_NVdata.lampControl.bit.Color = lamp_ctrl.bit.Color; 
-      
-      /* turn lamp on - stat fade on */
-      if(lamp_ctrl.bit.OnOff)
-      {      
-        ///===== fade on
-          if(lamp_NVdata.lampControl.bit.White)
-          {
-            /* white light is on */
-            TPM_PWM_WarmWhite(lamp_NVdata.lampWhite.uint8.warmW);
-            TPM_PWM_ColdWhite(lamp_NVdata.lampWhite.uint8.coldW);
-          }
-          else
-          {
-            TPM_PWM_WarmWhiteOff();
-            TPM_PWM_ColdWhiteOff();
-          }
+        lamp_NVdata.lampControl.bit.White = control.bit.White; 
+        lamp_NVdata.lampControl.bit.Color = control.bit.Color; 
+        lamp_NVdata.lampControl.bit.OnOff = control.bit.OnOff;          
+        
+        if (lamp_NVdata.lampControl.bit.White)
+        {
+          temp_lamp_NVdata.lampWhite.uint8.warmW = lamp_NVdata.lampWhite.uint8.warmW;
+          temp_lamp_NVdata.lampWhite.uint8.coldW = lamp_NVdata.lampWhite.uint8.coldW; 
+          temp_lamp_NVdata.lampControl.raw8 = 1;
+        }
+        
+        if (lamp_NVdata.lampControl.bit.Color)
+        {
+          temp_lamp_NVdata.lampRGB.uint8.r = lamp_NVdata.lampRGB.uint8.r;
+          temp_lamp_NVdata.lampRGB.uint8.g = lamp_NVdata.lampRGB.uint8.g;
+          temp_lamp_NVdata.lampRGB.uint8.b = lamp_NVdata.lampRGB.uint8.b; 
+          temp_lamp_NVdata.lampControl.raw8 += 2;
+        }
           
-          if(lamp_NVdata.lampControl.bit.Color)
-          {
-             /* color RGB light is on */
-             TPM_PWM_Red  (lamp_NVdata.lampRGB.uint8.r);
-             TPM_PWM_Green(lamp_NVdata.lampRGB.uint8.g);
-             TPM_PWM_Blue (lamp_NVdata.lampRGB.uint8.b);
-          } 
-          else
-          {
-             TPM_PWM_RedOff  ();
-             TPM_PWM_GreenOff();
-             TPM_PWM_BlueOff ();
-          }
-        ///=====      
-      }
-      /* turn lamp off - stat fade off */
-      else
-      {
-      ///===== fade off
-        TPM_PWM_Off();
-      ///=====
-      }
-      
-      lamp_NVdata.lampControl.bit.OnOff = lamp_ctrl.bit.OnOff; 
-    }
-    /* the White or RGB state is changed */
-    else
+      /* start fade timer - turn off */
+      FadeOnMutex=true;
+      tmrFadeId  = TMR_AllocateTimer();
+      TMR_StartTimer(tmrFadeId, gTmrIntervalTimer_c, TmrMilliseconds(speedMs), FadeTimerCallback, NULL);   
+    } else 
     {
-      lamp_NVdata.lampControl.bit.White = lamp_ctrl.bit.White; 
-      lamp_NVdata.lampControl.bit.Color = lamp_ctrl.bit.Color; 
-      
-      if(lamp_NVdata.lampControl.bit.White)
+        
+      /* turn on */
+      if( control.bit.OnOff  && (!lamp_NVdata.lampControl.bit.OnOff) )
       {
-        /* white light is on */
-        TPM_PWM_WarmWhite(lamp_NVdata.lampWhite.uint8.warmW);
-        TPM_PWM_ColdWhite(lamp_NVdata.lampWhite.uint8.coldW);
-      }
-      else
+        lamp_NVdata.lampControl.bit.White = control.bit.White; 
+        lamp_NVdata.lampControl.bit.Color = control.bit.Color; 
+        lamp_NVdata.lampControl.bit.OnOff = control.bit.OnOff;
+        
+        if (lamp_NVdata.lampControl.bit.White)
+        {
+          temp_lamp_NVdata.lampWhite.uint8.warmW = 0;
+          temp_lamp_NVdata.lampWhite.uint8.coldW = 0; 
+          temp_lamp_NVdata.lampControl.raw8 = 4;
+        }
+        
+        if (lamp_NVdata.lampControl.bit.Color)
+        {
+          temp_lamp_NVdata.lampRGB.uint8.r = 0;
+          temp_lamp_NVdata.lampRGB.uint8.g = 0;
+          temp_lamp_NVdata.lampRGB.uint8.b = 0; 
+          temp_lamp_NVdata.lampControl.raw8 += 5;
+        }      
+        
+        /* start fade timer - turn on*/
+        FadeOnMutex=true;
+        tmrFadeId  = TMR_AllocateTimer();
+        TMR_StartTimer(tmrFadeId, gTmrIntervalTimer_c, TmrMilliseconds(speedMs), FadeTimerCallback, NULL);  
+      } else
       {
-        TPM_PWM_WarmWhiteOff();
-        TPM_PWM_ColdWhiteOff();
-      }
-      
-      if(lamp_NVdata.lampControl.bit.Color)
-      {
-         /* color RGB light is on */
-         TPM_PWM_Red  (lamp_NVdata.lampRGB.uint8.r);
-         TPM_PWM_Green(lamp_NVdata.lampRGB.uint8.g);
-         TPM_PWM_Blue (lamp_NVdata.lampRGB.uint8.b);
-      } 
-      else
-      {
-         TPM_PWM_RedOff  ();
-         TPM_PWM_GreenOff();
-         TPM_PWM_BlueOff ();
+         
+        /* change on state  + White  01 -> 11 */  
+        if( (control.bit.White)  && (!lamp_NVdata.lampControl.bit.White) )
+        {
+            lamp_NVdata.lampControl.bit.White = control.bit.White;
+            
+            temp_lamp_NVdata.lampWhite.uint8.warmW = 0;
+            temp_lamp_NVdata.lampWhite.uint8.coldW = 0; 
+            temp_lamp_NVdata.lampControl.raw8 = 10;
+        } 
+        
+        /* change on state  - White  11 -> 01 */  
+        if( (!control.bit.White)  && (lamp_NVdata.lampControl.bit.White) )
+        {
+            lamp_NVdata.lampControl.bit.White = control.bit.White;
+          
+            temp_lamp_NVdata.lampWhite.uint8.warmW = lamp_NVdata.lampWhite.uint8.warmW;
+            temp_lamp_NVdata.lampWhite.uint8.coldW = lamp_NVdata.lampWhite.uint8.coldW; 
+            temp_lamp_NVdata.lampControl.raw8 = 11;
+        }   
+        
+        /* change on state  + RGB  10 -> 11 */  
+        if( (control.bit.Color)  && (!lamp_NVdata.lampControl.bit.Color) )
+        {
+            lamp_NVdata.lampControl.bit.Color = control.bit.Color; 
+          
+            temp_lamp_NVdata.lampRGB.uint8.r = 0;
+            temp_lamp_NVdata.lampRGB.uint8.g = 0;
+            temp_lamp_NVdata.lampRGB.uint8.b = 0; 
+            temp_lamp_NVdata.lampControl.raw8 += 12;
+        } 
+        
+        /* change on state  - RGB   11 -> 10  */  
+        if( (!control.bit.Color)  && (lamp_NVdata.lampControl.bit.Color) )
+        {
+            lamp_NVdata.lampControl.bit.Color = control.bit.Color; 
+          
+            temp_lamp_NVdata.lampRGB.uint8.r = lamp_NVdata.lampRGB.uint8.r;
+            temp_lamp_NVdata.lampRGB.uint8.g = lamp_NVdata.lampRGB.uint8.g;
+            temp_lamp_NVdata.lampRGB.uint8.b = lamp_NVdata.lampRGB.uint8.b; 
+            temp_lamp_NVdata.lampControl.raw8 += 14;
+        } 
+
+        /* start fade timer - change state*/
+        FadeOnMutex=true;
+        tmrFadeId  = TMR_AllocateTimer();
+        TMR_StartTimer(tmrFadeId, gTmrIntervalTimer_c, TmrMilliseconds(speedMs), FadeTimerCallback, NULL);         
+        
       }
     
     }
+    
     
     /* update DB */
     result = Las_RecordLampControl(serviceHandle, notify);
   }
   
-  
   return result;
 }
 
   
-bleResult_t Las_SetLampWhite (uint16_t serviceHandle, uint8_t warmW, uint8_t coldW, uint8_t notify)
+bleResult_t Las_SetLampWhite (uint16_t serviceHandle, uint8_t warmW, uint8_t coldW, bool notify, bool showMax)
 {
   bleResult_t result = gBleSuccess_c;
   uint8_t upd_db = 0;
+ 
+  /* if fade timer is on do not enter control */ 
+  if(FadeOnMutex) { return gBleUnavailable_c; }
   
+  /* do not permit false white on state */
+  if( (warmW + coldW) == 0) { warmW = 1; }
+    
   if (warmW != lamp_NVdata.lampWhite.uint8.warmW)
   {
     upd_db = 1;
@@ -351,13 +399,40 @@ bleResult_t Las_SetLampWhite (uint16_t serviceHandle, uint8_t warmW, uint8_t col
     {
       TPM_PWM_ColdWhite(lamp_NVdata.lampWhite.uint8.coldW); 
     }
-  }  
+  }
   
   if(upd_db)
   {
     /* update DB */
-    result = Las_RecordLampWhite(serviceHandle, notify);  
-  }
+    result = Las_RecordLampWhite(serviceHandle, notify);
+    
+    /* when max white is reach - make a blink */
+    if (showMax)
+    {
+      if( lamp_NVdata.lampControl.bit.mix)
+      {
+        if ( (lamp_NVdata.lampWhite.uint8.warmW == PWM_factor_MAX) || (lamp_NVdata.lampWhite.uint8.coldW == PWM_factor_MAX) )
+        {
+          /* start fade timer - blink */
+          FadeOnMutex=true;
+          tmrFadeId  = TMR_AllocateTimer();
+          temp_lamp_NVdata.lampControl.raw8 = blinkCnt_d;
+          TMR_StartTimer(tmrFadeId, gTmrIntervalTimer_c, TmrMilliseconds(blinkSpeedMs_d), BlinkTimerCallback, NULL); 
+        }
+      } else
+      {
+        if ( (lamp_NVdata.lampWhite.uint8.warmW == PWM_factor_MAX) && (lamp_NVdata.lampWhite.uint8.coldW == PWM_factor_MAX) )
+        {
+          /* start fade timer - blink */
+          FadeOnMutex=true;
+          tmrFadeId  = TMR_AllocateTimer();
+          temp_lamp_NVdata.lampControl.raw8 = blinkCnt_d;
+          TMR_StartTimer(tmrFadeId, gTmrIntervalTimer_c, TmrMilliseconds(blinkSpeedMs_d), BlinkTimerCallback, NULL);           
+        }
+      }
+    } // end showMax
+    
+  } // end upd_db
   
   return result;
 }
@@ -367,6 +442,12 @@ bleResult_t Las_SetLampRGB (uint16_t serviceHandle, uint8_t red, uint8_t green, 
 {
   bleResult_t result = gBleSuccess_c;
   uint8_t upd_db = 0;
+
+  /* if fade timer is on do not enter control */ 
+  if(FadeOnMutex) { return gBleUnavailable_c; }  
+  
+  /* do not permit false color on state */
+  if( (red + green + blue) == 0) { green = 1; }
   
   if (red != lamp_NVdata.lampRGB.uint8.r)
   {
@@ -618,13 +699,14 @@ static void Hls_LampNotification( uint16_t handle )
 ********************************************************************************** */
 static void OnTimerCallback(void * pParam)
 {
-    uint8_t control;
+    lamp_control_t control;
     
     /*  lamp was set before */
 
     /* turn on lamp */
-    control = lamp_NVdata.lampControl.raw8 | 0x80;
-    Las_SetLampControl (mLas_serviceHandle, control, TRUE);
+    control = lamp_NVdata.lampControl;
+    control.bit.OnOff = 1;
+    Las_SetLampControl (mLas_serviceHandle, control, TRUE, FALSE);
 }
 
 /*! *********************************************************************************
@@ -634,11 +716,189 @@ static void OnTimerCallback(void * pParam)
 ********************************************************************************** */
 static void OffTimerCallback(void * pParam)
 {
-    uint8_t control;
+    lamp_control_t control;
 
     /* turn off lamp and notify */
-    control = lamp_NVdata.lampControl.raw8 & 0x7F;
-    Las_SetLampControl (mLas_serviceHandle, control, TRUE);  
+    control = lamp_NVdata.lampControl;
+    control.bit.OnOff = 0;
+    Las_SetLampControl (mLas_serviceHandle, control, TRUE, FALSE);  
+}
+
+
+/*! *********************************************************************************
+* \brief        Fade Timer for lamp start stop slow.
+*
+* \param[in]    pParam        Callback parameters.
+********************************************************************************** */
+static void FadeTimerCallback(void * pParam)
+{
+
+     switch(temp_lamp_NVdata.lampControl.raw8)
+     {
+       case 11:
+       case 1: // white fade off 
+         {
+            if(temp_lamp_NVdata.lampWhite.uint8.warmW > 0) { temp_lamp_NVdata.lampWhite.uint8.warmW--; }
+            if(temp_lamp_NVdata.lampWhite.uint8.coldW > 0) { temp_lamp_NVdata.lampWhite.uint8.coldW--; }
+            TPM_PWM_WarmWhite(temp_lamp_NVdata.lampWhite.uint8.warmW);
+            TPM_PWM_ColdWhite(temp_lamp_NVdata.lampWhite.uint8.coldW);
+            if( temp_lamp_NVdata.lampWhite.raw16 == 0 ) 
+            { temp_lamp_NVdata.lampControl.raw8 = 0; }
+ 
+         } break;
+         
+       case 14: 
+       case 2: // rgb fade off 
+         {
+            if(temp_lamp_NVdata.lampRGB.uint8.r > 0) { temp_lamp_NVdata.lampRGB.uint8.r--;  }
+            if(temp_lamp_NVdata.lampRGB.uint8.g > 0) { temp_lamp_NVdata.lampRGB.uint8.g--;  }
+            if(temp_lamp_NVdata.lampRGB.uint8.b > 0) { temp_lamp_NVdata.lampRGB.uint8.b--;  }   
+            TPM_PWM_Red  (temp_lamp_NVdata.lampRGB.uint8.r);
+            TPM_PWM_Green(temp_lamp_NVdata.lampRGB.uint8.g);
+            TPM_PWM_Blue (temp_lamp_NVdata.lampRGB.uint8.b);
+            if( temp_lamp_NVdata.lampRGB.raw32 == 0 ) 
+            { temp_lamp_NVdata.lampControl.raw8 = 0; }
+         } break;    
+         
+        case 3: // white + rgb fade off 
+         {
+            if(temp_lamp_NVdata.lampWhite.uint8.warmW > 0) { temp_lamp_NVdata.lampWhite.uint8.warmW--; }
+            if(temp_lamp_NVdata.lampWhite.uint8.coldW > 0) { temp_lamp_NVdata.lampWhite.uint8.coldW--; }          
+            if(temp_lamp_NVdata.lampRGB.uint8.r > 0) { temp_lamp_NVdata.lampRGB.uint8.r--;  }
+            if(temp_lamp_NVdata.lampRGB.uint8.g > 0) { temp_lamp_NVdata.lampRGB.uint8.g--;  }
+            if(temp_lamp_NVdata.lampRGB.uint8.b > 0) { temp_lamp_NVdata.lampRGB.uint8.b--;  }   
+
+            TPM_PWM_WarmWhite(temp_lamp_NVdata.lampWhite.uint8.warmW);
+            TPM_PWM_ColdWhite(temp_lamp_NVdata.lampWhite.uint8.coldW);            
+            TPM_PWM_Red  (temp_lamp_NVdata.lampRGB.uint8.r);
+            TPM_PWM_Green(temp_lamp_NVdata.lampRGB.uint8.g);
+            TPM_PWM_Blue (temp_lamp_NVdata.lampRGB.uint8.b);
+            
+            if( (temp_lamp_NVdata.lampRGB.raw32 == 0) && ( temp_lamp_NVdata.lampWhite.raw16 == 0 ) ) 
+            { temp_lamp_NVdata.lampControl.raw8 = 0; }
+         } break;         
+
+        case 10: 
+        case 4: // white fade on 
+         {
+            if(temp_lamp_NVdata.lampWhite.uint8.warmW < lamp_NVdata.lampWhite.uint8.warmW) { temp_lamp_NVdata.lampWhite.uint8.warmW++; }
+            if(temp_lamp_NVdata.lampWhite.uint8.coldW < lamp_NVdata.lampWhite.uint8.coldW) { temp_lamp_NVdata.lampWhite.uint8.coldW++; }
+            TPM_PWM_WarmWhite(temp_lamp_NVdata.lampWhite.uint8.warmW);
+            TPM_PWM_ColdWhite(temp_lamp_NVdata.lampWhite.uint8.coldW);
+            if( temp_lamp_NVdata.lampWhite.raw16 == lamp_NVdata.lampWhite.raw16 ) 
+            { temp_lamp_NVdata.lampControl.raw8 = 0; }
+ 
+         } break;
+         
+       case 12:  
+       case 5: // rgb fade on 
+         {
+            if(temp_lamp_NVdata.lampRGB.uint8.r < lamp_NVdata.lampRGB.uint8.r) { temp_lamp_NVdata.lampRGB.uint8.r++;  }
+            if(temp_lamp_NVdata.lampRGB.uint8.g < lamp_NVdata.lampRGB.uint8.g) { temp_lamp_NVdata.lampRGB.uint8.g++;  }
+            if(temp_lamp_NVdata.lampRGB.uint8.b < lamp_NVdata.lampRGB.uint8.b) { temp_lamp_NVdata.lampRGB.uint8.b++;  }   
+            TPM_PWM_Red  (temp_lamp_NVdata.lampRGB.uint8.r);
+            TPM_PWM_Green(temp_lamp_NVdata.lampRGB.uint8.g);
+            TPM_PWM_Blue (temp_lamp_NVdata.lampRGB.uint8.b);
+            if( temp_lamp_NVdata.lampRGB.raw32 == lamp_NVdata.lampRGB.raw32 ) 
+            { temp_lamp_NVdata.lampControl.raw8 = 0; }
+         } break;    
+         
+        case 9: // white + rgb fade on 
+         {
+            if(temp_lamp_NVdata.lampWhite.uint8.warmW < lamp_NVdata.lampWhite.uint8.warmW) { temp_lamp_NVdata.lampWhite.uint8.warmW++; }
+            if(temp_lamp_NVdata.lampWhite.uint8.coldW < lamp_NVdata.lampWhite.uint8.coldW) { temp_lamp_NVdata.lampWhite.uint8.coldW++; }          
+            if(temp_lamp_NVdata.lampRGB.uint8.r < lamp_NVdata.lampRGB.uint8.r) { temp_lamp_NVdata.lampRGB.uint8.r++;  }
+            if(temp_lamp_NVdata.lampRGB.uint8.g < lamp_NVdata.lampRGB.uint8.g) { temp_lamp_NVdata.lampRGB.uint8.g++;  }
+            if(temp_lamp_NVdata.lampRGB.uint8.b < lamp_NVdata.lampRGB.uint8.b) { temp_lamp_NVdata.lampRGB.uint8.b++;  }   
+
+            TPM_PWM_WarmWhite(temp_lamp_NVdata.lampWhite.uint8.warmW);
+            TPM_PWM_ColdWhite(temp_lamp_NVdata.lampWhite.uint8.coldW);            
+            TPM_PWM_Red  (temp_lamp_NVdata.lampRGB.uint8.r);
+            TPM_PWM_Green(temp_lamp_NVdata.lampRGB.uint8.g);
+            TPM_PWM_Blue (temp_lamp_NVdata.lampRGB.uint8.b);
+            
+            if( (temp_lamp_NVdata.lampRGB.raw32 == lamp_NVdata.lampRGB.raw32) && ( temp_lamp_NVdata.lampWhite.raw16 == lamp_NVdata.lampWhite.raw16 ) ) 
+            { temp_lamp_NVdata.lampControl.raw8 = 0; }
+         } break; 
+         
+        case 23: // white fade off + rgb fade on
+          {
+            if(temp_lamp_NVdata.lampWhite.uint8.warmW > 0) { temp_lamp_NVdata.lampWhite.uint8.warmW--; }
+            if(temp_lamp_NVdata.lampWhite.uint8.coldW > 0) { temp_lamp_NVdata.lampWhite.uint8.coldW--; }          
+            if(temp_lamp_NVdata.lampRGB.uint8.r < lamp_NVdata.lampRGB.uint8.r) { temp_lamp_NVdata.lampRGB.uint8.r++;  }
+            if(temp_lamp_NVdata.lampRGB.uint8.g < lamp_NVdata.lampRGB.uint8.g) { temp_lamp_NVdata.lampRGB.uint8.g++;  }
+            if(temp_lamp_NVdata.lampRGB.uint8.b < lamp_NVdata.lampRGB.uint8.b) { temp_lamp_NVdata.lampRGB.uint8.b++;  }   
+
+            TPM_PWM_WarmWhite(temp_lamp_NVdata.lampWhite.uint8.warmW);
+            TPM_PWM_ColdWhite(temp_lamp_NVdata.lampWhite.uint8.coldW);            
+            TPM_PWM_Red  (temp_lamp_NVdata.lampRGB.uint8.r);
+            TPM_PWM_Green(temp_lamp_NVdata.lampRGB.uint8.g);
+            TPM_PWM_Blue (temp_lamp_NVdata.lampRGB.uint8.b);
+            
+            if( (temp_lamp_NVdata.lampRGB.raw32 == lamp_NVdata.lampRGB.raw32) && ( temp_lamp_NVdata.lampWhite.raw16 == 0 ) ) 
+            { temp_lamp_NVdata.lampControl.raw8 = 0; }            
+          } break; 
+         
+        case 24: // white fade on + rgb fade off
+         {
+            if(temp_lamp_NVdata.lampWhite.uint8.warmW < lamp_NVdata.lampWhite.uint8.warmW) { temp_lamp_NVdata.lampWhite.uint8.warmW++; }
+            if(temp_lamp_NVdata.lampWhite.uint8.coldW < lamp_NVdata.lampWhite.uint8.coldW) { temp_lamp_NVdata.lampWhite.uint8.coldW++; }          
+            if(temp_lamp_NVdata.lampRGB.uint8.r > 0) { temp_lamp_NVdata.lampRGB.uint8.r--;  }
+            if(temp_lamp_NVdata.lampRGB.uint8.g > 0) { temp_lamp_NVdata.lampRGB.uint8.g--;  }
+            if(temp_lamp_NVdata.lampRGB.uint8.b > 0) { temp_lamp_NVdata.lampRGB.uint8.b--;  }  
+
+            TPM_PWM_WarmWhite(temp_lamp_NVdata.lampWhite.uint8.warmW);
+            TPM_PWM_ColdWhite(temp_lamp_NVdata.lampWhite.uint8.coldW);            
+            TPM_PWM_Red  (temp_lamp_NVdata.lampRGB.uint8.r);
+            TPM_PWM_Green(temp_lamp_NVdata.lampRGB.uint8.g);
+            TPM_PWM_Blue (temp_lamp_NVdata.lampRGB.uint8.b);
+            
+            if( (temp_lamp_NVdata.lampRGB.raw32 == 0) && ( temp_lamp_NVdata.lampWhite.raw16 == lamp_NVdata.lampWhite.raw16 ) ) 
+            { temp_lamp_NVdata.lampControl.raw8 = 0; }
+         } break;         
+      }  
+     
+
+     if( temp_lamp_NVdata.lampControl.raw8 == 0 )
+     {
+       FadeOnMutex=false;
+       temp_lamp_NVdata.lampRGB.raw32 = 0;
+       temp_lamp_NVdata.lampWhite.raw16 = 0;
+       TMR_FreeTimer(tmrFadeId);
+     }
+  
+}
+
+/*! *********************************************************************************
+* \brief        Fade Timer for lamp blink when white max is reached.
+*
+* \param[in]    pParam        Callback parameters.
+********************************************************************************** */
+static void BlinkTimerCallback(void * pParam)
+{
+  
+    if(!temp_lamp_NVdata.lampControl.raw8)// exit
+    {
+        FadeOnMutex=false;
+        TPM_PWM_WarmWhite( lamp_NVdata.lampWhite.uint8.warmW );
+        TPM_PWM_ColdWhite( lamp_NVdata.lampWhite.uint8.coldW ); 
+        TMR_FreeTimer(tmrFadeId);
+    } else 
+    {
+      if( temp_lamp_NVdata.lampControl.raw8 % 2 )
+      {
+        TPM_PWM_WarmWhite( 0 );
+        TPM_PWM_ColdWhite( 0 ); 
+      } else
+      {
+        TPM_PWM_WarmWhite( lamp_NVdata.lampWhite.uint8.warmW );
+        TPM_PWM_ColdWhite( lamp_NVdata.lampWhite.uint8.coldW );         
+      }
+      
+      if(temp_lamp_NVdata.lampControl.raw8 > 0) { temp_lamp_NVdata.lampControl.raw8--; }
+    
+    }
+ 
 }
 
 /*! *********************************************************************************

@@ -192,7 +192,8 @@ static uint16_t WriteNotifHandles[] =     {value_otap_control_point,
                                            value_lamp_RGB,
                                            value_core_temperature,
                                            value_lamp_on_sec,
-                                           value_lamp_off_sec};
+                                           value_lamp_off_sec,
+                                           value_lamp_config};
 
 /* Application Data */
 
@@ -360,7 +361,7 @@ void BleApp_HandleKeys(key_event_t events)
 ********************************************************************************** */
 void BleApp_HandleTouch(tsi_event_t* pEvent)
 {
-  uint8_t control;
+  lamp_control_t control;
   uint8_t event;
   int8_t warmW, coldW;
   
@@ -375,16 +376,17 @@ void BleApp_HandleTouch(tsi_event_t* pEvent)
         
        case gTSI_EventShortPush_c :
         {
+            control = lamp_NVdata.lampControl;
             if(lamp_NVdata.lampControl.bit.OnOff)
-            {
-              control = lamp_NVdata.lampControl.raw8 & 0x7F;           
-              Las_SetLampControl (lasServiceConfig.serviceHandle, control, TRUE); 
+            {     
+              control.bit.OnOff = 0;
             }
             else
             {
-              control = lamp_NVdata.lampControl.raw8 | 0x80;
-              Las_SetLampControl (lasServiceConfig.serviceHandle, control, TRUE);
-            }          
+              control.bit.OnOff = 1;            
+            }
+            Las_SetLampControl (lasServiceConfig.serviceHandle, control, TRUE, lamp_NVdata.fadeSpeedMs);
+            
         } break;
         
       case gTSI_EventLongPush_c :
@@ -442,14 +444,17 @@ void BleApp_HandleTouch(tsi_event_t* pEvent)
                 
             }
             
-            Las_SetLampWhite (lasServiceConfig.serviceHandle, warmW, coldW, TRUE);
+            Las_SetLampWhite (lasServiceConfig.serviceHandle, warmW, coldW, TRUE, TRUE);
             
             
-            //if lamp off turn it on
-            if( !((lamp_NVdata.lampControl.raw8 & 0xC0) == 0xC0) )
+            //if lamp off turn it on - or white off
+            if( !lamp_NVdata.lampControl.bit.OnOff || !lamp_NVdata.lampControl.bit.White )
             {
-              control = (lamp_NVdata.lampControl.raw8 & 0xDF) | 0xC0;
-              Las_SetLampControl (lasServiceConfig.serviceHandle, control, TRUE);
+              control = lamp_NVdata.lampControl;
+              control.bit.OnOff = 1;
+              control.bit.White = 1;
+              control.bit.Color = 0;
+              Las_SetLampControl (lasServiceConfig.serviceHandle, control, TRUE, lamp_NVdata.fadeSpeedMs);
             }
             
             
@@ -950,7 +955,9 @@ static void BleApp_AttributeWritten(deviceId_t  deviceId,
     {
       if ( (length==1) )
       {
-        bleResult = Las_SetLampControl(lasServiceConfig.serviceHandle, pValue[0], FALSE);
+        lamp_control_t control;
+        control.raw8 = pValue[0];
+        bleResult = Las_SetLampControl(lasServiceConfig.serviceHandle, control, FALSE, lamp_NVdata.fadeSpeedMs);
         // Report status to client
         BleApp_SendAttWriteResponse (deviceId, handle, bleResult);
       }
@@ -959,7 +966,7 @@ static void BleApp_AttributeWritten(deviceId_t  deviceId,
     {
       if ( (length==2) && (pValue[0] <= PWM_factor_MAX) && (pValue[1] <= PWM_factor_MAX) )
       {
-         bleResult = Las_SetLampWhite (lasServiceConfig.serviceHandle, pValue[0], pValue[1], FALSE);
+         bleResult = Las_SetLampWhite (lasServiceConfig.serviceHandle, pValue[0], pValue[1], FALSE, FALSE);
         // Report status to client
         BleApp_SendAttWriteResponse (deviceId, handle, bleResult);
       }
@@ -1076,7 +1083,7 @@ static void BleApp_AttributeWrittenWithoutResponse (deviceId_t deviceId,
     {
       if ( (length==2) && (pValue[0] <= PWM_factor_MAX) && (pValue[1] <= PWM_factor_MAX) )
       {
-        bleResult = Las_SetLampWhite (lasServiceConfig.serviceHandle, pValue[0], pValue[1], FALSE);
+        bleResult = Las_SetLampWhite (lasServiceConfig.serviceHandle, pValue[0], pValue[1], FALSE, FALSE);
       }
     }     
     else if (handle == value_lamp_RGB)

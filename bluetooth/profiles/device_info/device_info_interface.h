@@ -6,7 +6,7 @@
 * Copyright (c) 2014, Freescale Semiconductor, Inc.
 * All rights reserved.
 *
-* \file battery_interface.h
+* \file device_info_interface.h
 * This file is the interface file for the Device Information service
 *
 * Redistribution and use in source and binary forms, with or without modification,
@@ -58,7 +58,7 @@
 
 typedef struct utf8s_tag
 {
-    uint16_t    stringLength;
+    uint8_t    stringLength;
     char        *pUtf8s;
 }utf8s_t;
 
@@ -70,7 +70,7 @@ typedef struct systemId_tag
 
 typedef struct regCertDataList_tag
 {
-    uint16_t    length;
+    uint8_t    length;
     void        *pList;
 }regCertDataList_t;
 
@@ -86,15 +86,8 @@ typedef struct pnpId_tag
 typedef struct disConfig_tag
 {
     uint16_t            serviceHandle;
-    utf8s_t             manufacturerName;
-    utf8s_t             modelNumber;
     utf8s_t             serialNumber;
-    utf8s_t             hwRevision;
-    utf8s_t             fwRevision;
-    utf8s_t             swRevision;
-    systemId_t*         pSystemId;
-    regCertDataList_t   rcdl;
-    pnpId_t*            pPnpId;
+
 } disConfig_t;
 
 /************************************************************************************
@@ -137,7 +130,7 @@ bleResult_t Dis_Stop(disConfig_t *pServiceConfig);
 }
 #endif 
 
-#endif /* _BATTERY_INTERFACE_H */
+#endif /* _DEVICE_INFO_INTERFACE_H_ */
 
 /*! *********************************************************************************
 * @}

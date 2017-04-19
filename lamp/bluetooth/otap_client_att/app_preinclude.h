@@ -240,11 +240,6 @@
    * 	app common
    ********************************************************************************** */
     /* ble_controller_task.c */                   
-      /*  Public Device Address variable type in ble_controller_task.c
-      *           TRUE  init in ROM  const uint8_t gBDAddress_c[6] = {BD_ADDR};
-      *           FALSE init in RAM
-      */       
-      #define initConstPublicDeviceAddress_d FALSE
               
       #define BD_ADDR             0x13,0x00,0x00,0x9F,0x04,0x00
       #define BD_ADDR_FF          0xFF,0xFF,0xFF,0xFF,0xFF,0xFF

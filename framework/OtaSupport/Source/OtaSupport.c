@@ -42,10 +42,11 @@
 #include "fsl_os_abstraction.h"
 
 #if gEnableOTAServer_d || gUpgradeImageOnCurrentDevice_d
-#include "FsciInterface.h"
-#include "FsciCommands.h"
+  #include "FsciInterface.h"
+  #include "FsciCommands.h"
 #endif
 
+#include "board.h"
 
 /******************************************************************************
 *******************************************************************************
@@ -80,13 +81,6 @@ extern uint32_t __BootFlags_Start__[];
 * Private type definitions
 *******************************************************************************
 ******************************************************************************/
-/* Structure containing the 2 boot flags */
-typedef PACKED_STRUCT
-{
-    uint8_t  newBootImageAvailable[gEepromParams_WriteAlignment_c];
-    uint8_t  bootProcessCompleted[gEepromParams_WriteAlignment_c];   
-    uint8_t  version[2];
-}bootInfo_t;
 
 
 /******************************************************************************
@@ -130,7 +124,7 @@ static  bool_t    mNewImageReady = FALSE;
 #else
   const bootInfo_t gBootFlags = 
 #endif
-  {{gBootValueForFALSE_c}, {gBootValueForTRUE_c}, {0x00, 0x02}};
+  { {gBootValueForFALSE_c}, {gBootValueForTRUE_c}, {DI_FirmwareRevisionMajor, DI_FirmwareRevisionMinor} };
 
 /* Contains Application Callbacks for packets received over the serial interface */
 #if gEnableOTAServer_d

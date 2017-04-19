@@ -62,7 +62,7 @@
 tsi_state_t tsiSensorState;
 tsi_sensor_callback_t userCallbackFunction;
 
-tsi_touch_t tsi;
+
 
 /* The TPM instance/channel used for board */
 #define BOARD_TSI_INSTANCE        0
@@ -80,7 +80,7 @@ static uint8_t tsi_event;
 /******************************************************************************
 * Globals
 *******************************************************************************/
-
+tsi_touch_t tsi;
 
 
 /******************************************************************************
@@ -131,7 +131,7 @@ void TSI_Init ()
   };
   
   /*!< Threshold value to detect a touch event */
-  tsi.sensitivity = 200; //10
+  tsi.sensitivity = 20; //10
   /*!< TSI update time in ms */
   tsi.tmr = 12; // 15
   

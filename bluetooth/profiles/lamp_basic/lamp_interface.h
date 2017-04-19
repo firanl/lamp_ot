@@ -42,7 +42,8 @@
 /* ***********************************************************************************
 * Include
 *********************************************************************************** */
-
+#include "stdbool.h"
+#include "board.h"
 
 /* ***********************************************************************************
 * Public constants & macros
@@ -115,9 +116,9 @@ bleResult_t Las_Unsubscribe();
 
 bleResult_t Las_RecordMeasurementTV (uint16_t serviceHandle);
 
-bleResult_t Las_SetLampControl (uint16_t serviceHandle, uint8_t control, uint8_t notify);
+bleResult_t Las_SetLampControl (uint16_t serviceHandle, lamp_control_t control, bool notify, uint8_t speedMs);
 
-bleResult_t Las_SetLampWhite (uint16_t serviceHandle, uint8_t warmW, uint8_t coldW, uint8_t notify);
+bleResult_t Las_SetLampWhite (uint16_t serviceHandle, uint8_t warmW, uint8_t coldW, bool notify, bool showMax);
 
 bleResult_t Las_SetLampRGB (uint16_t serviceHandle, uint8_t red, uint8_t green, uint8_t blue);
 

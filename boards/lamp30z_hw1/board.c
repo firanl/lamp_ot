@@ -2,6 +2,8 @@
  * Copyright (c) 2013-2015, Freescale Semiconductor, Inc.
  * All rights reserved.
  *
+ * \file board.c
+ *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
  *
@@ -63,12 +65,8 @@
 ************************************************************************************/
 extern uint32_t FREESCALE_PROD_DATA_BASE_ADDR[];
 
+extern uint8_t gBDAddress_c[];
 
-#if (initConstPublicDeviceAddress_d)
-  extern const uint8_t gBDAddress_c[];
-#else
-  extern uint8_t gBDAddress_c[];
-#endif
 
 /* lamp control light data */
 lamp_NVdata_t lamp_NVdata;
@@ -202,11 +200,10 @@ static void initHardwareParameters(void)
   lamp_NVdata.lampRGB.uint8.g = LA_LAMP_G;
   lamp_NVdata.lampRGB.uint8.b = LA_LAMP_B;
   */
+  lamp_NVdata.fadeSpeedMs = fadeSpeedMs_d;
   
   /* init MAC ADRESS */  
-  #if (!initConstPublicDeviceAddress_d)
-    clone_RSIM_private_static_MAC(gBDAddress_c);
-  #endif
+  clone_RSIM_private_static_MAC(gBDAddress_c);
 
  
    
