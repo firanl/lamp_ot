@@ -55,6 +55,7 @@
 #include "fsl_tsi_driver.h"
 #include "TimersManager.h"
 
+#include "board.h"
 
 /******************************************************************************
 * Locals
@@ -131,19 +132,25 @@ void TSI_Init ()
   };
   
   /*!< Threshold value to detect a touch event */
-  tsi.sensitivity = 20; //10
+  tsi.sensitivity = tsi_sensitivity_d; 
   /*!< TSI update time in ms */
-  tsi.tmr = 12; // 15
-  
-  tsi.InitHitCnt = 4;         /* Intermediate state hit cnt, time is  tmr*InitHitCnt ms */
-  tsi.InitIdleCnt = 4;        /* Intermediate state idle cnt */
-  tsi.InitHitHitCnt = 4;      /* Long Press Series hit cnt */
-  tsi.InitHitIdleCnt = 6;     /* Intermediate not used state idle cnt  */
-      
-  tsi.InitIdleHitCnt = 5;     /* Intermediate state hit cnt */
-  tsi.InitIdleIdleCnt = 8;    /* Idle state idle cnt  */
-  tsi.InitIdleHitHitCnt = 45;  /* First Long Press hit cnt */
-  tsi.InitIdleHitIdleCnt = 5; /* Short Press  idle cnt */  
+  tsi.tmr = tsi_tmr_d; // 15
+  /* Intermediate state hit cnt, time is  tmr*InitHitCnt ms */
+  tsi.InitHitCnt = tsi_InitHitCnt_d;    
+  /* Intermediate state idle cnt */
+  tsi.InitIdleCnt = tsi_InitIdleCnt_d;        
+  /* Long Press Series hit cnt */
+  tsi.InitHitHitCnt = tsi_InitHitHitCnt_d;      
+  /* Intermediate not used state idle cnt  */
+  tsi.InitHitIdleCnt = tsi_InitHitIdleCnt_d;     
+  /* Intermediate state hit cnt */    
+  tsi.InitIdleHitCnt = tsi_InitIdleHitCnt_d;     
+  /* Idle state idle cnt  */
+  tsi.InitIdleIdleCnt = tsi_InitIdleIdleCnt_d;    
+  /* First Long Press hit cnt */
+  tsi.InitIdleHitHitCnt = tsi_InitIdleHitHitCnt_d;  
+  /* Short Press  idle cnt */
+  tsi.InitIdleHitIdleCnt = tsi_InitIdleHitIdleCnt_d;   
   
   /*!< TSI  Long Press Series succesive count that triggers recalibration - 5 minutes */
   tsi.stuckBtnCntMax = (5 * 60 * 1000) / ( (tsi.InitHitCnt + tsi.InitHitHitCnt) * tsi.tmr );

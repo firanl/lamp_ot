@@ -54,7 +54,7 @@
   /* NON Volatile storage */
   #define DI_FirmwareRevision   '1', '0'
 
-  #define DI_ManufacturerNameString  "Win Enterprise Holdings LLC"
+  #define DI_ManufacturerNameString  "The Lampster, the licitatie"
   /* Lamp Model string */
   #define DI_ModelNumberString       "LA-2017"
 
@@ -153,10 +153,10 @@
   #define LA_LAMP_CONTROL      0xC0
   /*  Values 0% 100% Range 0x00 0x64 */
   #define LA_LAMP_WARM_WHITE   0x00
-  #define LA_LAMP_COLD_WHITE   0x10
+  #define LA_LAMP_COLD_WHITE   0x0A
   #define LA_LAMP_R            0x00
-  #define LA_LAMP_G            0x01     
-  #define LA_LAMP_B            0x00 
+  #define LA_LAMP_G            0x00     
+  #define LA_LAMP_B            0x1E 
 
   /* temperature value - default 20.01 */
   #define LA_LAMP_TEMP         0xD1, 0x07
@@ -191,7 +191,29 @@
     /*!< Fade refresh time, light increment, default 17 ms */  
     #define fadeTimeMs_d     17  
     /*!< Fade refresh time, light increment for temperature shutdown, default 5 ms */
-    #define fadeTimeCritMs_d  5    
+    #define fadeTimeCritMs_d  5  
+
+/* touch button TSI settings */
+  /*!< Threshold value to detect a touch event, default 10 */
+  #define tsi_sensitivity_d        25
+  /*!< TSI update time in ms, default 15 */
+  #define tsi_tmr_d                12
+  /* Intermediate state hit cnt, time is  tmr*InitHitCnt ms, default 4 */
+  #define tsi_InitHitCnt_d          4  
+  /* Intermediate state idle cnt, default 4 */
+  #define tsi_InitIdleCnt_d         4 
+  /* Long Press Series hit cnt, default 4 */
+  #define tsi_InitHitHitCnt_d       4 
+  /* Intermediate not used state idle cnt, default 6  */  
+  #define tsi_InitHitIdleCnt_d      6     
+  /* Intermediate state hit cnt, default 5 */    
+  #define tsi_InitIdleHitCnt_d      5  
+  /* Idle state idle cnt, default  8 */
+  #define tsi_InitIdleIdleCnt_d     8    
+  /* First Long Press hit cnt, default 45 */
+  #define tsi_InitIdleHitHitCnt_d  45  
+  /* Short Press  idle cnt, default 5 */ 
+  #define tsi_InitIdleHitIdleCnt_d  5 
    
 
 typedef union prog_cycles_tag {
