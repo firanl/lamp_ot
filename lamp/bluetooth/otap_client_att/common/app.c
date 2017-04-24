@@ -38,35 +38,32 @@
 * Include
 *********************************************************************************** */
 /* Framework / Drivers */
-#include "RNG_interface.h"
-#include "Keyboard.h"
-#include "Led.h"
-#include "TimersManager.h"
-#include "FunctionLib.h"
-#include "fsl_os_abstraction.h"
-#include "panic.h"
-#if cPWR_UsePowerDownMode
-  #include "PWR_Interface.h"
-#endif
-#include "OtaSupport.h"
+  #include "RNG_interface.h"
+  #include "Keyboard.h"
+  #include "Led.h"
+  #include "TimersManager.h"
+  #include "FunctionLib.h"
+  #include "fsl_os_abstraction.h"
+  #include "panic.h"
+  #if cPWR_UsePowerDownMode
+    #include "PWR_Interface.h"
+  #endif
+  #include "OtaSupport.h"
 
 /* BLE Host Stack */
-#include "gatt_interface.h"
-#include "gatt_server_interface.h"
-#include "gatt_client_interface.h"
-#include "gatt_database.h"
-#include "gap_interface.h"
-#include "gatt_db_app_interface.h"
-#include "gatt_db_handles.h"
+  #include "gatt_interface.h"
+  #include "gatt_server_interface.h"
+  #include "gatt_client_interface.h"
+  #include "gatt_database.h"
+  #include "gap_interface.h"
+  #include "gatt_db_app_interface.h"
+  #include "gatt_db_handles.h"
 
 /* Profile / Services */
-#include "device_info_interface.h"
-#include "otap_interface.h"
-#include "lamp_interface.h"
-
-#if (gBatteryServiceSupported_d) 
-  #include "battery_interface.h"
-#endif
+  #include "device_info_interface.h"
+  #include "otap_interface.h"
+  #include "lamp_interface.h"
+  #include "lamp_att_cfg.h"
 
 /* core temperature measurement, voltage reference measurement */
 #include "temperature_sensor.h"
@@ -77,9 +74,16 @@
 /* TSI Capacitive touch sensor */
 #include "tsi_sensor.h"
 
+
+#if (gBatteryServiceSupported_d) 
+  #include "battery_interface.h"
+#endif
+
 #include "board.h"
 #include "ApplMain.h"
 #include "app.h"
+
+
 
 /* ***********************************************************************************
 * Extern variables
@@ -1076,7 +1080,17 @@ static void BleApp_AttributeWritten(deviceId_t  deviceId,
         // Report status to client
         BleApp_SendAttWriteResponse (deviceId, handle, bleResult);
       }
-    }     
+    }   
+    else if (handle == value_lamp_config)
+    {
+      if ( (length>0) && (length<5) )
+      {
+        bleResult = Las_SetConfig(lasServiceConfig.serviceHandle, pValue);
+        // Report status to client
+        BleApp_SendAttWriteResponse (deviceId, handle, bleResult);
+      }
+    }    
+    
     else
     {
         /*! A GATT Server is trying to GATT Write an unknown attribute value.

@@ -1,14 +1,14 @@
 /*! *********************************************************************************
- * \addtogroup Lampster Custom Profile
+ * \addtogroup Lampster Custom Profile - Config Attribute 
  * @{
  ********************************************************************************** */
 /*!
  * Copyright (c) 2016, FiranL.
  * All rights reserved.
  *
- * \file lamp_interface.h
+ * \file lamp_att_cfg.h
  *
- * This file is the interface file for the Lamp Service
+ * This file is the interface file for the Lampster Custom Profile - Config Attribute 
  *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
@@ -36,8 +36,8 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _LAMP_INTERFACE_H_
-#define _LAMP_INTERFACE_H_
+#ifndef _LAMP_ATT_CFG_H_
+#define _LAMP_ATT_CFG_H_
 
 /* ***********************************************************************************
 * Include
@@ -54,14 +54,26 @@
 /* ***********************************************************************************
 * Public type definitions
 *********************************************************************************** */
-
-/*! Lamp Service - Configuration */
-typedef struct lasConfig_tag
+enum
 {
-    uint16_t    serviceHandle;
-    
-} lasConfig_t;
-
+    gCFG_TID_c = 0,                     /*!< uint8_t, TID tabel id pointer for witch value to be read */ 
+    gCFG_TSI_low_c,                     /*!< uint16_t, TSI idle value sensor not pressed  */
+    gCFG_TSI_sensitivity_c,             /*!< uint8_t, TSI treshold add value, default 10  */
+    gCFG_TSI_tmr_c,                     /*!< uint8_t, TSI update time in mili seconds, default 15 ms  */   
+    gCFG_TSI_InitHitCnt_c,              /*!< uint8_t, Intermediate state hit cnt  */
+    gCFG_TSI_InitIdleCnt_c,             /*!< uint8_t, Intermediate state idle cnt */
+    gCFG_TSI_InitHitHitCnt_c,           /*!< uint8_t, Long Press Series hit cnt */
+    gCFG_TSI_InitHitIdleCnt_c,          /*!< uint8_t, Intermediate not used state idle cnt  */   
+    gCFG_TSI_InitIdleHitCnt_c,          /*!< uint8_t, Intermediate state hit cnt */
+    gCFG_TSI_InitIdleIdleCnt_c,         /*!< uint8_t, Idle state idle cnt  */
+    gCFG_TSI_InitIdleHitHitCnt_c,       /*!< uint8_t, First Long Press hit cnt */
+    gCFG_TSI_InitIdleHitIdleCnt_c,      /*!< uint8_t, Short Press  idle cnt */    
+    gCFG_blinkTimeMs_c,                 /*!< uint16_t, On / off time period of a blink in mili seconds, default 300 ms  */
+    gCFG_blinkCnt_c,                    /*!< uint8_t, How many blinks are performed, default 5  */
+    gCFG_fadeTimeMs_c,                  /*!< uint8_t, Fade refresh time, light increment, default 17 ms */    
+    gCFG_fadeTimeCritMs_c,              /*!< uint8_t, Fade refresh time, light increment for temperature shutdown, default 5 ms */
+    gCFG_last                           /* max value in config table list */
+};
 
 
 /* ***********************************************************************************
@@ -77,67 +89,24 @@ extern "C" {
 #endif
 
 /*!**********************************************************************************
-* \brief        Starts Lamp Service functionality
+* \brief        Lamp Config set values for config table
 *
-* \param[in]    pServiceConfig  Pointer to structure that contains server 
-*                               configuration information.
-*
-* \return       gBleSuccess_c or error.
-************************************************************************************/
-bleResult_t Las_Start(lasConfig_t *pServiceConfig);
-
-/*!**********************************************************************************
-* \brief        Stops Lamp Service functionality
-*
-* \param[in]    pServiceConfig  Pointer to structure that contains server 
-*                               configuration information.
+* \param[in]    serviceHandle   
+* \param[in]          pConfig 
+*                               
 *
 * \return       gBleSuccess_c or error.
 ************************************************************************************/
-bleResult_t Las_Stop(lasConfig_t *pServiceConfig);
 
-/*!**********************************************************************************
-* \brief        Subscribes a GATT client to the Lamp service
-*
-* \param[in]    pClient  Client Id in Device DB.
-*
-* \return       gBleSuccess_c or error.
-************************************************************************************/
-bleResult_t Las_Subscribe(deviceId_t clientDeviceId);
+bleResult_t Las_SetConfig (uint16_t serviceHandle, const uint8_t* pConfig);
 
-/*!**********************************************************************************
-* \brief        Unsubscribes a GATT client from the Lamp service
-*
-* \return       gBleSuccess_c or error.
-************************************************************************************/
-bleResult_t Las_Unsubscribe();
-
-
-
-bleResult_t Las_RecordMeasurementTV (uint16_t serviceHandle);
-
-bleResult_t Las_SetLampControl (uint16_t serviceHandle, lamp_control_t control, bool notify, uint8_t speedMs);
-
-bleResult_t Las_SetLampWhite (uint16_t serviceHandle, uint8_t warmW, uint8_t coldW, bool notify, bool showMax);
-
-bleResult_t Las_SetLampRGB (uint16_t serviceHandle, uint8_t red, uint8_t green, uint8_t blue, bool notify);
-
-bleResult_t Las_SetOnTimer  (uint16_t serviceHandle, uint8_t* pSeconds);
-
-/* get remaining time of on timer and update record */
-bleResult_t Las_GetOnTimer(uint16_t serviceHandle);
-
-bleResult_t Las_SetOffTimer (uint16_t serviceHandle, uint8_t* pSeconds);
-
-/* get remaining time of off timer and update record */
-bleResult_t Las_GetOffTimer(uint16_t serviceHandle);
 
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* _LAMP_INTERFACE_H_ */
+#endif /* _LAMP_ATT_CFG_H_ */
 
 /*! **********************************************************************************
  * @}

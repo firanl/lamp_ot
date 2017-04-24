@@ -2274,6 +2274,12 @@
       <group>
         <name>lamp_basic</name>
         <file>
+          <name>$PROJ_DIR$\bluetooth\profiles\lamp_basic\lamp_att_cfg.c</name>
+        </file>
+        <file>
+          <name>$PROJ_DIR$\bluetooth\profiles\lamp_basic\lamp_att_cfg.h</name>
+        </file>
+        <file>
           <name>$PROJ_DIR$\bluetooth\profiles\lamp_basic\lamp_service.c</name>
         </file>
       </group>

@@ -63,14 +63,10 @@
 tsi_state_t tsiSensorState;
 tsi_sensor_callback_t userCallbackFunction;
 
-
-
 /* The TPM instance/channel used for board */
 #define BOARD_TSI_INSTANCE        0
   /*!< Electrode channel */
   #define BOARD_TSI_BTN_CHANNEL               15u
-
-
 
 /* Touch Sensing sensor timer  */
 static tmrTimerID_t tmrTsiId;  
@@ -78,9 +74,10 @@ static tmrTimerID_t tmrTsiId;
 static uint8_t tsi_event;
 
 
-/******************************************************************************
+/* *****************************************************************************
 * Globals
-*******************************************************************************/
+****************************************************************************** */
+/* lamp TSI cfg params */
 tsi_touch_t tsi;
 
 
