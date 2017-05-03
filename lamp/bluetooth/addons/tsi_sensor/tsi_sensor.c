@@ -69,7 +69,7 @@ tsi_sensor_callback_t userCallbackFunction;
   #define BOARD_TSI_BTN_CHANNEL               15u
 
 /* Touch Sensing sensor timer  */
-static tmrTimerID_t tmrTsiId;  
+tmrTimerID_t tmrTsiId;  
 
 static uint8_t tsi_event;
 
@@ -84,9 +84,7 @@ tsi_touch_t tsi;
 /******************************************************************************
 * Private Function prototypes
 ******************************************************************************/
-static void TsiTimerCallback(void* pParam);
 static void tsiIrqCallback(uint32_t instance, void* usrData);
-static tsi_status_t TsiCalibrate(void);
 
 /************************************************************************************
 * Extern functions
@@ -128,6 +126,9 @@ void TSI_Init ()
     .usrData = (void*)0x00,
   };
   
+  /*init min max values */
+  tsi.min = 0xFFFF;
+  tsi.max = 0;
   /*!< Threshold value to detect a touch event */
   tsi.sensitivity = tsi_sensitivity_d; 
   /*!< TSI update time in ms */
@@ -203,6 +204,9 @@ static void tsiIrqCallback(uint32_t instance, void* usrData)
     
    //Read current measurement
    TSI_DRV_GetCounter(BOARD_TSI_INSTANCE, BOARD_TSI_BTN_CHANNEL, &tsiChannelReading); 
+   if( tsiChannelReading > tsi.max ) { tsi.max = tsiChannelReading; }
+   if( tsiChannelReading < tsi.min ) { tsi.min = tsiChannelReading; }
+   
    if( tsiChannelReading > tsi.low ) hitCnt++;
    else idleCnt++;
    
@@ -319,7 +323,7 @@ tsi_status_t TsiCalibrate(void)
  *
  * \param[in]    pParam        Callback parameters.
 ********************************************************************************** */
-static void TsiTimerCallback(void* pParam)
+void TsiTimerCallback(void* pParam)
 {
   /* Start a new TSI single measurement */
   TSI_MeasureOnce();

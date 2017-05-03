@@ -124,9 +124,11 @@
 
    
 /* BLE Advertising Data from app_config.c */
-  #define LA_LAMP_GapAdShortenedLocalName  "Lampster"
+  #define LA_LAMP_AdShortenedLocalName  "Lampster"
+  /* Manufacturer Specific Data */
+  #define LA_LAMP_AdManufacturerSpecificData  "tst"
   /* Adv service support from Kinetis BLE Toolbox - OTAP */ 
-  #define LA_LAMP_GapAd_uuid_service   uuid_service_otap
+  #define LA_LAMP_Ad_uuid_service   uuid_service_otap
   /* Adv service */ 
   //#define LA_LAMP_GapAd_uuid_service   uuid_service_lamp
 
@@ -157,6 +159,7 @@
   #define LA_LAMP_R            0x00
   #define LA_LAMP_G            0x00     
   #define LA_LAMP_B            0x1E 
+    
 
   /* temperature value - default 20.01 */
   #define LA_LAMP_TEMP         0xD1, 0x07
@@ -192,10 +195,13 @@
     #define fadeTimeMs_d     17  
     /*!< Fade refresh time, light increment for temperature shutdown, default 5 ms */
     #define fadeTimeCritMs_d  5  
+    
+    /*!< TSI btn low value at with the ramp is changed if fade dm - fade up, range 0 - 100, default 1 */
+    #define LA_LAMP_TSI_LED_LOW   1
 
 /* touch button TSI settings */
   /*!< Threshold value to detect a touch event, default 10 */
-  #define tsi_sensitivity_d        25
+  #define tsi_sensitivity_d        35
   /*!< TSI update time in ms, default 15 */
   #define tsi_tmr_d                12
   /* Intermediate state hit cnt, time is  tmr*InitHitCnt ms, default 4 */

@@ -73,6 +73,9 @@ typedef struct tsi_touch_tag {
     uint16_t low;               /*!< TSI idle value sensor not pressed  */
     uint8_t  sensitivity;       /*!< TSI treshold add value, default 10 */
     uint8_t  tmr;               /*!< TSI update time in mili seconds, default 15 ms */
+
+    uint16_t min;               /*!< TSI min value over time sensor not pressed  */    
+    uint16_t max;               /*!< TSI max value over time sensor pressed */  
     
     uint8_t  InitHitCnt;         /* Intermediate state hit cnt  */
     uint8_t  InitIdleCnt;        /* Intermediate state idle cnt */
@@ -159,6 +162,10 @@ void TSI_Init(void);
 * \return       @ref tsi_sensor_status_t Error status.
 ****************************************************************************/
 void TSI_MeasureOnce(void);
+
+void TsiTimerCallback(void* pParam);
+
+tsi_status_t TsiCalibrate(void);
 
 /*!
  * @} End of tsi_sensor

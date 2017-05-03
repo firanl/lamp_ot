@@ -45,6 +45,7 @@
 #include "gap_interface.h"
 
 #include "board.h"
+#include "TimersManager.h"
 #include "lamp_interface.h"
 #include "tsi_sensor.h"
 #include "lamp_att_cfg.h"
@@ -59,7 +60,8 @@
 * Extern memory
 ************************************************************************************/
 
-
+/* Touch Sensing sensor timer  */
+extern tmrTimerID_t tmrTsiId;
 
 /* lamp cfg params */
 extern lamp_config_t lamp_cfg;
@@ -113,8 +115,10 @@ bleResult_t Las_SetConfig (uint16_t serviceHandle, const uint8_t* pConfig)
             {
              case gCFG_TID_c:                    { return Las_RecordValueToBeRead (serviceHandle, sizeof(uint8_t),  (uint8_t*) &val8);                   } break; 
              
-             case gCFG_TSI_low_c:                { return Las_RecordValueToBeRead (serviceHandle, sizeof(uint16_t), (uint8_t*) &tsi.low);                } break;      
-             case gCFG_TSI_sensitivity_c:        { return Las_RecordValueToBeRead (serviceHandle, sizeof(uint8_t),  (uint8_t*) &tsi.sensitivity);        } break; 
+             case gCFG_TSI_low_c:                { return Las_RecordValueToBeRead (serviceHandle, sizeof(uint16_t), (uint8_t*) &tsi.low);                } break; 
+             case gCFG_TSI_sensitivity_c:        { return Las_RecordValueToBeRead (serviceHandle, sizeof(uint8_t),  (uint8_t*) &tsi.sensitivity);        } break;
+             case gCFG_TSI_min_c:                { return Las_RecordValueToBeRead (serviceHandle, sizeof(uint16_t), (uint8_t*) &tsi.min);                } break; 
+             case gCFG_TSI_max_c:                { return Las_RecordValueToBeRead (serviceHandle, sizeof(uint16_t), (uint8_t*) &tsi.max);                } break;                           
              case gCFG_TSI_tmr_c:                { return Las_RecordValueToBeRead (serviceHandle, sizeof(uint8_t),  (uint8_t*) &tsi.tmr);                } break; 
              case gCFG_TSI_InitHitCnt_c:         { return Las_RecordValueToBeRead (serviceHandle, sizeof(uint8_t),  (uint8_t*) &tsi.InitHitCnt);         } break;
              case gCFG_TSI_InitIdleCnt_c:        { return Las_RecordValueToBeRead (serviceHandle, sizeof(uint8_t),  (uint8_t*) &tsi.InitIdleCnt);        } break;
@@ -124,6 +128,8 @@ bleResult_t Las_SetConfig (uint16_t serviceHandle, const uint8_t* pConfig)
              case gCFG_TSI_InitIdleIdleCnt_c:    { return Las_RecordValueToBeRead (serviceHandle, sizeof(uint8_t),  (uint8_t*) &tsi.InitIdleIdleCnt);    } break;
              case gCFG_TSI_InitIdleHitHitCnt_c:  { return Las_RecordValueToBeRead (serviceHandle, sizeof(uint8_t),  (uint8_t*) &tsi.InitIdleHitHitCnt);  } break;
              case gCFG_TSI_InitIdleHitIdleCnt_c: { return Las_RecordValueToBeRead (serviceHandle, sizeof(uint8_t),  (uint8_t*) &tsi.InitIdleHitIdleCnt); } break;
+
+             case gCFG_TSI_Recalibrate_low_c:    { return Las_RecordValueToBeRead (serviceHandle, sizeof(uint8_t),  (uint8_t*) &val8);                   } break;              
              
              case gCFG_blinkTimeMs_c:            { return Las_RecordValueToBeRead (serviceHandle, sizeof(uint16_t), (uint8_t*) &lamp_cfg.blinkTimeMs);   } break;
              case gCFG_blinkCnt_c:               { return Las_RecordValueToBeRead (serviceHandle, sizeof(uint8_t),  (uint8_t*) &lamp_cfg.blinkCnt);      } break;
@@ -162,9 +168,34 @@ bleResult_t Las_SetConfig (uint16_t serviceHandle, const uint8_t* pConfig)
               tsi.low = (uint16_t) (tsi.low  + ( val8 - tsi.sensitivity )  );
               /* update sensitivity */
               tsi.sensitivity = val8;
-            }
-          
+            } 
         } break;  
+        
+      /* uint16_t, TSI highest value over time, max value */
+      case gCFG_TSI_max_c: 
+        {
+            pConfig++;
+            val16 = *( (uint16_t*) pConfig); 
+            
+            /* check if value in limits */
+            if( (val16 >= 0) && (val16 < 0xFFFF) )
+            {
+              tsi.max = val16;
+            }
+        } break;    
+        
+      /* uint16_t, TSI lowest value over time, min value */
+      case gCFG_TSI_min_c: 
+        {
+            pConfig++;
+            val16 = *( (uint16_t*) pConfig); 
+            
+            /* check if value in limits */
+            if( (val16 >= 0) && (val16 < 0xFFFF) )
+            {
+              tsi.min = val16;
+            }
+        } break;        
         
       /* uint8_t, TSI update time in mili seconds, default 15 ms  */ 
       case  gCFG_TSI_tmr_c: 
@@ -176,7 +207,8 @@ bleResult_t Las_SetConfig (uint16_t serviceHandle, const uint8_t* pConfig)
             if( (val8 > 4) && (val8 < 0xFF) )
             {
               tsi.tmr = val8;
-              //TODO restart timer 
+              /* ReStart TSI timer for capacitive touch BTN with new interval */     
+              TMR_StartTimer(tmrTsiId, gTmrIntervalTimer_c, tsi.tmr, TsiTimerCallback, NULL); 
             }
           
         } break;         
@@ -291,7 +323,20 @@ bleResult_t Las_SetConfig (uint16_t serviceHandle, const uint8_t* pConfig)
               tsi.InitIdleHitIdleCnt = val8; 
             }
           
-        } break;    
+        } break; 
+        
+      /* uint8_t, Start a low recalibration - TSI not pressed */ 
+      case  gCFG_TSI_Recalibrate_low_c: 
+        {
+            pConfig++;
+            val8 = *( (uint8_t*) pConfig); 
+            
+            /* check if value is 0x01 */
+            if( val8 == 0x01 )
+            {
+              TsiCalibrate(); 
+            }
+        } break;        
         
       /* uint16_t, On / off time period of a blink in mili seconds, default 300 ms  */
       case gCFG_blinkTimeMs_c: 

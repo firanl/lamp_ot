@@ -43,6 +43,7 @@
 #include "fsl_pmc_hal.h"
 #include "Flash_Adapter.h"
 #include "gpio_pins.h"
+#include "fsl_gpio_driver.h"
 #include "FunctionLib.h"
 
 /* core temperature measurement, voltage reference measurement */
@@ -179,9 +180,8 @@ void hardware_init(void) {
 
   
   initHardwareParameters();
- 
-
   
+
  
 }
 
@@ -204,8 +204,19 @@ static void initHardwareParameters(void)
   /* init MAC ADRESS */  
   clone_RSIM_private_static_MAC(gBDAddress_c);
 
- 
-   
+  /* set RESET pin as input */
+  #ifndef DEBUG
+     gpio_input_pin_user_config_t gpioReset = 
+                    {
+                        .pinName = kGpioRST,
+                        .config.isPullEnable = true,
+                        .config.pullSelect = kPortPullUp,
+                        .config.isPassiveFilterEnabled = false,
+                        .config.interrupt = kPortIntDisabled,
+                    };
+     
+     GPIO_DRV_InputPinInit(&gpioReset);
+   #endif 
 }
 
 

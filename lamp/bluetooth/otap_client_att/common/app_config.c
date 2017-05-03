@@ -48,29 +48,66 @@
 #define smpEdiv                 0x1F99
 #define mcEncryptionKeySize_c   16
 
+/* https://www.bluetooth.com/specifications/assigned-numbers/company-identifiers */
+// 0x01FF	Freescale Semiconductor, Inc.
+#define mAdvCompanyIdFSL   0xFF, 0x01
+// 0x0025	NXP Semiconductors (formerly Philips Semiconductors)
+#define mAdvCompanyIdNXP   0x25, 0x00
+
+#define mBeaconId       0xBC
+
+/* This value will be set to a random value on BLE App init */
+#define mUuid  0xE0, 0x1C, 0x4B, 0x5E, 0x1E, 0xEB, 0xA1, 0x5C, 0xEE, 0xF4, 0x5E, 0xBA, 0x50, 0x55, 0xFF, 0x01
+
 /************************************************************************************
 * Public memory declarations
 ************************************************************************************/
 
+
+
 /* Scanning and Advertising Data */
 static const uint8_t adData0[1] =  { (gapAdTypeFlags_t)(gLeGeneralDiscoverableMode_c | gBrEdrNotSupported_c) };
-static const gapAdStructure_t advScanStruct[3] = {
+static uint8_t adData1[26] = { 
+                       /* Company Identifier*/ 
+                       mAdvCompanyIdNXP,    
+                       /* Beacon Identifier */ 
+                       mBeaconId,
+                       /* UUID */
+                       mUuid,                               
+                       /* A */
+                       0x00, 0x00,
+                       /* B */
+                       0x00, 0x00,
+                       /* C */
+                       0x00, 0x00,
+                       /* RSSI at 1m */
+                       0x1E};
+
+
+static const gapAdStructure_t advScanStruct[] = {
   {
+    .adType = gAdFlags_c, // 0x01
     .length = NumberOfElements(adData0) + 1,
-    .adType = gAdFlags_c,
-    .aData = (void *)adData0
+    .aData = (uint8_t *)adData0
   },
+  {  
+    .adType = gAdComplete128bitServiceList_c, //  0x07
+    .length = NumberOfElements(LA_LAMP_Ad_uuid_service) + 1,    
+    .aData = (uint8_t *)LA_LAMP_Ad_uuid_service
+  },   
   {
-    .length = NumberOfElements(LA_LAMP_GapAd_uuid_service) + 1,
-    .adType = gAdComplete128bitServiceList_c,
-    .aData = (void *)LA_LAMP_GapAd_uuid_service
-  },
-  {
-    .length = sizeof(LA_LAMP_GapAdShortenedLocalName),
-    .adType = gAdShortenedLocalName_c,
-    .aData = LA_LAMP_GapAdShortenedLocalName 
-  }
+    .adType = gAdShortenedLocalName_c,    // 0x08
+    .length = sizeof(LA_LAMP_AdShortenedLocalName),    
+    .aData = (uint8_t *)LA_LAMP_AdShortenedLocalName 
+  },  
+  
+/*  {
+    .adType = gAdManufacturerSpecificData_c,
+    .length = NumberOfElements(adData1) + 1,
+    .aData = (void *)adData1 
+  } */  
 };
+
 
 gapAdvertisingData_t gAppAdvertisingData = 
 {

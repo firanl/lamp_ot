@@ -186,7 +186,7 @@ static otapClientConfig_t otapServiceConfig = {service_otap};
 #endif
 
 
-static uint8_t whiteLightRamp;
+static uint8_t whiteLightRamp = 1;
 enum {
   whiteLightRampUP_c = 0,
   whiteLightRampDN_c,
@@ -290,6 +290,7 @@ static otapStatus_t OtapClient_IsImageFileHeaderValid (bleOtaImageFileHeader_t* 
 void BleApp_Init(void)
 {
      tmrErrCode_t tmrerr = gTmrInvalidId_c;
+     uint8_t adv;
      
     /* Initialize application support for drivers */          
      
@@ -307,7 +308,7 @@ void BleApp_Init(void)
     /* Start 5 second measurements voltage and temperature */
     tmrerr = TMR_StartTimer(tmrMeasurementTimerId, gTmrIntervalTimer_c, TmrSeconds(5), MeasurementTimerCallback, NULL);
     
-
+    // TODO test limit adv pack
 
 }
 
@@ -493,10 +494,10 @@ void BleApp_HandleTouch(tsi_event_t* pEvent)
                 if( (    G > 0) ) {     G--; } 
                 if( (    B > 0) ) {     B--; }                  
                 /* check for ramp change */
-                if(!lamp_NVdata.lampControl.bit.Color) // no overdrive - just white
+                if( !lamp_NVdata.lampControl.bit.Color ) // no overdrive - just white
                 {
-                    /* check for ramp change */
-                    if( ( warmW <= 0 ) && ( coldW <= 0 ) )
+                    /* check for ramp change 0 or 1 LA_LAMP_TSI_LED_LOW */
+                    if( ( warmW <= LA_LAMP_TSI_LED_LOW ) && ( coldW <= LA_LAMP_TSI_LED_LOW ) )
                     { 
                       whiteLightRamp = whiteLightRampUP_c; 
                     }
@@ -505,7 +506,7 @@ void BleApp_HandleTouch(tsi_event_t* pEvent)
                       /* mix is loked */
                       if(lamp_NVdata.lampControl.bit.mix)
                       {
-                        if( (warmW <= 0) || (coldW <= 0) )
+                        if( (warmW <= LA_LAMP_TSI_LED_LOW) || (coldW <= LA_LAMP_TSI_LED_LOW) )
                         { 
                           whiteLightRamp = whiteLightRampUP_c; 
                         }
@@ -515,7 +516,8 @@ void BleApp_HandleTouch(tsi_event_t* pEvent)
                 // overdrive white+RGB
                 {
                     /* check for ramp change */
-                    if( ( warmW <= 0 ) && ( coldW <= 0 ) && ( R <= 0 ) && ( G <= 0 ) && ( B <= 0 ) )
+                    if( ( warmW <= LA_LAMP_TSI_LED_LOW ) && ( coldW <= LA_LAMP_TSI_LED_LOW ) && 
+                        ( R <= LA_LAMP_TSI_LED_LOW ) && ( G <= LA_LAMP_TSI_LED_LOW ) && ( B <= LA_LAMP_TSI_LED_LOW ) )
                     { 
                       whiteLightRamp = whiteLightRampUP_c; 
                     }
@@ -524,7 +526,8 @@ void BleApp_HandleTouch(tsi_event_t* pEvent)
                       /* mix is loked */
                       if(lamp_NVdata.lampControl.bit.mix)
                       {
-                        if( (warmW <= 0) || (coldW <= 0) || ( R <= 0) || ( G <= 0) || ( B <= 0) )
+                        if( ( warmW <= LA_LAMP_TSI_LED_LOW ) || ( coldW <= LA_LAMP_TSI_LED_LOW ) ||
+                            ( R <= LA_LAMP_TSI_LED_LOW ) || ( G <= LA_LAMP_TSI_LED_LOW ) || ( B <= LA_LAMP_TSI_LED_LOW ) )
                         { 
                           whiteLightRamp = whiteLightRampUP_c; 
                         }
@@ -539,8 +542,6 @@ void BleApp_HandleTouch(tsi_event_t* pEvent)
                Las_SetLampRGB (lasServiceConfig.serviceHandle, R, G, B, TRUE);
             
 
-                    
-          
         }  break;  
         
       }
@@ -608,6 +609,7 @@ void BleApp_GenericCallback (gapGenericEvent_t* pGenericEvent)
 ********************************************************************************** */
 static void BleApp_Config()
 {  
+    bleResult_t   bleResult;
     tmrErrCode_t tmrerr = gTmrInvalidId_c;
     uint8_t      handleCount = sizeof(WriteNotifHandles)/sizeof(WriteNotifHandles[0]);
   
@@ -629,7 +631,7 @@ static void BleApp_Config()
 #endif
 
     /* Setup Advertising and scanning data */
-    Gap_SetAdvertisingData(&gAppAdvertisingData, &gAppScanRspData);
+    bleResult = Gap_SetAdvertisingData(&gAppAdvertisingData, &gAppScanRspData);
 
     /* Populate White List if bonding is supported */
 #if gBondingSupported_d
@@ -669,8 +671,10 @@ static void BleApp_Config()
 ********************************************************************************** */
 static void BleApp_Advertise(void)
 {
+   bleResult_t   bleResult;
+   
     /* Set advertising parameters*/
-    Gap_SetAdvertisingParameters(&gAdvParameters);
+    bleResult = Gap_SetAdvertisingParameters(&gAdvParameters);
 }
 
 static void BleApp_AdvertisingCallback (gapAdvertisingEvent_t* pAdvertisingEvent)

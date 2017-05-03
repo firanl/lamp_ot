@@ -59,6 +59,8 @@ enum
     gCFG_TID_c = 0,                     /*!< uint8_t, TID tabel id pointer for witch value to be read */ 
     gCFG_TSI_low_c,                     /*!< uint16_t, TSI idle value sensor not pressed  */
     gCFG_TSI_sensitivity_c,             /*!< uint8_t, TSI treshold add value, default 10  */
+    gCFG_TSI_min_c,                     /*!< uint16_t, TSI lowest value over time, min value  */   
+    gCFG_TSI_max_c,                     /*!< uint16_t, TSI highest value over time, max value  */       
     gCFG_TSI_tmr_c,                     /*!< uint8_t, TSI update time in mili seconds, default 15 ms  */   
     gCFG_TSI_InitHitCnt_c,              /*!< uint8_t, Intermediate state hit cnt  */
     gCFG_TSI_InitIdleCnt_c,             /*!< uint8_t, Intermediate state idle cnt */
@@ -68,10 +70,12 @@ enum
     gCFG_TSI_InitIdleIdleCnt_c,         /*!< uint8_t, Idle state idle cnt  */
     gCFG_TSI_InitIdleHitHitCnt_c,       /*!< uint8_t, First Long Press hit cnt */
     gCFG_TSI_InitIdleHitIdleCnt_c,      /*!< uint8_t, Short Press  idle cnt */    
+    gCFG_TSI_Recalibrate_low_c,         /*!< uint8_t, Start a low recalibration - TSI not pressed */      
     gCFG_blinkTimeMs_c,                 /*!< uint16_t, On / off time period of a blink in mili seconds, default 300 ms  */
     gCFG_blinkCnt_c,                    /*!< uint8_t, How many blinks are performed, default 5  */
     gCFG_fadeTimeMs_c,                  /*!< uint8_t, Fade refresh time, light increment, default 17 ms */    
     gCFG_fadeTimeCritMs_c,              /*!< uint8_t, Fade refresh time, light increment for temperature shutdown, default 5 ms */
+    gCFG_SaveToFlash_c,                 /*!< uint8_t, save all cfg and TSI to flash */    
     gCFG_last                           /* max value in config table list */
 };
 

@@ -54,6 +54,8 @@ enum _gpio_pins
     kGpioLED4        = GPIO_MAKE_PIN(GPIOB_IDX, 3),   /* lamp Cold White LED 4 */
     
     kGpioSW1         = GPIO_MAKE_PIN(GPIOC_IDX, 3),  /* lamp CapacitiveTouch switchPin1 */
+    
+    kGpioRST         = GPIO_MAKE_PIN(GPIOA_IDX, 2),  /* PTA2 disable RESET_b, set as input */
 
     
     //kGpioI2cDAP      = GPIO_MAKE_PIN(GPIOB_IDX, 1),  
