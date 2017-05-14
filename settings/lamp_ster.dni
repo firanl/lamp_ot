@@ -3,7 +3,7 @@ FillEnabled=1
 OverflowWarningsEnabled=1
 WarningThreshold=90
 SpWarningsEnabled=1
-WarnLogOnly=1
+WarnLogOnly=0
 UseTrigger=1
 TriggerName=main
 LimitSize=0
@@ -21,7 +21,7 @@ TraceBufferSize=0x00010000
 TraceStallIfFIFOFull=0x00000000
 TracePortSize=0x00000000
 [DebugChecksum]
-Checksum=1515851807
+Checksum=944938180
 [CodeCoverage]
 Enabled=_ 0
 [Exceptions]

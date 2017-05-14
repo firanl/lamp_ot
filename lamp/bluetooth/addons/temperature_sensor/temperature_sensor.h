@@ -93,16 +93,15 @@ typedef union lamp_TempVoltage_tag {
 *******************************************************************************/
 
 
-/* core temperature at witch the sistem should switch off all outputs, exponent -2 */
+/* core temperature at witch the sistem should switch off all outputs, exponent -2, default 70C */
 #ifndef gCoreTemperatureFaliure_d 
-  #define gCoreTemperatureFaliure_d    7500
+  #define gCoreTemperatureFaliure_d    7000
 #endif
 
-/* core temperature at upper limit, exponent -2 */
+/* core temperature at upper limit, exponent -2, default 150C */
 #define gCoreTemperatureFaliureUL_d    15000
 
-/* core temperature at lower limit, exponent -2 */
-//#define gCoreTemperatureFaliureLL_d    3500
+/* core temperature at lower limit, exponent -2, default 20C */
 #define gCoreTemperatureFaliureLL_d    2000
 
 
@@ -134,7 +133,6 @@ temperature_sensor_status_t temperature_sensor_init (void);
 ****************************************************************************/
 void measure_chip_temperature (void);
 
-bleResult_t set_chip_critical_temperature (int16_t new_critical_temperature);
 
 /*!
  * @} End of temperature_sensor

@@ -50,6 +50,8 @@
 #include "tsi_sensor.h"
 #include "lamp_att_cfg.h"
 
+#include "temperature_sensor.h"
+
 /************************************************************************************
 * Private constants & macros
 ************************************************************************************/
@@ -69,6 +71,9 @@ extern lamp_config_t lamp_cfg;
 /* lamp TSI cfg params */
 extern tsi_touch_t tsi;
 
+/* core temperature at witch the sistem should disable all outputs, exponent -2 */
+extern int16_t gCoreTemperatureFaliure;
+
 /************************************************************************************
 * Private type definitions
 ************************************************************************************/
@@ -83,7 +88,7 @@ extern tsi_touch_t tsi;
 * Private functions prototypes
 ************************************************************************************/
 static bleResult_t Las_RecordValueToBeRead (uint16_t serviceHandle, uint16_t valLenght, uint8_t* pValue);
-
+static bleResult_t Las_GetParamToBeRead(uint16_t serviceHandle, uint8_t paramID);
 
 /************************************************************************************
 * Extern functions
@@ -96,71 +101,36 @@ static bleResult_t Las_RecordValueToBeRead (uint16_t serviceHandle, uint16_t val
 
 
 
-bleResult_t Las_SetConfig (uint16_t serviceHandle, const uint8_t* pConfig)
+bleResult_t Las_SetConfig (uint16_t serviceHandle, uint8_t cfg8, uint8_t  val8, uint16_t val16)
 {
     bleResult_t result = gBleSuccess_c;
-    uint8_t  val8 = 0;
-    uint16_t val16 = 0;
-    uint32_t val32 = 0;
- 
-    switch(pConfig[0])
+    
+    val16 = val16<<8; 
+    val16 += (uint16_t) val8;
+
+    switch(cfg8)
     {
       /* TID tabel id pointer for witch value to be read */ 
       case gCFG_TID_c: 
         {
-            pConfig++;
-            val8 = *( (uint8_t*) pConfig); 
-            
-            switch(val8)
-            {
-             case gCFG_TID_c:                    { return Las_RecordValueToBeRead (serviceHandle, sizeof(uint8_t),  (uint8_t*) &val8);                   } break; 
-             
-             case gCFG_TSI_low_c:                { return Las_RecordValueToBeRead (serviceHandle, sizeof(uint16_t), (uint8_t*) &tsi.low);                } break; 
-             case gCFG_TSI_sensitivity_c:        { return Las_RecordValueToBeRead (serviceHandle, sizeof(uint8_t),  (uint8_t*) &tsi.sensitivity);        } break;
-             case gCFG_TSI_min_c:                { return Las_RecordValueToBeRead (serviceHandle, sizeof(uint16_t), (uint8_t*) &tsi.min);                } break; 
-             case gCFG_TSI_max_c:                { return Las_RecordValueToBeRead (serviceHandle, sizeof(uint16_t), (uint8_t*) &tsi.max);                } break;                           
-             case gCFG_TSI_tmr_c:                { return Las_RecordValueToBeRead (serviceHandle, sizeof(uint8_t),  (uint8_t*) &tsi.tmr);                } break; 
-             case gCFG_TSI_InitHitCnt_c:         { return Las_RecordValueToBeRead (serviceHandle, sizeof(uint8_t),  (uint8_t*) &tsi.InitHitCnt);         } break;
-             case gCFG_TSI_InitIdleCnt_c:        { return Las_RecordValueToBeRead (serviceHandle, sizeof(uint8_t),  (uint8_t*) &tsi.InitIdleCnt);        } break;
-             case gCFG_TSI_InitHitHitCnt_c:      { return Las_RecordValueToBeRead (serviceHandle, sizeof(uint8_t),  (uint8_t*) &tsi.InitHitHitCnt);      } break;
-             case gCFG_TSI_InitHitIdleCnt_c:     { return Las_RecordValueToBeRead (serviceHandle, sizeof(uint8_t),  (uint8_t*) &tsi.InitHitIdleCnt);     } break;
-             case gCFG_TSI_InitIdleHitCnt_c:     { return Las_RecordValueToBeRead (serviceHandle, sizeof(uint8_t),  (uint8_t*) &tsi.InitIdleHitCnt);     } break;
-             case gCFG_TSI_InitIdleIdleCnt_c:    { return Las_RecordValueToBeRead (serviceHandle, sizeof(uint8_t),  (uint8_t*) &tsi.InitIdleIdleCnt);    } break;
-             case gCFG_TSI_InitIdleHitHitCnt_c:  { return Las_RecordValueToBeRead (serviceHandle, sizeof(uint8_t),  (uint8_t*) &tsi.InitIdleHitHitCnt);  } break;
-             case gCFG_TSI_InitIdleHitIdleCnt_c: { return Las_RecordValueToBeRead (serviceHandle, sizeof(uint8_t),  (uint8_t*) &tsi.InitIdleHitIdleCnt); } break;
-
-             case gCFG_TSI_Recalibrate_low_c:    { return Las_RecordValueToBeRead (serviceHandle, sizeof(uint8_t),  (uint8_t*) &val8);                   } break;              
-             
-             case gCFG_blinkTimeMs_c:            { return Las_RecordValueToBeRead (serviceHandle, sizeof(uint16_t), (uint8_t*) &lamp_cfg.blinkTimeMs);   } break;
-             case gCFG_blinkCnt_c:               { return Las_RecordValueToBeRead (serviceHandle, sizeof(uint8_t),  (uint8_t*) &lamp_cfg.blinkCnt);      } break;
-             case gCFG_fadeTimeMs_c:             { return Las_RecordValueToBeRead (serviceHandle, sizeof(uint8_t),  (uint8_t*) &lamp_cfg.fadeTimeMs);    } break;
-             case gCFG_fadeTimeCritMs_c:         { return Las_RecordValueToBeRead (serviceHandle, sizeof(uint8_t),  (uint8_t*) &lamp_cfg.fadeTimeCritMs);} break;
-             default:                            { return gBleInvalidParameter_c; }                 
-            }
-          
+          return Las_GetParamToBeRead(serviceHandle, val8); 
         } break;
         
       /* TSI */ 
       /* uint16_t, TSI idle value sensor not pressed  */
       case gCFG_TSI_low_c: 
-        {
-            pConfig++;
-            val16 = *( (uint16_t*) pConfig); 
-            
+        {   
             /* check if value in limits */
             if( (val16 >= 0) && (val16 < 0xFFFF) )
             {
               tsi.low = val16;
-            }
+            } else { return gBleOverflow_c; }
           
         } break;   
         
       /* uint8_t, TSI treshold add value, default 10  */
       case gCFG_TSI_sensitivity_c: 
-        {
-            pConfig++;
-            val8 = *( (uint8_t*) pConfig); 
-            
+        {           
             /* check if value in limits */
             if( (val8 > 0) && (val8 < 0xFF) )
             {
@@ -168,232 +138,181 @@ bleResult_t Las_SetConfig (uint16_t serviceHandle, const uint8_t* pConfig)
               tsi.low = (uint16_t) (tsi.low  + ( val8 - tsi.sensitivity )  );
               /* update sensitivity */
               tsi.sensitivity = val8;
-            } 
+            } else { return gBleOverflow_c; } 
         } break;  
         
       /* uint16_t, TSI highest value over time, max value */
       case gCFG_TSI_max_c: 
-        {
-            pConfig++;
-            val16 = *( (uint16_t*) pConfig); 
-            
+        {       
             /* check if value in limits */
             if( (val16 >= 0) && (val16 < 0xFFFF) )
             {
               tsi.max = val16;
-            }
+            } else { return gBleOverflow_c; }
         } break;    
         
       /* uint16_t, TSI lowest value over time, min value */
       case gCFG_TSI_min_c: 
         {
-            pConfig++;
-            val16 = *( (uint16_t*) pConfig); 
-            
             /* check if value in limits */
             if( (val16 >= 0) && (val16 < 0xFFFF) )
             {
               tsi.min = val16;
-            }
+            } else { return gBleOverflow_c; }
         } break;        
         
       /* uint8_t, TSI update time in mili seconds, default 15 ms  */ 
       case  gCFG_TSI_tmr_c: 
-        {
-            pConfig++;
-            val8 = *( (uint8_t*) pConfig); 
-            
+        {  
             /* check if value in limits */
             if( (val8 > 4) && (val8 < 0xFF) )
             {
               tsi.tmr = val8;
               /* ReStart TSI timer for capacitive touch BTN with new interval */     
               TMR_StartTimer(tmrTsiId, gTmrIntervalTimer_c, tsi.tmr, TsiTimerCallback, NULL); 
-            }
-          
+            } else { return gBleOverflow_c; }
         } break;         
  
       /* uint8_t, Intermediate state hit cnt  */ 
       case  gCFG_TSI_InitHitCnt_c: 
         {
-            pConfig++;
-            val8 = *( (uint8_t*) pConfig); 
-            
             /* check if value in limits */
             if( (val8 > 1) && (val8 < 0xFF) )
             {
               tsi.InitHitCnt = val8;
-            }
-          
+            } else { return gBleOverflow_c; }
         } break;  
                  
       /* uint8_t, Intermediate state idle cnt */ 
       case  gCFG_TSI_InitIdleCnt_c: 
         {
-            pConfig++;
-            val8 = *( (uint8_t*) pConfig); 
-            
             /* check if value in limits */
             if( (val8 > 1) && (val8 < 0xFF) )
             {
               tsi.InitIdleCnt = val8;
-            }
-          
+            } else { return gBleOverflow_c; } 
         } break;     
                    
       /* uint8_t, Long Press Series hit cnt */
       case  gCFG_TSI_InitHitHitCnt_c: 
         {
-            pConfig++;
-            val8 = *( (uint8_t*) pConfig); 
-            
             /* check if value in limits */
             if( (val8 > 1) && (val8 < 0xFF) )
             {
               tsi.InitHitHitCnt = val8;
-            }
-          
+            } else { return gBleOverflow_c; }
         } break;     
                         
       /* uint8_t, Intermediate not used state idle cnt  */  
       case  gCFG_TSI_InitHitIdleCnt_c: 
-        {
-            pConfig++;
-            val8 = *( (uint8_t*) pConfig); 
-            
+        {  
             /* check if value in limits */
             if( (val8 > 1) && (val8 < 0xFF) )
             {
               tsi.InitHitIdleCnt = val8;
-            }
-          
+            } else { return gBleOverflow_c; }
         } break;      
              
       /* uint8_t, Intermediate state hit cnt */ 
       case  gCFG_TSI_InitIdleHitCnt_c: 
         {
-            pConfig++;
-            val8 = *( (uint8_t*) pConfig); 
-            
             /* check if value in limits */
             if( (val8 > 1) && (val8 < 0xFF) )
             {
               tsi.InitIdleHitCnt = val8;
-            }
-          
+            } else { return gBleOverflow_c; }  
         } break;      
              
       /* uint8_t, Idle state idle cnt  */ 
       case  gCFG_TSI_InitIdleIdleCnt_c: 
         {
-            pConfig++;
-            val8 = *( (uint8_t*) pConfig); 
-            
             /* check if value in limits */
             if( (val8 > 1) && (val8 < 0xFF) )
             {
               tsi.InitIdleIdleCnt = val8;
-            }
-          
+            } else { return gBleOverflow_c; } 
         } break; 
                   
       /* uint8_t, First Long Press hit cnt */ 
       case  gCFG_TSI_InitIdleHitHitCnt_c: 
         {
-            pConfig++;
-            val8 = *( (uint8_t*) pConfig); 
-            
             /* check if value in limits */
             if( (val8 > 1) && (val8 < 0xFF) )
             {
               tsi.InitIdleHitHitCnt = val8;
-            }
-          
+            } else { return gBleOverflow_c; }    
         } break;      
               
       /* uint8_t, Short Press  idle cnt */ 
       case  gCFG_TSI_InitIdleHitIdleCnt_c: 
         {
-            pConfig++;
-            val8 = *( (uint8_t*) pConfig); 
-            
             /* check if value in limits */
             if( (val8 > 1) && (val8 < 0xFF) )
             {
               tsi.InitIdleHitIdleCnt = val8; 
-            }
-          
+            } else { return gBleOverflow_c; } 
         } break; 
         
       /* uint8_t, Start a low recalibration - TSI not pressed */ 
       case  gCFG_TSI_Recalibrate_low_c: 
         {
-            pConfig++;
-            val8 = *( (uint8_t*) pConfig); 
-            
             /* check if value is 0x01 */
             if( val8 == 0x01 )
             {
               TsiCalibrate(); 
-            }
+            } else { return gBleOverflow_c; }
         } break;        
         
       /* uint16_t, On / off time period of a blink in mili seconds, default 300 ms  */
       case gCFG_blinkTimeMs_c: 
         {
-            pConfig++;
-            val16 = *( (uint16_t*) pConfig); 
-            
             /* check if value in limits */
             if( (val16 > 6) && (val16 < 5000) )
             {
               lamp_cfg.blinkTimeMs = val16;
-            }
-          
+            } else { return gBleOverflow_c; }
         } break;   
         
       /* uint8_t, How many blinks are performed, default 5  */
       case  gCFG_blinkCnt_c: 
         {
-            pConfig++;
-            val8 = *( (uint8_t*) pConfig); 
-            
             /* check if value in limits */
             if( (val8 > 1) && (val8 < 15) )
             {
               lamp_cfg.blinkCnt = val8;
-            }
-          
+            } else { return gBleOverflow_c; }  
         } break;    
                            
       /* uint8_t, Fade refresh time, light increment, default 17 ms */
       case  gCFG_fadeTimeMs_c: 
         {
-            pConfig++;
-            val8 = *( (uint8_t*) pConfig); 
-            
             /* check if value in limits */
             if( (val8 > 4) && (val8 < 200) )
             {
               lamp_cfg.fadeTimeMs = val8;
-            }
-          
+            } else { return gBleOverflow_c; }
         } break;      
                   
       /* uint8_t, Fade refresh time, light increment for temperature shutdown, default 5 ms */
       case  gCFG_fadeTimeCritMs_c: 
         {
-            pConfig++;
-            val8 = *( (uint8_t*) pConfig); 
-            
             /* check if value in limits */
             if( (val8 > 1) && (val8 < 15) )
             {
               lamp_cfg.fadeTimeCritMs = val8;
-            }
-          
+            } else { return gBleOverflow_c; }  
         } break;      
-        
+
+      /* uint16_t, core temperature at witch the sistem should disable all outputs, exponent -2  */
+      case gCFG_ChipFailTemp_c: 
+        {
+
+            /* check if value in limits */
+            if( (val16 >= gCoreTemperatureFaliureLL_d) && (val16 <= gCoreTemperatureFaliureUL_d) )
+            {
+              gCoreTemperatureFaliure = val16;
+            } else { return gBleOverflow_c; }          
+        } break;           
                                       
           
       default:  
@@ -412,6 +331,79 @@ bleResult_t Las_SetConfig (uint16_t serviceHandle, const uint8_t* pConfig)
 * Private functions
 ************************************************************************************/
 
+static bleResult_t Las_GetParamToBeRead(uint16_t serviceHandle, uint8_t paramID)
+{
+    switch(paramID)
+    {
+     case gCFG_TID_c:                    
+       { return Las_RecordValueToBeRead (serviceHandle, sizeof(uint8_t),
+                                         (uint8_t*) &paramID);                   } break; 
+     
+     case gCFG_TSI_low_c:                
+       { return Las_RecordValueToBeRead (serviceHandle, sizeof(uint16_t),
+                                         (uint8_t*) &tsi.low);                } break; 
+     case gCFG_TSI_sensitivity_c:       
+       { return Las_RecordValueToBeRead (serviceHandle, sizeof(uint8_t),
+                                         (uint8_t*) &tsi.sensitivity);        } break;
+     case gCFG_TSI_min_c:                
+       { return Las_RecordValueToBeRead (serviceHandle, sizeof(uint16_t),
+                                         (uint8_t*) &tsi.min);                } break; 
+     case gCFG_TSI_max_c:                
+       { return Las_RecordValueToBeRead (serviceHandle, sizeof(uint16_t)
+                                         , (uint8_t*) &tsi.max);                } break;                           
+     case gCFG_TSI_tmr_c:                
+       { return Las_RecordValueToBeRead (serviceHandle, sizeof(uint8_t),
+                                         (uint8_t*) &tsi.tmr);                } break; 
+     case gCFG_TSI_InitHitCnt_c:         
+       { return Las_RecordValueToBeRead (serviceHandle, sizeof(uint8_t),
+                                         (uint8_t*) &tsi.InitHitCnt);         } break;
+     case gCFG_TSI_InitIdleCnt_c:        
+       { return Las_RecordValueToBeRead (serviceHandle, sizeof(uint8_t),
+                                         (uint8_t*) &tsi.InitIdleCnt);        } break;
+     case gCFG_TSI_InitHitHitCnt_c:      
+       { return Las_RecordValueToBeRead (serviceHandle, sizeof(uint8_t),
+                                         (uint8_t*) &tsi.InitHitHitCnt);      } break;
+     case gCFG_TSI_InitHitIdleCnt_c:     
+       { return Las_RecordValueToBeRead (serviceHandle, sizeof(uint8_t),
+                                         (uint8_t*) &tsi.InitHitIdleCnt);     } break;
+     case gCFG_TSI_InitIdleHitCnt_c:     
+       { return Las_RecordValueToBeRead (serviceHandle, sizeof(uint8_t),
+                                         (uint8_t*) &tsi.InitIdleHitCnt);     } break;
+     case gCFG_TSI_InitIdleIdleCnt_c:    
+       { return Las_RecordValueToBeRead (serviceHandle, sizeof(uint8_t),
+                                         (uint8_t*) &tsi.InitIdleIdleCnt);    } break;
+     case gCFG_TSI_InitIdleHitHitCnt_c:  
+       { return Las_RecordValueToBeRead (serviceHandle, sizeof(uint8_t),
+                                         (uint8_t*) &tsi.InitIdleHitHitCnt);  } break;
+     case gCFG_TSI_InitIdleHitIdleCnt_c: 
+       { return Las_RecordValueToBeRead (serviceHandle, sizeof(uint8_t),
+                                         (uint8_t*) &tsi.InitIdleHitIdleCnt); } break;
+
+     case gCFG_TSI_Recalibrate_low_c:    
+       { return Las_RecordValueToBeRead (serviceHandle, sizeof(uint8_t),
+                                         (uint8_t*) &paramID);                } break;              
+     
+     case gCFG_blinkTimeMs_c:            
+       { return Las_RecordValueToBeRead (serviceHandle, sizeof(uint16_t),
+                                         (uint8_t*) &lamp_cfg.blinkTimeMs);    } break;
+     case gCFG_blinkCnt_c:               
+       { return Las_RecordValueToBeRead (serviceHandle, sizeof(uint8_t),
+                                         (uint8_t*) &lamp_cfg.blinkCnt);       } break;
+     case gCFG_fadeTimeMs_c:             
+       { return Las_RecordValueToBeRead (serviceHandle, sizeof(uint8_t),
+                                         (uint8_t*) &lamp_cfg.fadeTimeMs);     } break;
+     case gCFG_fadeTimeCritMs_c:         
+       { return Las_RecordValueToBeRead (serviceHandle, sizeof(uint8_t),
+                                         (uint8_t*) &lamp_cfg.fadeTimeCritMs); } break;
+     
+     case gCFG_ChipFailTemp_c:           
+       { return Las_RecordValueToBeRead (serviceHandle, sizeof(uint16_t),
+                                         (uint8_t*) &gCoreTemperatureFaliure); } break;
+
+     default:                            
+       { return gBleInvalidParameter_c; }                 
+    }
+}
 
 static bleResult_t Las_RecordValueToBeRead (uint16_t serviceHandle, uint16_t valLenght, uint8_t* pValue)
 {

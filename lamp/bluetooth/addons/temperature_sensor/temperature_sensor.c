@@ -208,19 +208,11 @@ void measure_chip_temperature (void){
   
 }
 
-bleResult_t set_chip_critical_temperature (int16_t new_critical_temperature)
-{
-  if( (new_critical_temperature <= gCoreTemperatureFaliureUL_d) && ( new_critical_temperature >= gCoreTemperatureFaliureLL_d ) )
-  {
-    gCoreTemperatureFaliure = new_critical_temperature;
-    return gBleSuccess_c;
-  }
-  
-  return gBleOverflow_c;
-}
+
 
 /******************************************************************************
 * Private Functions
 ******************************************************************************/
+
 
 /* End of file */

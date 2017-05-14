@@ -197,7 +197,6 @@ static uint16_t WriteNotifHandles[] =     {value_otap_control_point,
                                            value_lamp_Control,
                                            value_lamp_White, 
                                            value_lamp_RGB,
-                                           value_core_temperature,
                                            value_lamp_on_sec,
                                            value_lamp_off_sec,
                                            value_lamp_config};
@@ -500,6 +499,7 @@ void BleApp_HandleTouch(tsi_event_t* pEvent)
                     if( ( warmW <= LA_LAMP_TSI_LED_LOW ) && ( coldW <= LA_LAMP_TSI_LED_LOW ) )
                     { 
                       whiteLightRamp = whiteLightRampUP_c; 
+                      isMax = true;
                     }
                     else
                     {
@@ -509,6 +509,7 @@ void BleApp_HandleTouch(tsi_event_t* pEvent)
                         if( (warmW <= LA_LAMP_TSI_LED_LOW) || (coldW <= LA_LAMP_TSI_LED_LOW) )
                         { 
                           whiteLightRamp = whiteLightRampUP_c; 
+                          isMax = true;
                         }
                       }
                     }
@@ -1021,13 +1022,14 @@ static void BleApp_AttributeWritten(deviceId_t  deviceId,
                 otapClientData.lastCmdSentToOtapServer = gOtapCmdIdErrorNotification_c;
             }
             else
-            {
+            {   //TODO this is for debug, remove in production, or send some notification
                 /*! A BLE error has occurred - Disconnect */
                 Gap_Disconnect (deviceId);
             }
             break;
         };
     }
+    
     /* lamp data BleApp_AttributeWritten  with BT ACK */
     else if (handle == value_lamp_Control)
     {
@@ -1038,8 +1040,9 @@ static void BleApp_AttributeWritten(deviceId_t  deviceId,
         bleResult = Las_SetLampControl(lasServiceConfig.serviceHandle, control, FALSE, lamp_cfg.fadeTimeMs);
         // Report status to client
         BleApp_SendAttWriteResponse (deviceId, handle, bleResult);
-      }
-    }     
+      } else { BleApp_SendAttWriteResponse (deviceId, handle, gBleOverflow_c); }
+    }   
+    
     else if (handle == value_lamp_White)
     {
       if ( (length==2) && (pValue[0] <= PWM_factor_MAX) && (pValue[1] <= PWM_factor_MAX) )
@@ -1047,8 +1050,9 @@ static void BleApp_AttributeWritten(deviceId_t  deviceId,
          bleResult = Las_SetLampWhite (lasServiceConfig.serviceHandle, pValue[0], pValue[1], FALSE, FALSE);
         // Report status to client
         BleApp_SendAttWriteResponse (deviceId, handle, bleResult);
-      }
-    }     
+      } else { BleApp_SendAttWriteResponse (deviceId, handle, gBleOverflow_c); }
+    }  
+    
     else if (handle == value_lamp_RGB)
     {
        if ( (length==3) && (pValue[0] <= PWM_factor_MAX) && (pValue[1] <= PWM_factor_MAX) && (pValue[2] <= PWM_factor_MAX))
@@ -1056,17 +1060,9 @@ static void BleApp_AttributeWritten(deviceId_t  deviceId,
         bleResult = Las_SetLampRGB (lasServiceConfig.serviceHandle, pValue[0], pValue[1], pValue[2], FALSE);
         // Report status to client
         BleApp_SendAttWriteResponse (deviceId, handle, bleResult);
-      }
-    }      
-    else if (handle == value_core_temperature)
-    {
-      if ( (length==2) )
-      {
-        bleResult = set_chip_critical_temperature ( *( (int16_t*) pValue) );
-        // Report status to client
-        BleApp_SendAttWriteResponse (deviceId, handle, bleResult);
-      }
-    }    
+      } else { BleApp_SendAttWriteResponse (deviceId, handle, gBleOverflow_c); }
+    }  
+    
     else if (handle == value_lamp_on_sec)
     {
       if ( (length==4) )
@@ -1074,8 +1070,9 @@ static void BleApp_AttributeWritten(deviceId_t  deviceId,
         bleResult = Las_SetOnTimer(lasServiceConfig.serviceHandle, pValue);
         // Report status to client
         BleApp_SendAttWriteResponse (deviceId, handle, bleResult);
-      }
+      } else { BleApp_SendAttWriteResponse (deviceId, handle, gBleOverflow_c); }
     }
+    
     else if (handle == value_lamp_off_sec)
     {
       if ( (length==4) )
@@ -1083,23 +1080,27 @@ static void BleApp_AttributeWritten(deviceId_t  deviceId,
         bleResult = Las_SetOffTimer(lasServiceConfig.serviceHandle, pValue);
         // Report status to client
         BleApp_SendAttWriteResponse (deviceId, handle, bleResult);
-      }
-    }   
+      } else { BleApp_SendAttWriteResponse (deviceId, handle, gBleOverflow_c); }
+    }  
+    
     else if (handle == value_lamp_config)
     {
-      if ( (length>0) && (length<5) )
+      if ( (length>1) && (length<5) )
       {
-        bleResult = Las_SetConfig(lasServiceConfig.serviceHandle, pValue);
+        
+        bleResult = Las_SetConfig(lasServiceConfig.serviceHandle, pValue[0], pValue[1], pValue[2] );
         // Report status to client
         BleApp_SendAttWriteResponse (deviceId, handle, bleResult);
-      }
+      } else { BleApp_SendAttWriteResponse (deviceId, handle, gBleOverflow_c); }
     }    
     
     else
     {
         /*! A GATT Server is trying to GATT Write an unknown attribute value.
          *  This should not happen. Disconnect the link. */
-        Gap_Disconnect (deviceId);
+        //Gap_Disconnect (deviceId);
+        // error response
+        BleApp_SendAttWriteResponse (deviceId, handle, gGattDbServiceNotFound_c);
     }
 }
 
@@ -2237,10 +2238,6 @@ static otapStatus_t OtapClient_IsImageFileHeaderValid (bleOtaImageFileHeader_t* 
 }
 
 
-
-
-
-
 /*! *********************************************************************************
 * \brief        Measurement Timer for Temperature and voltage on core.
 *
@@ -2261,6 +2258,16 @@ static void MeasurementTimerCallback(void * pParam)
       #endif
     }
 
+}
+
+/*! *********************************************************************************
+* \brief        Hard Fault Handler is reset.
+*
+********************************************************************************** */
+void HardFault_Handler(void)
+{
+    ResetMCU();
+    //TODO in debug should be while(1);
 }
 
 

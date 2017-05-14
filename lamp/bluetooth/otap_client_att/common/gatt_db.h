@@ -42,8 +42,8 @@ PRIMARY_SERVICE_UUID128(service_lamp, uuid_service_lamp)
         VALUE_UUID128(value_lamp_RGB, uuid_char_lamp_RGB, (gPermissionFlagReadable_c | gPermissionFlagWritable_c), 3, LA_LAMP_R, LA_LAMP_G, LA_LAMP_B)
         CCCD(cccd_RGB)
  
-    CHARACTERISTIC(char_core_temperature, gBleSig_Temperature_d, (gGattCharPropNotify_c | gGattCharPropRead_c | gGattCharPropWrite_c))
-        VALUE(value_core_temperature, gBleSig_Temperature_d, (gPermissionFlagReadable_c | gPermissionFlagWritable_c), 2, LA_LAMP_TEMP)
+    CHARACTERISTIC(char_core_temperature, gBleSig_Temperature_d, (gGattCharPropNotify_c | gGattCharPropRead_c ))
+        VALUE(value_core_temperature, gBleSig_Temperature_d, (gPermissionFlagReadable_c ), 2, LA_LAMP_TEMP)
         DESCRIPTOR(desc_core_temperature, gBleSig_CharPresFormatDescriptor_d, (gPermissionFlagReadable_c), gBleSig_CharPresFormatDescriptorBytes_d, gBleSig_signed_16_bit_integer_d, gBleSig_Exponent_neg2_d, gBleSig_Celsius_temperature_d, gBleSig_Bluetooth_SIG_Assigned_Numbers_d , gBleSig_unknown_d)
         CCCD(cccd_core_temperature)          
 
@@ -60,9 +60,8 @@ PRIMARY_SERVICE_UUID128(service_lamp, uuid_service_lamp)
         VALUE_UUID128(value_lamp_off_sec, uuid_char_lamp_off_sec, (gPermissionFlagReadable_c | gPermissionFlagWritable_c), 4, 0x00, 0x00, 0x00, 0x00)   
         CCCD(cccd_lamp_off_sec)     
           
-     CHARACTERISTIC_UUID128(char_lamp_config, uuid_char_lamp_config, ( gGattCharPropNotify_c | gGattCharPropRead_c | gGattCharPropWrite_c ) )  
-        VALUE_UUID128_VARLEN(value_lamp_config, uuid_char_lamp_config, (gPermissionFlagReadable_c | gPermissionFlagWritable_c), 5, 1, 0x00, 0x00, 0x00, 0x00, 0x00)
-        CCCD(cccd_lamp_TSI)          
+     CHARACTERISTIC_UUID128(char_lamp_config, uuid_char_lamp_config, ( gGattCharPropRead_c | gGattCharPropWrite_c ) )  
+        VALUE_UUID128_VARLEN(value_lamp_config, uuid_char_lamp_config, (gPermissionFlagReadable_c | gPermissionFlagWritable_c), 5, 1, 0x00, 0x00, 0x00, 0x00, 0x00)         
 
           
 PRIMARY_SERVICE_UUID128(service_otap, uuid_service_otap)

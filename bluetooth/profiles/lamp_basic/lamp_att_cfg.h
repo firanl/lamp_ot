@@ -75,7 +75,8 @@ enum
     gCFG_blinkCnt_c,                    /*!< uint8_t, How many blinks are performed, default 5  */
     gCFG_fadeTimeMs_c,                  /*!< uint8_t, Fade refresh time, light increment, default 17 ms */    
     gCFG_fadeTimeCritMs_c,              /*!< uint8_t, Fade refresh time, light increment for temperature shutdown, default 5 ms */
-    gCFG_SaveToFlash_c,                 /*!< uint8_t, save all cfg and TSI to flash */    
+    gCFG_SaveToFlash_c,                 /*!< uint8_t, Save all cfg and TSI to flash */   
+    gCFG_ChipFailTemp_c,                /*!< uint16_t, core temperature at witch the sistem should disable all outputs, exponent -2  */  
     gCFG_last                           /* max value in config table list */
 };
 
@@ -102,7 +103,7 @@ extern "C" {
 * \return       gBleSuccess_c or error.
 ************************************************************************************/
 
-bleResult_t Las_SetConfig (uint16_t serviceHandle, const uint8_t* pConfig);
+bleResult_t Las_SetConfig (uint16_t serviceHandle, uint8_t cfg8, uint8_t  val8, uint16_t val16);
 
 
 
