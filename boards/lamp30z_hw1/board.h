@@ -44,8 +44,8 @@
 /* BLE Device Info service default data from gatt_db.h  */
 
   /* Software revision Major.Minor.Build */
-  #define DI_SoftwareRevisionString  "0.0.2"
-  /* build date 14 may 2017 */
+  #define DI_SoftwareRevisionString  "0.0.3"
+  /* build date 15 may 2017 */
 
 
   /* Hardware Revision 4 bytes Major byte, Minor byte, Revision byte, Variant byte */

@@ -553,7 +553,7 @@ static bleResult_t Las_RecordLampControl (uint16_t serviceHandle, uint8_t notify
     bleUuid_t* pUuid = (bleUuid_t*)&uuid_char_lamp_Control;
 
     
-    if(mLas_SubscribedClientId != gInvalidDeviceId_c)
+    //if(mLas_SubscribedClientId != gInvalidDeviceId_c)
     {
       /* Get handle of Temperature characteristic */
       result = GattDb_FindCharValueHandleInService(serviceHandle,
@@ -580,7 +580,7 @@ static bleResult_t Las_RecordLampWhite (uint16_t serviceHandle, uint8_t notify)
     bleResult_t result;
     bleUuid_t* pUuid = (bleUuid_t*)&uuid_char_lamp_White;
 
-    if(mLas_SubscribedClientId != gInvalidDeviceId_c)
+    //if(mLas_SubscribedClientId != gInvalidDeviceId_c)
     {
       /* Get handle of Temperature characteristic */
       result = GattDb_FindCharValueHandleInService(serviceHandle,
@@ -607,7 +607,7 @@ static bleResult_t Las_RecordLampRGB (uint16_t serviceHandle, uint8_t notify)
     bleResult_t result;
     bleUuid_t* pUuid = (bleUuid_t*)&uuid_char_lamp_RGB;
 
-    if(mLas_SubscribedClientId != gInvalidDeviceId_c)
+    //if(mLas_SubscribedClientId != gInvalidDeviceId_c)
     {
       /* Get handle of Temperature characteristic */
       result = GattDb_FindCharValueHandleInService(serviceHandle,
@@ -639,7 +639,7 @@ static bleResult_t Las_RecordOnTimer (uint16_t serviceHandle, uint8_t timerOnOff
     else
       pUuid = (bleUuid_t*)&uuid_char_lamp_off_sec;
     
-    if(mLas_SubscribedClientId != gInvalidDeviceId_c)
+    //if(mLas_SubscribedClientId != gInvalidDeviceId_c)
     {
       /* Get handle of Temperature characteristic */
       result = GattDb_FindCharValueHandleInService(serviceHandle,
