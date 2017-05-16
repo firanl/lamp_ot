@@ -200,6 +200,8 @@ static void initHardwareParameters(void)
   lamp_cfg.blinkTimeMs    = blinkTimeMs_d;
   lamp_cfg.fadeTimeCritMs = fadeTimeCritMs_d;
   lamp_cfg.fadeTimeMs     = fadeTimeMs_d;
+  lamp_cfg.fadeTimerOnTimeMs  = fadeTimerOnTimeMs_d;
+  lamp_cfg.fadeTimerOffTimeMs = fadeTimerOffTimeMs_d;
   
   /* init MAC ADRESS */  
   clone_RSIM_private_static_MAC(gBDAddress_c);

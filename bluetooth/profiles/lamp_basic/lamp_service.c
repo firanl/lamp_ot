@@ -231,7 +231,7 @@ bleResult_t Las_RecordMeasurementTV (uint16_t serviceHandle)
 
 
 
-bleResult_t Las_SetLampControl (uint16_t serviceHandle, lamp_control_t control, bool notify, uint8_t speedMs)
+bleResult_t Las_SetLampControl (uint16_t serviceHandle, lamp_control_t control, bool notify, uint16_t speedMs)
 {
   bleResult_t result = gBleSuccess_c;
 
@@ -553,23 +553,20 @@ static bleResult_t Las_RecordLampControl (uint16_t serviceHandle, uint8_t notify
     bleUuid_t* pUuid = (bleUuid_t*)&uuid_char_lamp_Control;
 
     
-    //if(mLas_SubscribedClientId != gInvalidDeviceId_c)
-    {
-      /* Get handle of Temperature characteristic */
-      result = GattDb_FindCharValueHandleInService(serviceHandle,
-          gBleUuidType128_c, pUuid, &handle);
+    /* Get handle of Temperature characteristic */
+    result = GattDb_FindCharValueHandleInService(serviceHandle,
+        gBleUuidType128_c, pUuid, &handle);
 
-      if (result != gBleSuccess_c)
-          return result;
-      
-      /* Update characteristic value */
-      result = GattDb_WriteAttribute(handle, sizeof(uint8_t), (uint8_t*)&lamp_NVdata.lampControl.raw8);
+    if (result != gBleSuccess_c)
+        return result;
+    
+    /* Update characteristic value */
+    result = GattDb_WriteAttribute(handle, sizeof(uint8_t), (uint8_t*)&lamp_NVdata.lampControl.raw8);
 
-      if (result != gBleSuccess_c)
-          return result;
+    if (result != gBleSuccess_c)
+        return result;
 
-      if (notify) Hls_LampNotification(handle);
-    }
+    if (notify) Hls_LampNotification(handle);
 
     return gBleSuccess_c;
 }
@@ -580,23 +577,22 @@ static bleResult_t Las_RecordLampWhite (uint16_t serviceHandle, uint8_t notify)
     bleResult_t result;
     bleUuid_t* pUuid = (bleUuid_t*)&uuid_char_lamp_White;
 
-    //if(mLas_SubscribedClientId != gInvalidDeviceId_c)
-    {
-      /* Get handle of Temperature characteristic */
-      result = GattDb_FindCharValueHandleInService(serviceHandle,
-          gBleUuidType128_c, pUuid, &handle);
+    
+    /* Get handle of Temperature characteristic */
+    result = GattDb_FindCharValueHandleInService(serviceHandle,
+        gBleUuidType128_c, pUuid, &handle);
 
-      if (result != gBleSuccess_c)
-          return result;
-      
-      /* Update characteristic value */
-      result = GattDb_WriteAttribute(handle, sizeof(uint16_t), (uint8_t*)&lamp_NVdata.lampWhite.raw16);
+    if (result != gBleSuccess_c)
+        return result;
+    
+    /* Update characteristic value */
+    result = GattDb_WriteAttribute(handle, sizeof(uint16_t), (uint8_t*)&lamp_NVdata.lampWhite.raw16);
 
-      if (result != gBleSuccess_c)
-          return result;
+    if (result != gBleSuccess_c)
+        return result;
 
-      if (notify) Hls_LampNotification(handle);
-    }
+    if (notify) Hls_LampNotification(handle);
+
 
     return gBleSuccess_c;
 }
@@ -607,23 +603,21 @@ static bleResult_t Las_RecordLampRGB (uint16_t serviceHandle, uint8_t notify)
     bleResult_t result;
     bleUuid_t* pUuid = (bleUuid_t*)&uuid_char_lamp_RGB;
 
-    //if(mLas_SubscribedClientId != gInvalidDeviceId_c)
-    {
-      /* Get handle of Temperature characteristic */
-      result = GattDb_FindCharValueHandleInService(serviceHandle,
-          gBleUuidType128_c, pUuid, &handle);
 
-      if (result != gBleSuccess_c)
-          return result;
-      
-      /* Update characteristic value - only first 3 bytes */
-      result = GattDb_WriteAttribute(handle, 3, (uint8_t*)&lamp_NVdata.lampRGB.raw32);
+    /* Get handle of Temperature characteristic */
+    result = GattDb_FindCharValueHandleInService(serviceHandle,
+        gBleUuidType128_c, pUuid, &handle);
 
-      if (result != gBleSuccess_c)
-          return result;
-      
-      if (notify) Hls_LampNotification(handle);
-    }
+    if (result != gBleSuccess_c)
+        return result;
+    
+    /* Update characteristic value - only first 3 bytes */
+    result = GattDb_WriteAttribute(handle, 3, (uint8_t*)&lamp_NVdata.lampRGB.raw32);
+
+    if (result != gBleSuccess_c)
+        return result;
+    
+    if (notify) Hls_LampNotification(handle);
 
     return gBleSuccess_c;
 }
@@ -631,7 +625,7 @@ static bleResult_t Las_RecordLampRGB (uint16_t serviceHandle, uint8_t notify)
 static bleResult_t Las_RecordOnTimer (uint16_t serviceHandle, uint8_t timerOnOff, uint32_t seconds)
 {
     uint16_t  handle;
-    bleResult_t result;
+    bleResult_t result = gBleSuccess_c;
     bleUuid_t* pUuid ;
 
     if(timerOnOff)
@@ -639,24 +633,18 @@ static bleResult_t Las_RecordOnTimer (uint16_t serviceHandle, uint8_t timerOnOff
     else
       pUuid = (bleUuid_t*)&uuid_char_lamp_off_sec;
     
-    //if(mLas_SubscribedClientId != gInvalidDeviceId_c)
-    {
-      /* Get handle of Temperature characteristic */
-      result = GattDb_FindCharValueHandleInService(serviceHandle,
-          gBleUuidType128_c, pUuid, &handle);
 
-      if (result != gBleSuccess_c)
-          return result;
-      
-      /* Update characteristic value */
-      result = GattDb_WriteAttribute(handle, sizeof(uint32_t), (uint8_t*)&seconds);
+    /* Get handle of Temperature characteristic */
+    result = GattDb_FindCharValueHandleInService(serviceHandle,
+        gBleUuidType128_c, pUuid, &handle);
 
-      if (result != gBleSuccess_c)
-          return result;
+    if (result != gBleSuccess_c)
+        return result;
+    
+    /* Update characteristic value */
+    result = GattDb_WriteAttribute(handle, sizeof(uint32_t), (uint8_t*)&seconds);
 
-    }
-
-    return gBleSuccess_c;
+    return result;
 }
 
 
@@ -695,7 +683,7 @@ static void OnTimerCallback(void * pParam)
     /* turn on lamp */
     control = lamp_NVdata.lampControl;
     control.bit.OnOff = 1;
-    Las_SetLampControl (mLas_serviceHandle, control, TRUE, FALSE);
+    Las_SetLampControl (mLas_serviceHandle, control, TRUE, lamp_cfg.fadeTimerOnTimeMs);
 }
 
 /*! *********************************************************************************
@@ -710,7 +698,7 @@ static void OffTimerCallback(void * pParam)
     /* turn off lamp and notify */
     control = lamp_NVdata.lampControl;
     control.bit.OnOff = 0;
-    Las_SetLampControl (mLas_serviceHandle, control, TRUE, FALSE);  
+    Las_SetLampControl (mLas_serviceHandle, control, TRUE, lamp_cfg.fadeTimerOffTimeMs);  
 }
 
 

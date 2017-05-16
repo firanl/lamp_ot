@@ -73,8 +73,10 @@ enum
     gCFG_TSI_Recalibrate_low_c,         /*!< uint8_t, Start a low recalibration - TSI not pressed */      
     gCFG_blinkTimeMs_c,                 /*!< uint16_t, On / off time period of a blink in mili seconds, default 300 ms  */
     gCFG_blinkCnt_c,                    /*!< uint8_t, How many blinks are performed, default 5  */
-    gCFG_fadeTimeMs_c,                  /*!< uint8_t, Fade refresh time, light increment, default 17 ms */    
-    gCFG_fadeTimeCritMs_c,              /*!< uint8_t, Fade refresh time, light increment for temperature shutdown, default 5 ms */
+    gCFG_fadeTimeMs_c,                  /*!< uint16_t, Fade refresh time, light increment, default 17 ms */    
+    gCFG_fadeTimeCritMs_c,              /*!< uint16_t, Fade refresh time, light increment for temperature shutdown, default 5 ms */
+    gCFG_fadeTimerOnTimeMs_c,           /*!< Fade on timer refresh time, light increment, default 30 ms */
+    gCFG_fadeTimerOffTimeMs_c,          /*!< Fade off timer refresh time, light decrement, default 20 ms */
     gCFG_SaveToFlash_c,                 /*!< uint8_t, Save all cfg and TSI to flash */   
     gCFG_ChipFailTemp_c,                /*!< uint16_t, core temperature at witch the sistem should disable all outputs, exponent -2  */  
     gCFG_last                           /* max value in config table list */

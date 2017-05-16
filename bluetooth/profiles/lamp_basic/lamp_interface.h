@@ -116,7 +116,7 @@ bleResult_t Las_Unsubscribe();
 
 bleResult_t Las_RecordMeasurementTV (uint16_t serviceHandle);
 
-bleResult_t Las_SetLampControl (uint16_t serviceHandle, lamp_control_t control, bool notify, uint8_t speedMs);
+bleResult_t Las_SetLampControl (uint16_t serviceHandle, lamp_control_t control, bool notify, uint16_t speedMs);
 
 bleResult_t Las_SetLampWhite (uint16_t serviceHandle, uint8_t warmW, uint8_t coldW, bool notify, bool showMax);
 

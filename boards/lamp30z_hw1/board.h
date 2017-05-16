@@ -44,8 +44,8 @@
 /* BLE Device Info service default data from gatt_db.h  */
 
   /* Software revision Major.Minor.Build */
-  #define DI_SoftwareRevisionString  "0.0.3"
-  /* build date 15 may 2017 */
+  #define DI_SoftwareRevisionString  "0.0.4"
+  /* build date 16 may 2017 */
 
 
   /* Hardware Revision 4 bytes Major byte, Minor byte, Revision byte, Variant byte */
@@ -197,6 +197,10 @@
     #define fadeTimeMs_d     17  
     /*!< Fade refresh time, light increment for temperature shutdown, default 5 ms */
     #define fadeTimeCritMs_d  5  
+    /*!< Fade on timer refresh time, light increment, default 30 ms */
+    #define fadeTimerOnTimeMs_d 30
+    /*!< Fade off timer refresh time, light decrement, default 20 ms */
+    #define fadeTimerOffTimeMs_d 20
     
     /*!< TSI btn low value at with the ramp is changed if fade dm - fade up, range 0 - 100, default 1 */
     #define LA_LAMP_TSI_LED_LOW   1
@@ -283,9 +287,10 @@ typedef struct lamp_NVdata_tag {
 typedef struct lamp_config_tag {
     uint16_t blinkTimeMs;       /*!< On / off time period of a blink in mili seconds, default 300 ms  */
     uint8_t  blinkCnt;          /*!< How many blinks are performed, default 5  */
-    uint8_t  fadeTimeMs;        /*!< Fade refresh time, light increment, default 17 ms */    
-    uint8_t fadeTimeCritMs;     /*!< Fade refresh time, light increment for temperature shutdown, default 5 ms */
-
+    uint16_t  fadeTimeMs;        /*!< Fade refresh time, light increment, default 17 ms */    
+    uint16_t  fadeTimeCritMs;     /*!< Fade refresh time, light increment for temperature shutdown, default 5 ms */
+    uint16_t  fadeTimerOnTimeMs;  /*!< Fade on timer refresh time, light increment, default 100 ms */
+    uint16_t  fadeTimerOffTimeMs; /*!< Fade off timer refresh time, light decrement, default 100 ms */
 } lamp_config_t;
 
 

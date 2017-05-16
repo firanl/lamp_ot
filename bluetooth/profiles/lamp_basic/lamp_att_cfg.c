@@ -283,26 +283,46 @@ bleResult_t Las_SetConfig (uint16_t serviceHandle, uint8_t cfg8, uint8_t  val8, 
             } else { return gBleOverflow_c; }  
         } break;    
                            
-      /* uint8_t, Fade refresh time, light increment, default 17 ms */
+      /* uint16_t, Fade refresh time, light increment, default 17 ms */
       case  gCFG_fadeTimeMs_c: 
         {
             /* check if value in limits */
-            if( (val8 > 4) && (val8 < 200) )
+            if( (val16 > 4) && (val16 < 200) )
             {
-              lamp_cfg.fadeTimeMs = val8;
+              lamp_cfg.fadeTimeMs = val16;
             } else { return gBleOverflow_c; }
         } break;      
                   
-      /* uint8_t, Fade refresh time, light increment for temperature shutdown, default 5 ms */
+      /* uint16_t, Fade refresh time, light increment for temperature shutdown, default 5 ms */
       case  gCFG_fadeTimeCritMs_c: 
         {
             /* check if value in limits */
-            if( (val8 > 1) && (val8 < 15) )
+            if( (val16 > 2) && (val16 < 15) )
             {
-              lamp_cfg.fadeTimeCritMs = val8;
+              lamp_cfg.fadeTimeCritMs = val16;
             } else { return gBleOverflow_c; }  
         } break;      
 
+      /* uint16_t, Fade on timer refresh time, light increment, default 30 ms */
+      case  gCFG_fadeTimerOnTimeMs_c: 
+        {
+            /* check if value in limits */
+            if( (val16 > 5) && (val16 < 10000) )
+            {
+              lamp_cfg.fadeTimerOnTimeMs = val16;
+            } else { return gBleOverflow_c; }  
+        } break;  
+
+      /* uint16_t, Fade off timer refresh time, light decrement, default 20 ms */
+      case  gCFG_fadeTimerOffTimeMs_c: 
+        {
+            /* check if value in limits */
+            if( (val16 > 5) && (val16 < 10000) )
+            {
+              lamp_cfg.fadeTimerOffTimeMs = val16;
+            } else { return gBleOverflow_c; }  
+        } break;        
+        
       /* uint16_t, core temperature at witch the sistem should disable all outputs, exponent -2  */
       case gCFG_ChipFailTemp_c: 
         {
@@ -378,11 +398,9 @@ static bleResult_t Las_GetParamToBeRead(uint16_t serviceHandle, uint8_t paramID)
      case gCFG_TSI_InitIdleHitIdleCnt_c: 
        { return Las_RecordValueToBeRead (serviceHandle, sizeof(uint8_t),
                                          (uint8_t*) &tsi.InitIdleHitIdleCnt); } break;
-
      case gCFG_TSI_Recalibrate_low_c:    
        { return Las_RecordValueToBeRead (serviceHandle, sizeof(uint8_t),
-                                         (uint8_t*) &paramID);                } break;              
-     
+                                         (uint8_t*) &paramID);                } break;                 
      case gCFG_blinkTimeMs_c:            
        { return Las_RecordValueToBeRead (serviceHandle, sizeof(uint16_t),
                                          (uint8_t*) &lamp_cfg.blinkTimeMs);    } break;
@@ -390,12 +408,17 @@ static bleResult_t Las_GetParamToBeRead(uint16_t serviceHandle, uint8_t paramID)
        { return Las_RecordValueToBeRead (serviceHandle, sizeof(uint8_t),
                                          (uint8_t*) &lamp_cfg.blinkCnt);       } break;
      case gCFG_fadeTimeMs_c:             
-       { return Las_RecordValueToBeRead (serviceHandle, sizeof(uint8_t),
+       { return Las_RecordValueToBeRead (serviceHandle, sizeof(uint16_t),
                                          (uint8_t*) &lamp_cfg.fadeTimeMs);     } break;
      case gCFG_fadeTimeCritMs_c:         
-       { return Las_RecordValueToBeRead (serviceHandle, sizeof(uint8_t),
+       { return Las_RecordValueToBeRead (serviceHandle, sizeof(uint16_t),
                                          (uint8_t*) &lamp_cfg.fadeTimeCritMs); } break;
-     
+     case gCFG_fadeTimerOnTimeMs_c:         
+       { return Las_RecordValueToBeRead (serviceHandle, sizeof(uint16_t),
+                                         (uint8_t*) &lamp_cfg.fadeTimerOnTimeMs); } break;
+     case gCFG_fadeTimerOffTimeMs_c:         
+       { return Las_RecordValueToBeRead (serviceHandle, sizeof(uint16_t),
+                                         (uint8_t*) &lamp_cfg.fadeTimerOffTimeMs); } break;         
      case gCFG_ChipFailTemp_c:           
        { return Las_RecordValueToBeRead (serviceHandle, sizeof(uint16_t),
                                          (uint8_t*) &gCoreTemperatureFaliure); } break;
