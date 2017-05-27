@@ -99,7 +99,7 @@ static void Hls_LampNotification(uint16_t handle);
 static bleResult_t  Las_RecordLampControl (uint16_t serviceHandle, uint8_t notify);
 static bleResult_t  Las_RecordLampWhite   (uint16_t serviceHandle, uint8_t notify);
 static bleResult_t  Las_RecordLampRGB     (uint16_t serviceHandle, uint8_t notify);
-static bleResult_t  Las_RecordOnTimer     (uint16_t serviceHandle, uint8_t timerOnOff, uint32_t seconds);
+static bleResult_t  Las_RecordTimer       (uint16_t serviceHandle, uint8_t timerOnOff, uint32_t seconds);
 
 static void FadeTimerCallback(void* pParam);
 static void BlinkTimerCallback(void * pParam);
@@ -162,7 +162,12 @@ bleResult_t Las_Subscribe(deviceId_t deviceId)
         control.bit.OnOff = 1;
         Las_SetLampControl (mLas_serviceHandle, control, TRUE, lamp_cfg.fadeTimeMs);
       }
-    }   
+    } 
+    
+    /* refresh on timer data in gat DB */
+    Las_GetOnTimer(mLas_serviceHandle);
+    /* refresh off timer data in gat DB */
+    Las_GetOffTimer(mLas_serviceHandle);
 
     return gBleSuccess_c;
 }
@@ -489,7 +494,7 @@ bleResult_t Las_SetOnTimer(uint16_t serviceHandle, uint8_t* pSeconds)
       tmrerr = TMR_StopTimer(tmrOn_secondsId);
     }
     
-    Las_RecordOnTimer(serviceHandle, 1, seconds);
+    Las_RecordTimer(serviceHandle, timerOn_d, seconds);
     
     return gBleSuccess_c;
 }
@@ -503,7 +508,7 @@ bleResult_t Las_GetOnTimer(uint16_t serviceHandle)
     {
       seconds = TMR_GetRemainingTime(tmrOn_secondsId)  / 1000;
     }
-    Las_RecordOnTimer(serviceHandle, 1, seconds);
+    Las_RecordTimer(serviceHandle, timerOn_d, seconds);
     
     return gBleSuccess_c;
 }
@@ -524,7 +529,7 @@ bleResult_t Las_SetOffTimer(uint16_t serviceHandle, uint8_t* pSeconds)
        tmrerr = TMR_StopTimer(tmrOff_secondsId);
     }
 
-    Las_RecordOnTimer(serviceHandle, 0, seconds);
+    Las_RecordTimer(serviceHandle, timerOff_d, seconds);
     
     return gBleSuccess_c;
 }
@@ -538,7 +543,7 @@ bleResult_t Las_GetOffTimer(uint16_t serviceHandle)
     {
       seconds = TMR_GetRemainingTime(tmrOff_secondsId) / 1000;
     }
-    Las_RecordOnTimer(serviceHandle, 0, seconds);
+    Las_RecordTimer(serviceHandle, timerOff_d, seconds);
     
     return gBleSuccess_c;
 }             
@@ -623,13 +628,13 @@ static bleResult_t Las_RecordLampRGB (uint16_t serviceHandle, uint8_t notify)
     return gBleSuccess_c;
 }
 
-static bleResult_t Las_RecordOnTimer (uint16_t serviceHandle, uint8_t timerOnOff, uint32_t seconds)
+static bleResult_t Las_RecordTimer (uint16_t serviceHandle, uint8_t timerOnOff, uint32_t seconds)
 {
     uint16_t  handle;
     bleResult_t result = gBleSuccess_c;
     bleUuid_t* pUuid ;
 
-    if(timerOnOff)
+    if(timerOnOff == timerOn_d)
       pUuid = (bleUuid_t*)&uuid_char_lamp_on_sec;
     else
       pUuid = (bleUuid_t*)&uuid_char_lamp_off_sec;
@@ -644,6 +649,8 @@ static bleResult_t Las_RecordOnTimer (uint16_t serviceHandle, uint8_t timerOnOff
     
     /* Update characteristic value */
     result = GattDb_WriteAttribute(handle, sizeof(uint32_t), (uint8_t*)&seconds);
+    
+    Hls_LampNotification(handle);
 
     return result;
 }
@@ -679,12 +686,13 @@ static void OnTimerCallback(void * pParam)
 {
     lamp_control_t control;
     
-    /*  lamp was set before */
-
     /* turn on lamp */
     control = lamp_NVdata.lampControl;
     control.bit.OnOff = 1;
     Las_SetLampControl (mLas_serviceHandle, control, TRUE, lamp_cfg.fadeTimerOnTimeMs);
+    
+    /* update on timer gatt database with value 0 */
+    Las_RecordTimer (mLas_serviceHandle, timerOn_d, 0);
 }
 
 /*! *********************************************************************************
@@ -699,7 +707,10 @@ static void OffTimerCallback(void * pParam)
     /* turn off lamp and notify */
     control = lamp_NVdata.lampControl;
     control.bit.OnOff = 0;
-    Las_SetLampControl (mLas_serviceHandle, control, TRUE, lamp_cfg.fadeTimerOffTimeMs);  
+    Las_SetLampControl (mLas_serviceHandle, control, TRUE, lamp_cfg.fadeTimerOffTimeMs); 
+    
+    /* update on timer gatt database with value 0 */
+    Las_RecordTimer (mLas_serviceHandle, timerOff_d, 0);
 }
 
 
