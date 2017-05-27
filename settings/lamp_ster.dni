@@ -21,7 +21,7 @@ TraceBufferSize=0x00010000
 TraceStallIfFIFOFull=0x00000000
 TracePortSize=0x00000000
 [DebugChecksum]
-Checksum=1939645378
+Checksum=-1406141758
 [CodeCoverage]
 Enabled=_ 0
 [Exceptions]
@@ -57,7 +57,8 @@ ShowTiming=1
 mode=0
 [Breakpoints2]
 Bp0=_ 0 "EMUL_CODE" "{$PROJ_DIR$\bluetooth\profiles\device_info\device_info_service.c}.113.5" 0 0 1 "" 0 "" 0
-Count=1
+Bp1=_ 0 "EMUL_CODE" "{$PROJ_DIR$\lamp\bluetooth\addons\tsi_sensor\tsi_sensor.c}.171.3" 0 0 1 "" 0 "" 0
+Count=2
 [Aliases]
 Count=0
 SuppressDialog=0

@@ -82,11 +82,11 @@ static bool FadeOnMutex;
 
 /* timers 3 */
   /* Fade in out lamp control */
-  static tmrTimerID_t tmrFadeId;
+  extern tmrTimerID_t tmrFadeId;
   /* Set on lamp timer */
-  static tmrTimerID_t tmrOn_secondsId;
+  extern  tmrTimerID_t tmrOn_secondsId;
   /* Set off lamp timer */
-  static tmrTimerID_t tmrOff_secondsId;
+  extern tmrTimerID_t tmrOff_secondsId;
 
 static lamp_NVdata_t temp_lamp_NVdata; 
 
@@ -132,8 +132,8 @@ bleResult_t Las_Start (lasConfig_t *pServiceConfig)
     result = Las_SetLampRGB     (pServiceConfig->serviceHandle, LA_LAMP_R, LA_LAMP_G, LA_LAMP_B, FALSE);
     control.raw8 = LA_LAMP_CONTROL;
     result = Las_SetLampControl (pServiceConfig->serviceHandle, control, FALSE, lamp_cfg.fadeTimeMs);
-    
-    
+      
+      
     mLas_serviceHandle = pServiceConfig->serviceHandle;
     
     return result;
@@ -234,6 +234,7 @@ bleResult_t Las_RecordMeasurementTV (uint16_t serviceHandle)
 bleResult_t Las_SetLampControl (uint16_t serviceHandle, lamp_control_t control, bool notify, uint16_t speedMs)
 {
   bleResult_t result = gBleSuccess_c;
+  bool startFade = false;
 
 
   /* check if reset */
@@ -278,9 +279,7 @@ bleResult_t Las_SetLampControl (uint16_t serviceHandle, lamp_control_t control, 
         }
           
       /* start fade timer - turn off */
-      FadeOnMutex=true;
-      tmrFadeId  = TMR_AllocateTimer();
-      TMR_StartTimer(tmrFadeId, gTmrIntervalTimer_c, TmrMilliseconds(speedMs), FadeTimerCallback, NULL);   
+      startFade = true;  
     } else 
     {
         
@@ -307,9 +306,7 @@ bleResult_t Las_SetLampControl (uint16_t serviceHandle, lamp_control_t control, 
         }      
         
         /* start fade timer - turn on*/
-        FadeOnMutex=true;
-        tmrFadeId  = TMR_AllocateTimer();
-        TMR_StartTimer(tmrFadeId, gTmrIntervalTimer_c, TmrMilliseconds(speedMs), FadeTimerCallback, NULL);  
+        startFade = true; 
       } else
       {
          
@@ -356,15 +353,16 @@ bleResult_t Las_SetLampControl (uint16_t serviceHandle, lamp_control_t control, 
         } 
 
         /* start fade timer - change state*/
-        FadeOnMutex=true;
-        tmrFadeId  = TMR_AllocateTimer();
-        TMR_StartTimer(tmrFadeId, gTmrIntervalTimer_c, TmrMilliseconds(speedMs), FadeTimerCallback, NULL);         
-        
+        startFade = true;             
       }
     
     }
     
-    
+    if(startFade)
+    {
+      FadeOnMutex=true;
+      TMR_StartTimer(tmrFadeId, gTmrIntervalTimer_c, TmrMilliseconds(speedMs), FadeTimerCallback, NULL);     
+    }
     /* update DB */
     result = Las_RecordLampControl(serviceHandle, notify);
   }
@@ -414,7 +412,6 @@ bleResult_t Las_SetLampWhite (uint16_t serviceHandle, uint8_t warmW, uint8_t col
     {
       /* start fade timer - blink */
       FadeOnMutex=true;
-      tmrFadeId  = TMR_AllocateTimer();
       temp_lamp_NVdata.lampControl.raw8 = lamp_cfg.blinkCnt;
       TMR_StartTimer(tmrFadeId, gTmrIntervalTimer_c, TmrMilliseconds(lamp_cfg.blinkTimeMs), BlinkTimerCallback, NULL); 
     } // end showMax
@@ -485,12 +482,11 @@ bleResult_t Las_SetOnTimer(uint16_t serviceHandle, uint8_t* pSeconds)
     
     if(seconds>0)
     {
-      tmrOn_secondsId  = TMR_AllocateTimer();
       tmrerr = TMR_StartSingleShotTimer(tmrOn_secondsId, TmrSeconds(seconds), OnTimerCallback, NULL);
     }
     else
     {
-      tmrerr = TMR_FreeTimer(tmrOn_secondsId);
+      tmrerr = TMR_StopTimer(tmrOn_secondsId);
     }
     
     Las_RecordOnTimer(serviceHandle, 1, seconds);
@@ -501,9 +497,12 @@ bleResult_t Las_SetOnTimer(uint16_t serviceHandle, uint8_t* pSeconds)
 /* get remaining time of on timer and update record */
 bleResult_t Las_GetOnTimer(uint16_t serviceHandle)
 {
-    uint32_t seconds=0;
+    uint32_t seconds = 0;
     
-    seconds = TMR_GetRemainingTime(tmrOn_secondsId)  / 1000;
+    if( TMR_IsTimerActive(tmrOn_secondsId) )
+    {
+      seconds = TMR_GetRemainingTime(tmrOn_secondsId)  / 1000;
+    }
     Las_RecordOnTimer(serviceHandle, 1, seconds);
     
     return gBleSuccess_c;
@@ -518,12 +517,11 @@ bleResult_t Las_SetOffTimer(uint16_t serviceHandle, uint8_t* pSeconds)
     
     if(seconds>0)
     {
-      tmrOff_secondsId  = TMR_AllocateTimer();
       tmrerr = TMR_StartSingleShotTimer(tmrOff_secondsId, TmrSeconds(seconds), OffTimerCallback, NULL);
     }
     else
     {
-       tmrerr = TMR_FreeTimer(tmrOff_secondsId);
+       tmrerr = TMR_StopTimer(tmrOff_secondsId);
     }
 
     Las_RecordOnTimer(serviceHandle, 0, seconds);
@@ -534,9 +532,12 @@ bleResult_t Las_SetOffTimer(uint16_t serviceHandle, uint8_t* pSeconds)
 /* get remaining time of off timer and update record */
 bleResult_t Las_GetOffTimer(uint16_t serviceHandle)
 {
-    uint32_t seconds=0;
+    uint32_t seconds = 0;
     
-    seconds = TMR_GetRemainingTime(tmrOff_secondsId) / 1000;
+    if( TMR_IsTimerActive(tmrOff_secondsId) )
+    {
+      seconds = TMR_GetRemainingTime(tmrOff_secondsId) / 1000;
+    }
     Las_RecordOnTimer(serviceHandle, 0, seconds);
     
     return gBleSuccess_c;
@@ -841,7 +842,7 @@ static void FadeTimerCallback(void * pParam)
        FadeOnMutex=false;
        temp_lamp_NVdata.lampRGB.raw32 = 0;
        temp_lamp_NVdata.lampWhite.raw16 = 0;
-       TMR_FreeTimer(tmrFadeId);
+       TMR_StopTimer(tmrFadeId);
      }
   
 }
@@ -859,7 +860,7 @@ static void BlinkTimerCallback(void * pParam)
         FadeOnMutex=false;
         TPM_PWM_WarmWhite( lamp_NVdata.lampWhite.uint8.warmW );
         TPM_PWM_ColdWhite( lamp_NVdata.lampWhite.uint8.coldW ); 
-        TMR_FreeTimer(tmrFadeId);
+        TMR_StopTimer(tmrFadeId);
     } else 
     {
       if( temp_lamp_NVdata.lampControl.raw8 % 2 )

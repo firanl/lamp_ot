@@ -69,7 +69,7 @@ tsi_sensor_callback_t userCallbackFunction;
   #define BOARD_TSI_BTN_CHANNEL               15u
 
 /* Touch Sensing sensor timer  */
-tmrTimerID_t tmrTsiId;  
+extern tmrTimerID_t tmrTsiId;  
 
 static uint8_t tsi_event;
 
@@ -166,8 +166,6 @@ void TSI_Init ()
 
   /* Calibrate all electrode channels */
   result = TsiCalibrate();
-  
-  tmrTsiId = TMR_AllocateTimer(); /* TSI */
   
   /* Start TSI timer for capacitive touch BTN */     
   tmrerr = TMR_StartTimer(tmrTsiId, gTmrIntervalTimer_c, tsi.tmr, TsiTimerCallback, NULL);  

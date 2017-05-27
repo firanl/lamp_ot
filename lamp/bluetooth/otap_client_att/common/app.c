@@ -163,8 +163,16 @@ static advState_t  mAdvState;
 
 /* Timers */
   /* Temperature voltage timer  */
-  static tmrTimerID_t tmrMeasurementTimerId;
-  static tmrTimerID_t tmrAdvStartTimerId;
+  tmrTimerID_t tmrMeasurementTimerId;
+  //static tmrTimerID_t tmrAdvStartTimerId;
+  /* Fade in out lamp control */
+  tmrTimerID_t tmrFadeId;
+  /* Set on lamp timer */
+  tmrTimerID_t tmrOn_secondsId;
+  /* Set off lamp timer */
+  tmrTimerID_t tmrOff_secondsId;  
+  /* Touch Sensing sensor timer  */
+  tmrTimerID_t tmrTsiId; 
 
 
 static deviceId_t  mPeerDeviceId = gInvalidDeviceId_c;
@@ -293,16 +301,22 @@ void BleApp_Init(void)
      
     /* Initialize application support for drivers */          
      
-    /* Initialize TSI sensor */
-    TSI_Init();
+
     
     /* init PWM TPM driver */
     TPM_PWM_Init();   
     
     /* Init timers */    
     tmrMeasurementTimerId = TMR_AllocateTimer(); /* T+V */
-    tmrAdvStartTimerId    = TMR_AllocateTimer();
-      
+    //tmrAdvStartTimerId    = TMR_AllocateTimer();
+    tmrTsiId              = TMR_AllocateTimer(); /* TSI */
+    tmrFadeId             = TMR_AllocateTimer();
+    tmrOff_secondsId      = TMR_AllocateTimer();
+    tmrOn_secondsId       = TMR_AllocateTimer();
+
+    /* Initialize TSI sensor */
+    TSI_Init();      
+    
    /* start timers */  
     /* Start 5 second measurements voltage and temperature */
     tmrerr = TMR_StartTimer(tmrMeasurementTimerId, gTmrIntervalTimer_c, TmrSeconds(5), MeasurementTimerCallback, NULL);
@@ -315,7 +329,7 @@ void BleApp_Init(void)
 * \brief    Starts the BLE application.
 *
 ********************************************************************************** */
-void BleApp_Start(void* pParam)
+void BleApp_Start(void)
 {
     
     if (mPeerDeviceId == gInvalidDeviceId_c)
@@ -662,7 +676,8 @@ static void BleApp_Config()
     
  
     // start advertising
-    tmrerr =  TMR_StartSingleShotTimer(tmrAdvStartTimerId, TmrSeconds(3), BleApp_Start, NULL);
+    //tmrerr =  TMR_StartSingleShotTimer(tmrAdvStartTimerId, TmrSeconds(3), BleApp_Start, NULL);
+    BleApp_Start();
 }
 
 /*! *********************************************************************************
@@ -758,7 +773,8 @@ static void BleApp_ConnectionCallback (deviceId_t peerDeviceId, gapConnectionEve
             OtapClient_HandleDisconnectionEvent (peerDeviceId);
             
             /* Restart advertising*/
-            TMR_StartSingleShotTimer(tmrAdvStartTimerId, TmrSeconds(3), BleApp_Start, NULL);
+            BleApp_Start();
+            //TMR_StartSingleShotTimer(tmrAdvStartTimerId, TmrSeconds(3), BleApp_Start, NULL);
         }
         break;
 
