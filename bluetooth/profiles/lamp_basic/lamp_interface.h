@@ -125,15 +125,19 @@ bleResult_t Las_SetLampWhite (uint16_t serviceHandle, uint8_t warmW, uint8_t col
 
 bleResult_t Las_SetLampRGB (uint16_t serviceHandle, uint8_t red, uint8_t green, uint8_t blue, bool notify);
 
-bleResult_t Las_SetOnTimer  (uint16_t serviceHandle, uint8_t* pSeconds);
+/* timers On and Off */
+
+/* set On timer and start */
+bleResult_t Las_SetOnTimer(uint16_t serviceHandle, uint8_t* pSeconds);
 
 /* get remaining time of on timer and update record */
-bleResult_t Las_GetOnTimer(uint16_t serviceHandle);
+bleResult_t Las_GetOnTimer(uint16_t serviceHandle, bool notify);
 
-bleResult_t Las_SetOffTimer (uint16_t serviceHandle, uint8_t* pSeconds);
+/* set Off timer and start */
+bleResult_t Las_SetOffTimer(uint16_t serviceHandle, uint8_t* pSeconds);
 
 /* get remaining time of off timer and update record */
-bleResult_t Las_GetOffTimer(uint16_t serviceHandle);
+bleResult_t Las_GetOffTimer(uint16_t serviceHandle, bool notify);
 
 
 #ifdef __cplusplus

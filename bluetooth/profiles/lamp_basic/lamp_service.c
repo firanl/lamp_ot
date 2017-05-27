@@ -96,10 +96,10 @@ static lamp_NVdata_t temp_lamp_NVdata;
 static void Hls_LampNotification(uint16_t handle);
 
 
-static bleResult_t  Las_RecordLampControl (uint16_t serviceHandle, uint8_t notify);
-static bleResult_t  Las_RecordLampWhite   (uint16_t serviceHandle, uint8_t notify);
-static bleResult_t  Las_RecordLampRGB     (uint16_t serviceHandle, uint8_t notify);
-static bleResult_t  Las_RecordTimer       (uint16_t serviceHandle, uint8_t timerOnOff, uint32_t seconds);
+static bleResult_t  Las_RecordLampControl (uint16_t serviceHandle, bool notify);
+static bleResult_t  Las_RecordLampWhite   (uint16_t serviceHandle, bool notify);
+static bleResult_t  Las_RecordLampRGB     (uint16_t serviceHandle, bool notify);
+static bleResult_t  Las_RecordTimer       (uint16_t serviceHandle, uint8_t timerOnOff, bool notify, uint32_t seconds);
 
 static void FadeTimerCallback(void* pParam);
 static void BlinkTimerCallback(void * pParam);
@@ -165,9 +165,9 @@ bleResult_t Las_Subscribe(deviceId_t deviceId)
     } 
     
     /* refresh on timer data in gat DB */
-    Las_GetOnTimer(mLas_serviceHandle);
+    Las_GetOnTimer(mLas_serviceHandle, false);
     /* refresh off timer data in gat DB */
-    Las_GetOffTimer(mLas_serviceHandle);
+    Las_GetOffTimer(mLas_serviceHandle, false);
 
     return gBleSuccess_c;
 }
@@ -379,7 +379,7 @@ bleResult_t Las_SetLampControl (uint16_t serviceHandle, lamp_control_t control, 
 bleResult_t Las_SetLampWhite (uint16_t serviceHandle, uint8_t warmW, uint8_t coldW, bool notify, bool showMax)
 {
   bleResult_t result = gBleSuccess_c;
-  uint8_t upd_db = 0;
+  bool upd_db = false;
  
   /* if fade timer is on do not enter control */ 
   if(FadeOnMutex) { return gBleUnavailable_c; }
@@ -389,7 +389,7 @@ bleResult_t Las_SetLampWhite (uint16_t serviceHandle, uint8_t warmW, uint8_t col
     
   if (warmW != lamp_NVdata.lampWhite.uint8.warmW)
   {
-    upd_db = 1;
+    upd_db = true;
     lamp_NVdata.lampWhite.uint8.warmW = warmW;
     if (lamp_NVdata.lampControl.bit.OnOff && lamp_NVdata.lampControl.bit.White)
     {
@@ -399,7 +399,7 @@ bleResult_t Las_SetLampWhite (uint16_t serviceHandle, uint8_t warmW, uint8_t col
   
   if (coldW != lamp_NVdata.lampWhite.uint8.coldW)
   {
-    upd_db = 1;
+    upd_db = true;
     lamp_NVdata.lampWhite.uint8.coldW = coldW;
     if (lamp_NVdata.lampControl.bit.OnOff && lamp_NVdata.lampControl.bit.White)
     {
@@ -430,7 +430,7 @@ bleResult_t Las_SetLampWhite (uint16_t serviceHandle, uint8_t warmW, uint8_t col
 bleResult_t Las_SetLampRGB (uint16_t serviceHandle, uint8_t red, uint8_t green, uint8_t blue, bool notify)
 {
   bleResult_t result = gBleSuccess_c;
-  uint8_t upd_db = 0;
+  bool upd_db = false;
 
   /* if fade timer is on do not enter control */ 
   if(FadeOnMutex) { return gBleUnavailable_c; }  
@@ -440,7 +440,7 @@ bleResult_t Las_SetLampRGB (uint16_t serviceHandle, uint8_t red, uint8_t green, 
   
   if (red != lamp_NVdata.lampRGB.uint8.r)
   {
-    upd_db = 1;
+    upd_db = true;
     lamp_NVdata.lampRGB.uint8.r = red;
     if (lamp_NVdata.lampControl.bit.OnOff && lamp_NVdata.lampControl.bit.Color)
     {
@@ -450,7 +450,7 @@ bleResult_t Las_SetLampRGB (uint16_t serviceHandle, uint8_t red, uint8_t green, 
   
   if (green != lamp_NVdata.lampRGB.uint8.g)
   {
-    upd_db = 1;
+    upd_db = true;
     lamp_NVdata.lampRGB.uint8.g = green;
     if (lamp_NVdata.lampControl.bit.OnOff && lamp_NVdata.lampControl.bit.Color)
     {
@@ -460,7 +460,7 @@ bleResult_t Las_SetLampRGB (uint16_t serviceHandle, uint8_t red, uint8_t green, 
 
   if (blue != lamp_NVdata.lampRGB.uint8.b)
   {
-    upd_db = 1;
+    upd_db = true;
     lamp_NVdata.lampRGB.uint8.b = blue;
     if (lamp_NVdata.lampControl.bit.OnOff && lamp_NVdata.lampControl.bit.Color)
     {
@@ -494,13 +494,13 @@ bleResult_t Las_SetOnTimer(uint16_t serviceHandle, uint8_t* pSeconds)
       tmrerr = TMR_StopTimer(tmrOn_secondsId);
     }
     
-    Las_RecordTimer(serviceHandle, timerOn_d, seconds);
+    Las_RecordTimer(serviceHandle, timerOn_d, false, seconds);
     
     return gBleSuccess_c;
 }
 
 /* get remaining time of on timer and update record */
-bleResult_t Las_GetOnTimer(uint16_t serviceHandle)
+bleResult_t Las_GetOnTimer(uint16_t serviceHandle, bool notify)
 {
     uint32_t seconds = 0;
     
@@ -508,7 +508,7 @@ bleResult_t Las_GetOnTimer(uint16_t serviceHandle)
     {
       seconds = TMR_GetRemainingTime(tmrOn_secondsId)  / 1000;
     }
-    Las_RecordTimer(serviceHandle, timerOn_d, seconds);
+    Las_RecordTimer(serviceHandle, timerOn_d, notify, seconds);
     
     return gBleSuccess_c;
 }
@@ -529,13 +529,13 @@ bleResult_t Las_SetOffTimer(uint16_t serviceHandle, uint8_t* pSeconds)
        tmrerr = TMR_StopTimer(tmrOff_secondsId);
     }
 
-    Las_RecordTimer(serviceHandle, timerOff_d, seconds);
+    Las_RecordTimer(serviceHandle, timerOff_d, false, seconds);
     
     return gBleSuccess_c;
 }
              
 /* get remaining time of off timer and update record */
-bleResult_t Las_GetOffTimer(uint16_t serviceHandle)
+bleResult_t Las_GetOffTimer(uint16_t serviceHandle, bool notify)
 {
     uint32_t seconds = 0;
     
@@ -543,7 +543,7 @@ bleResult_t Las_GetOffTimer(uint16_t serviceHandle)
     {
       seconds = TMR_GetRemainingTime(tmrOff_secondsId) / 1000;
     }
-    Las_RecordTimer(serviceHandle, timerOff_d, seconds);
+    Las_RecordTimer(serviceHandle, timerOff_d, notify, seconds);
     
     return gBleSuccess_c;
 }             
@@ -552,7 +552,7 @@ bleResult_t Las_GetOffTimer(uint16_t serviceHandle)
 * Private functions
 ************************************************************************************/
 
-static bleResult_t Las_RecordLampControl (uint16_t serviceHandle, uint8_t notify)
+static bleResult_t Las_RecordLampControl (uint16_t serviceHandle, bool notify)
 {
     uint16_t  handle;
     bleResult_t result;
@@ -577,7 +577,7 @@ static bleResult_t Las_RecordLampControl (uint16_t serviceHandle, uint8_t notify
     return gBleSuccess_c;
 }
 
-static bleResult_t Las_RecordLampWhite (uint16_t serviceHandle, uint8_t notify)
+static bleResult_t Las_RecordLampWhite (uint16_t serviceHandle, bool notify)
 {
     uint16_t  handle;
     bleResult_t result;
@@ -603,7 +603,7 @@ static bleResult_t Las_RecordLampWhite (uint16_t serviceHandle, uint8_t notify)
     return gBleSuccess_c;
 }
 
-static bleResult_t Las_RecordLampRGB (uint16_t serviceHandle, uint8_t notify)
+static bleResult_t Las_RecordLampRGB (uint16_t serviceHandle, bool notify)
 {
     uint16_t  handle;
     bleResult_t result;
@@ -628,7 +628,7 @@ static bleResult_t Las_RecordLampRGB (uint16_t serviceHandle, uint8_t notify)
     return gBleSuccess_c;
 }
 
-static bleResult_t Las_RecordTimer (uint16_t serviceHandle, uint8_t timerOnOff, uint32_t seconds)
+static bleResult_t Las_RecordTimer (uint16_t serviceHandle, uint8_t timerOnOff, bool notify, uint32_t seconds)
 {
     uint16_t  handle;
     bleResult_t result = gBleSuccess_c;
@@ -650,7 +650,7 @@ static bleResult_t Las_RecordTimer (uint16_t serviceHandle, uint8_t timerOnOff, 
     /* Update characteristic value */
     result = GattDb_WriteAttribute(handle, sizeof(uint32_t), (uint8_t*)&seconds);
     
-    Hls_LampNotification(handle);
+    if(notify) Hls_LampNotification(handle);
 
     return result;
 }
@@ -692,7 +692,7 @@ static void OnTimerCallback(void * pParam)
     Las_SetLampControl (mLas_serviceHandle, control, TRUE, lamp_cfg.fadeTimerOnTimeMs);
     
     /* update on timer gatt database with value 0 */
-    Las_RecordTimer (mLas_serviceHandle, timerOn_d, 0);
+    Las_RecordTimer (mLas_serviceHandle, timerOn_d, true, 0);
 }
 
 /*! *********************************************************************************
@@ -710,7 +710,7 @@ static void OffTimerCallback(void * pParam)
     Las_SetLampControl (mLas_serviceHandle, control, TRUE, lamp_cfg.fadeTimerOffTimeMs); 
     
     /* update on timer gatt database with value 0 */
-    Las_RecordTimer (mLas_serviceHandle, timerOff_d, 0);
+    Las_RecordTimer (mLas_serviceHandle, timerOff_d, true, 0);
 }
 
 

@@ -950,11 +950,11 @@ static void BleApp_CccdWritten (deviceId_t deviceId, uint16_t handle, gattCccdFl
     }
     else if (handle == cccd_lamp_on_sec)
     {
-      Las_GetOnTimer(lasServiceConfig.serviceHandle);
+      Las_GetOnTimer(lasServiceConfig.serviceHandle, false);
     }
     else if (handle == cccd_lamp_off_sec)
     {
-       Las_GetOffTimer(lasServiceConfig.serviceHandle);    
+       Las_GetOffTimer(lasServiceConfig.serviceHandle, false);    
     }     
 }
 
